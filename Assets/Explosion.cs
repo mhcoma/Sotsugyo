@@ -55,7 +55,6 @@ public class Explosion : MonoBehaviour
 					float dist = (2.0f - (Vector3.Distance(other.transform.position, transform.position) / damage_range));
 					float final_damage = dist * damage;
 					other.transform.gameObject.GetComponent<SpriteObject>().get_damage(final_damage);
-					Debug.Log(other.transform.gameObject.GetComponent<SpriteObject>().health);
 				}
 			}
 		}
