@@ -38,6 +38,10 @@ public class Player : MonoBehaviour {
 
 	float weapons_range = 100.0f;
 	Sprite[] weapon_hud_sprites;
+
+
+	public Transform canvas_transform;
+	WeaponHUDSprite weapon_hud_sprite_manager;
 	
 	ParticleSystem spark;
 
@@ -70,6 +74,8 @@ public class Player : MonoBehaviour {
 		weapon_hud_sprites = Resources.LoadAll<Sprite>("Sprites/Weapons");
 
 		raycast_mask = ~(1 << LayerMask.NameToLayer("ProjectileSprite"));
+
+		weapon_hud_sprite_manager = canvas_transform.GetChild(0).GetComponent<WeaponHUDSprite>();
 	}
 
 	void Update() {
@@ -122,35 +128,38 @@ public class Player : MonoBehaviour {
 	}
 
 	void weapon_control() {
-		if (Input.GetKeyDown(KeyCode.Alpha1)) {
+		if (Input.GetKeyDown(KeyCode.Alpha1) && weapon_index != Weapon_index.lasergun) {
 			is_shooting = false;
 			toggle_laser(false);
 			weapon_index = Weapon_index.lasergun;
+			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[0]);
 		}
-		if (Input.GetKeyDown(KeyCode.Alpha2)) {
+		if (Input.GetKeyDown(KeyCode.Alpha2) && weapon_index != Weapon_index.rocketlauncher) {
 			is_shooting = false;
 			toggle_laser(false);
 			weapon_index = Weapon_index.rocketlauncher;
+			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[1]);
 		}
 
-
-		if (Input.GetMouseButtonDown(0)) {
-			switch (weapon_index) {
-				case Weapon_index.lasergun:
-					toggle_laser(true);
-					is_shooting = true;
-					break;
-				case Weapon_index.rocketlauncher:
-					is_shooting = true;
-					break;
+		if (!weapon_hud_sprite_manager.is_changing_weapon()) {
+			if (Input.GetMouseButtonDown(0)) {
+				switch (weapon_index) {
+					case Weapon_index.lasergun:
+						toggle_laser(true);
+						is_shooting = true;
+						break;
+					case Weapon_index.rocketlauncher:
+						is_shooting = true;
+						break;
+				}
 			}
-		}
-		if (Input.GetMouseButtonUp(0)) {
-			switch (weapon_index) {
-				case Weapon_index.lasergun:
-					toggle_laser(false);
-					is_shooting = false;
-					break;
+			if (Input.GetMouseButtonUp(0)) {
+				switch (weapon_index) {
+					case Weapon_index.lasergun:
+						toggle_laser(false);
+						is_shooting = false;
+						break;
+				}
 			}
 		}
 

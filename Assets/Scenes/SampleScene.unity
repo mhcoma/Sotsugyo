@@ -259,6 +259,7 @@ MonoBehaviour:
   - Sprites/Gas
   sprite_side_count: 1
   anim: 0
+  health: 100
   explosion: {fileID: 1249377751591763654, guid: 8ac77b580d9565b4f99f7fe0783f7dea, type: 3}
   is_gas_explosion: 1
 --- !u!54 &118074263
@@ -851,6 +852,7 @@ MonoBehaviour:
   - Sprites/Gunner
   sprite_side_count: 8
   anim: 0
+  health: 100
   explosion: {fileID: 1249377751591763654, guid: 8ac77b580d9565b4f99f7fe0783f7dea, type: 3}
   is_gas_explosion: 0
 --- !u!43 &582463088
@@ -1948,7 +1950,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1001199103}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.15, y: -0.15, z: 0.55}
+  m_LocalPosition: {x: 0.125, y: -0.125, z: 0.55}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 10285958}
@@ -7269,6 +7271,7 @@ MonoBehaviour:
   - Sprites/Melee/Walk2
   sprite_side_count: 8
   anim: 0
+  health: 100
   explosion: {fileID: 1249377751591763654, guid: 8ac77b580d9565b4f99f7fe0783f7dea, type: 3}
   is_gas_explosion: 0
 --- !u!54 &1884013292
