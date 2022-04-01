@@ -1,5 +1,27 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-2437918294517497696
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b94fcd11afffcb142908bfcb1e261fba, type: 3}
+  m_Name: MotionBlur
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  shutterAngle:
+    overrideState: 1
+    value: 360
+  sampleCount:
+    overrideState: 1
+    value: 32
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13,8 +35,9 @@ MonoBehaviour:
   m_Name: PlayerCamera Profile
   m_EditorClassIdentifier: 
   settings:
-  - {fileID: 5748570681287915805}
---- !u!114 &5748570681287915805
+  - {fileID: -2437918294517497696}
+  - {fileID: 8708308816987740910}
+--- !u!114 &8708308816987740910
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -23,31 +46,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a34fa72bd4185749832024e9c8010bf, type: 3}
-  m_Name: ScreenSpaceReflections
+  m_Script: {fileID: 11500000, guid: 9b77c5407dc277943b591ade9e6b18c5, type: 3}
+  m_Name: LensDistortion
   m_EditorClassIdentifier: 
   active: 1
   enabled:
     overrideState: 1
     value: 1
-  preset:
+  intensity:
     overrideState: 1
-    value: 3
-  maximumIterationCount:
-    overrideState: 1
-    value: 16
-  resolution:
+    value: 0
+  intensityX:
     overrideState: 1
     value: 1
-  thickness:
+  intensityY:
     overrideState: 1
-    value: 8
-  maximumMarchDistance:
+    value: 1
+  centerX:
     overrideState: 1
-    value: 100
-  distanceFade:
+    value: 0
+  centerY:
     overrideState: 1
-    value: 0.534
-  vignette:
+    value: 0
+  scale:
     overrideState: 1
-    value: 0.512
+    value: 1

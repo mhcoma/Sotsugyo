@@ -7,7 +7,7 @@ Shader "Custom/LaserShader" {
 	SubShader {
 		Tags {
 			"RenderType" = "TransparentCutout"
-			"Queue" = "Transparent"
+			"Queue" = "Overlay"
 		}
 		LOD 200
 
@@ -31,7 +31,7 @@ Shader "Custom/LaserShader" {
 
 		void surf (Input IN, inout SurfaceOutput o) {
 			fixed noise = tex2D(_NoiseMap,
-				float2(IN.uv_NoiseMap.x - _Time.w * 2, IN.uv_NoiseMap.y - _SinTime.x)
+				float2(IN.uv_NoiseMap.x - _Time.w * 2, IN.uv_NoiseMap.y - _SinTime.w * 4)
 			).r;
 
 			fixed4 c = tex2D (_MainTex, IN.uv_MainTex + noise.r + 0.5) * _Color;

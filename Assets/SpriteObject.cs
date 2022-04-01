@@ -7,22 +7,41 @@ public class SpriteObject : MonoBehaviour {
 	public Transform camera_transform;
 	private Transform sprite_box_transform;
 	private Transform sprite_transform;
+	private Transform shadow_mesh_transform;
 	private SpriteRenderer sprite_renderer;
+	private Rigidbody rigid;
+	private CapsuleCollider colid;
 
 	public string[] directories;
 	public int sprite_side_count;
 	public List<Sprite[]> sprites = new List<Sprite[]>();
 	public int anim = 0;
 
+	public float health = 100;
+	bool is_alive = true;
+	float dead_anim = 0;
+
+	public GameObject explosion;
+
+	public bool is_gas_explosion = false;
+
+
 	// Start is called before the first frame update
 	void Start() {
+		rigid = GetComponent<Rigidbody>();
+		colid = GetComponent<CapsuleCollider>();
+
 		sprite_box_transform = transform.GetChild(0);
 		sprite_transform = sprite_box_transform.GetChild(0);
 		sprite_renderer = sprite_transform.GetComponent<SpriteRenderer>();
 
+		shadow_mesh_transform = transform.GetChild(1);
+
 		foreach (string directory in directories) {
 			sprites.Add(Resources.LoadAll<Sprite>(directory + "/diffuse"));
 		}
+
+		
 	}
 
 	// Update is called once per frame
@@ -38,5 +57,34 @@ public class SpriteObject : MonoBehaviour {
 		int angle_index = ((sprite_side_count * 2) - Mathf.RoundToInt((direction_angle_y - angle.y) / 45)) % sprite_side_count;
 		sprite_box_transform.rotation = Quaternion.Euler(0, direction_angle_y + 180.0f, 0);
 		sprite_renderer.sprite = sprites[anim][angle_index];
+
+		if (!is_alive) {
+			if (dead_anim <= 0) {
+				GameObject explosion_object = Instantiate(explosion, transform.position, Quaternion.identity);
+				if (!is_gas_explosion) {
+					Explosion explosion_explosion = explosion_object.GetComponent<Explosion>();
+					explosion_explosion.set_size(2.0f, 0.1f);
+					explosion_explosion.set_lifetime(1.0f, 0.25f);
+				}
+			}
+
+			dead_anim += Time.deltaTime * 1.5f;
+			sprite_renderer.material.SetFloat("_NoisePower", dead_anim);
+
+
+			if (dead_anim >= 1) {
+				Destroy(gameObject);
+			}
+		}
+	}
+
+	public void get_damage(float damage) {
+		health -= damage;
+		if (health <= 0) {
+			is_alive = false;
+			rigid.isKinematic = true;
+			colid.enabled = false;
+			shadow_mesh_transform.gameObject.SetActive(false);
+		}
 	}
 }
