@@ -78,18 +78,18 @@ Shader "Custom/SpriteShader"
 			float4 final;
 
 			float3 diff_color;
-			float n_dot_l = saturate(dot(s.Normal, light_dir));
+			float n_dot_l = DotClamped(s.Normal, light_dir);
 			diff_color = n_dot_l * s.Albedo * _LightColor0.rgb * atten * s.Shadow;
+			diff_color = n_dot_l * _LightColor0.rgb * atten * s.Shadow;
 
 			float3 half_vector = normalize(light_dir + view_dir);
-			float3 specualr = pow(saturate(dot(half_vector, s.Normal)), 100) * _LightColor0.rgb * s.Shadow * s.Specular;
+			float3 specular = pow(saturate(dot(half_vector, s.Normal)), 100) * _LightColor0.rgb * s.Shadow * s.Specular;
 
-			final.rgb = diff_color.rgb + specualr + s.Emission;
+			final.rgb = diff_color.rgb + specular + s.Emission;
 			final.a = s.Alpha;
 			return final;
 		}
 
 		ENDCG
 	}
-	FallBack "Diffuse"
 }

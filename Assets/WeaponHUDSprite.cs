@@ -20,18 +20,18 @@ public class WeaponHUDSprite : MonoBehaviour {
 	void Update() {
 		float size = Screen.height / 96.0f;
 		rt.localScale = new Vector3(size, size, 0);
-		anim_speed = size * 1.5f;
+		anim_speed = size * 300;
 
 		switch (anim_y_direction) {
 			case 1:
-				anim_pos_y += anim_speed;
+				anim_pos_y += anim_speed * Time.deltaTime;
 				if (anim_pos_y >= 0) {
 					anim_y_direction = 0;
 					anim_pos_y = 0;
 				}
 				break;
 			case -1:
-				anim_pos_y -= anim_speed;
+				anim_pos_y -= anim_speed * Time.deltaTime;
 				if (anim_pos_y <= -(Screen.height / 2.0f)) {
 					anim_y_direction = 1;
 					GetComponent<CanvasRenderer>().SetTexture(next_sprite.texture);

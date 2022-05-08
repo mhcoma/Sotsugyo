@@ -16,7 +16,7 @@ public class Explosion : MonoBehaviour
 	float damage_time = 0.0f;
 	public float damage = 50.0f;
 
-	float damage_range = 1.0f;
+	float damage_range = 2.0f;
 	SphereCollider colid;
 	List<int> damaged_objects = new List<int>();
 
@@ -48,13 +48,27 @@ public class Explosion : MonoBehaviour
 
 	void OnTriggerEnter(Collider other) {
 		if (damage_time < 1.0f) {
-			if (other.transform.CompareTag("Actor")) {
+			if (other.transform.CompareTag("Actor") || other.transform.CompareTag("Player")) {
 				int index = other.GetInstanceID();
 				if (damaged_objects.FindIndex(x => x == index) == -1) {
 					damaged_objects.Add(index);
-					float dist = (2.0f - (Vector3.Distance(other.transform.position, transform.position) / damage_range));
+
+					Vector3 temp1 = other.transform.position;
+					temp1.y = 0;
+
+					Vector3 temp2 = transform.position;
+					temp2.y = 0;
+
+					float dist = 0.5f - (Vector3.Distance(temp1, temp2) / (damage_range * Mathf.Sqrt(2) * 2));
+
 					float final_damage = dist * damage;
-					other.transform.gameObject.GetComponent<SpriteObject>().get_damage(final_damage);
+					if (other.transform.CompareTag("Actor")) {
+						other.transform.gameObject.GetComponent<SpriteObject>().get_damage(final_damage);
+					}
+					else {
+						other.transform.gameObject.GetComponent<Player>().get_damage(final_damage);
+					}
+					other.gameObject.GetComponent<Rigidbody>().AddExplosionForce(2000.0f, transform.position, 10.0f, 1.0f);
 				}
 			}
 		}

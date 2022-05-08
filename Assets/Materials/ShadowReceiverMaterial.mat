@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ShadowReceiverMaterial
-  m_Shader: {fileID: 4800000, guid: 889ff92948415f045bf74a3d34ab435c, type: 3}
+  m_Shader: {fileID: 4800000, guid: f10c80af1ecc3974e8601fbd63e6f84c, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0

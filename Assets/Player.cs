@@ -20,7 +20,7 @@ public class Player : MonoBehaviour {
 
 	float player_height = 2.0f;
 	float ground_distance = 0.3f;
-	public LayerMask groundMask;
+	public LayerMask ground_mask;
 	bool is_grounded;
 	RaycastHit slope_hit;
 	Vector3 slope_move_amount;
@@ -28,13 +28,15 @@ public class Player : MonoBehaviour {
 
 	public Transform cam_holder_transform;
 	CameraHolder camhold;
-	Transform camhold_transform;
+	Transform cam_transform;
 	Camera cam;
 	
-	Transform laser_object;
-	Transform test_obj;
-	Transform rocket_launcher;
+	Transform laser_transform;
+	Transform spark_transform;
+	Transform rocket_launcher_transform;
+	Transform spark_light_transform;
 	LineRenderer laser;
+	float spark_light_distance = 0.25f;
 
 	float weapons_range = 100.0f;
 	Sprite[] weapon_hud_sprites;
@@ -48,25 +50,32 @@ public class Player : MonoBehaviour {
 	bool is_shooting = false;
 
 	enum Weapon_index {
+		none,
 		lasergun,
 		rocketlauncher
 	}
-	Weapon_index weapon_index = Weapon_index.lasergun;
+	Weapon_index weapon_index = Weapon_index.none;
 
 	public GameObject rocket_prefab;
 	
 	LayerMask raycast_mask;
 
+	public float health = 100;
+
+
+	AudioSource laser_asrc;
+
 	void Start() {
 		rigid = GetComponent<Rigidbody>();
 		camhold = cam_holder_transform.GetComponent<CameraHolder>();
-		camhold_transform = cam_holder_transform.GetChild(0);
-		cam = camhold_transform.GetComponent<Camera>();
-		laser_object = camhold_transform.GetChild(1);
-		laser = laser_object.GetComponent<LineRenderer>();
-		test_obj = camhold_transform.GetChild(2);
-		spark = test_obj.GetComponent<ParticleSystem>();
-		rocket_launcher = camhold_transform.GetChild(3);
+		cam_transform = cam_holder_transform.GetChild(0);
+		cam = cam_transform.GetComponent<Camera>();
+		laser_transform = cam_transform.GetChild(1);
+		laser = laser_transform.GetComponent<LineRenderer>();
+		spark_transform = cam_transform.GetChild(2);
+		spark = spark_transform.GetComponent<ParticleSystem>();
+		rocket_launcher_transform = cam_transform.GetChild(3);
+		spark_light_transform = cam_transform.GetChild(4);
 
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
@@ -76,11 +85,14 @@ public class Player : MonoBehaviour {
 		raycast_mask = ~(1 << LayerMask.NameToLayer("ProjectileSprite"));
 
 		weapon_hud_sprite_manager = canvas_transform.GetChild(0).GetComponent<WeaponHUDSprite>();
+
+		AudioSource[] asrcs = GetComponents<AudioSource>();
+		laser_asrc = asrcs[0];
 	}
 
 	void Update() {
 		// is_grounded = Physics.Raycast(transform.position, Vector3.down, player_height / 2 + 0.1f);
-		is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, groundMask);
+		is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
 
 		key_direc = new Vector3 (Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
 		
@@ -104,7 +116,7 @@ public class Player : MonoBehaviour {
 
 		mouse_y += Input.GetAxis("Mouse Y") * 10;
 		mouse_y = Mathf.Clamp(mouse_y, -90.0f, 90.0f);
-		camhold_transform.localEulerAngles = new Vector3(-mouse_y, 0, 0);
+		cam_transform.localEulerAngles = new Vector3(-mouse_y, 0, 0);
 
 		weapon_control();
 	}
@@ -132,13 +144,13 @@ public class Player : MonoBehaviour {
 			is_shooting = false;
 			toggle_laser(false);
 			weapon_index = Weapon_index.lasergun;
-			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[0]);
+			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[(int)Weapon_index.lasergun]);
 		}
 		if (Input.GetKeyDown(KeyCode.Alpha2) && weapon_index != Weapon_index.rocketlauncher) {
 			is_shooting = false;
 			toggle_laser(false);
 			weapon_index = Weapon_index.rocketlauncher;
-			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[1]);
+			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[(int)Weapon_index.rocketlauncher]);
 		}
 
 		if (!weapon_hud_sprite_manager.is_changing_weapon()) {
@@ -167,16 +179,21 @@ public class Player : MonoBehaviour {
 		bool is_hit = false;
 		Ray first_ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 		if (Physics.Raycast(first_ray, out first_hit, Mathf.Infinity, raycast_mask)) {
-			is_hit = cast_second_ray(laser_object.position, -(laser_object.position - first_hit.point).normalized);
+			is_hit = cast_second_ray(laser_transform.position, -(laser_transform.position - first_hit.point).normalized);
 		}
 		else {
-			test_obj.localPosition = new Vector3(0, 0, weapons_range);
-			is_hit = cast_second_ray(laser_object.position, -(laser_object.position - test_obj.position).normalized);
+			spark_transform.localPosition = new Vector3(0, 0, weapons_range);
+			spark_light_transform.localPosition = new Vector3(0, 0, weapons_range - spark_light_distance);
+			is_hit = cast_second_ray(laser_transform.position, -(laser_transform.position - spark_transform.position).normalized);
 		}
 		if (!is_hit) {
-			test_obj.localPosition = new Vector3(0, 0, weapons_range);
-			laser.SetPosition(0, laser_object.position);
-			laser.SetPosition(1, test_obj.position);
+			spark_transform.localPosition = new Vector3(0, 0, weapons_range);
+			spark_light_transform.localPosition = new Vector3(0, 0, weapons_range - spark_light_distance);
+			
+			// laser.SetPosition(0, laser_transform.position);
+			// laser.SetPosition(1, spark_transform.position);
+			Vector3[] temp_laser_positions = {laser_transform.position, spark_transform.position};
+			laser.SetPositions(temp_laser_positions);
 
 			if (is_shooting) {
 				switch (weapon_index) {
@@ -194,9 +211,12 @@ public class Player : MonoBehaviour {
 		Ray second_ray = new Ray(origin, direction);
 		if (Physics.Raycast(second_ray, out second_hit, Mathf.Infinity, raycast_mask)) {
 			if (second_hit.distance < weapons_range) {
-				laser.SetPosition(0, laser_object.position);
+				laser.SetPosition(0, laser_transform.position);
 				laser.SetPosition(1, second_hit.point);
-				test_obj.position = second_hit.point;
+				spark_transform.position = second_hit.point;
+
+				Vector3 temp_distance = -((second_hit.point - cam_transform.position).normalized) * spark_light_distance;
+				spark_light_transform.position = second_hit.point + temp_distance;
 				Transform objectHit = second_hit.transform;
 				is_hit = true;
 
@@ -218,7 +238,7 @@ public class Player : MonoBehaviour {
 	}
 
 	bool on_slope() {
-		if (Physics.Raycast(transform.position, Vector3.down, out slope_hit, player_height / 2 + 0.5f, groundMask)) {
+		if (Physics.Raycast(transform.position, Vector3.down, out slope_hit, player_height / 2 + 0.5f, ground_mask)) {
 			if (slope_hit.normal != Vector3.up) {
 				return true;
 			}
@@ -229,18 +249,28 @@ public class Player : MonoBehaviour {
 	void launch_rocket() {
 		GameObject rocket_obj = Instantiate(rocket_prefab);
 		Rocket rocket = rocket_obj.GetComponent<Rocket>();
-		rocket.launch(rocket_launcher.position, test_obj.position, transform);
+		rocket.launch(rocket_launcher_transform.position, spark_transform.position, transform);
 		is_shooting = false;
 	}
 
 	void toggle_laser(bool state) {
+		laser_transform.gameObject.SetActive(state);
+		spark_light_transform.gameObject.SetActive(state);
 		if (state) {
-			laser_object.gameObject.SetActive(true);
 			spark.Play();
+			laser_asrc.Play();
 		}
 		else {
-			laser_object.gameObject.SetActive(false);
 			spark.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+			laser_asrc.Pause();
+		}
+	}
+
+	public void get_damage(float damage) {
+		health -= damage;
+		Debug.Log($"Get Damaged! : {health}");
+		if (health <= 0) {
+			Debug.Log("Player Dead");
 		}
 	}
 }

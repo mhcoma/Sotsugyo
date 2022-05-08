@@ -9,7 +9,6 @@ public class PlayerShadowCamera : MonoBehaviour {
 		GetComponent<Camera>().targetTexture = render_texture;
 		GetComponent<Camera>().aspect = aspect;
 	}
-
 	void Update() {
 		
 	}
