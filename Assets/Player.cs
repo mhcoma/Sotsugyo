@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Player : MonoBehaviour {
 	// Start is called before the first frame update
@@ -44,16 +45,26 @@ public class Player : MonoBehaviour {
 
 	public Transform canvas_transform;
 	WeaponHUDSprite weapon_hud_sprite_manager;
+	Transform HUD_transform;
+	TextMeshProUGUI hp_tmpro;
+	TextMeshProUGUI weapon_tmpro;
 	
 	ParticleSystem spark;
 
 	bool is_shooting = false;
+	bool is_shooting_laser = false;
 
 	enum Weapon_index {
 		none,
 		lasergun,
 		rocketlauncher
 	}
+	static string[] weapon_names = {
+		"None",
+		"Laser",
+		"Rocket"
+	};
+	int[] weapon_ammo = {0, 1000, 250};
 	Weapon_index weapon_index = Weapon_index.none;
 
 	public GameObject rocket_prefab;
@@ -85,6 +96,14 @@ public class Player : MonoBehaviour {
 		raycast_mask = ~(1 << LayerMask.NameToLayer("ProjectileSprite"));
 
 		weapon_hud_sprite_manager = canvas_transform.GetChild(0).GetComponent<WeaponHUDSprite>();
+		HUD_transform = canvas_transform.GetChild(1);
+		hp_tmpro = HUD_transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+		weapon_tmpro = HUD_transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+
+		hp_tmpro.SetText($"<size=64>HP</size>\n{(int)health}");
+		weapon_tmpro.SetText($"<size=64>{weapon_names[(int) weapon_index]}</size>\n{weapon_ammo[(int) weapon_index]}");
+
+		Debug.Log(HUD_transform.GetChild(0));
 
 		AudioSource[] asrcs = GetComponents<AudioSource>();
 		laser_asrc = asrcs[0];
@@ -127,16 +146,28 @@ public class Player : MonoBehaviour {
 		if (is_grounded) {
 			if (on_slope()) {
 				rigid.AddForce(slope_move_amount * speed * movement_multiplier, ForceMode.Acceleration);
-				rigid.AddForce(-(Physics.gravity * rigid.mass));
+				rigid.useGravity = false;
 			}
 			else {
 				rigid.AddForce(move_amount * speed * movement_multiplier, ForceMode.Acceleration);
+				rigid.useGravity = true;
 			}
 		}
 		else {
 			rigid.AddForce(move_amount * speed * movement_multiplier * air_multiplier, ForceMode.Acceleration);
+			rigid.useGravity = true;
 		}
 		
+		if (is_shooting_laser) {
+			if (weapon_ammo[(int)weapon_index] > 0) {
+				weapon_ammo[(int) Weapon_index.lasergun] -= 1;
+				weapon_tmpro.SetText($"<size=64>{weapon_names[(int) Weapon_index.lasergun]}</size>\n{weapon_ammo[(int) weapon_index]}");
+			}
+			else {
+				toggle_laser(false);
+				is_shooting = false;
+			}
+		}
 	}
 
 	void weapon_control() {
@@ -145,16 +176,18 @@ public class Player : MonoBehaviour {
 			toggle_laser(false);
 			weapon_index = Weapon_index.lasergun;
 			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[(int)Weapon_index.lasergun]);
+			weapon_tmpro.SetText($"<size=64>{weapon_names[(int) weapon_index]}</size>\n{weapon_ammo[(int) weapon_index]}");
 		}
 		if (Input.GetKeyDown(KeyCode.Alpha2) && weapon_index != Weapon_index.rocketlauncher) {
 			is_shooting = false;
 			toggle_laser(false);
 			weapon_index = Weapon_index.rocketlauncher;
 			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[(int)Weapon_index.rocketlauncher]);
+			weapon_tmpro.SetText($"<size=64>{weapon_names[(int) weapon_index]}</size>\n{weapon_ammo[(int) weapon_index]}");
 		}
 
 		if (!weapon_hud_sprite_manager.is_changing_weapon()) {
-			if (Input.GetMouseButtonDown(0)) {
+			if (Input.GetMouseButtonDown(0) && weapon_ammo[(int)weapon_index] > 0) {
 				switch (weapon_index) {
 					case Weapon_index.lasergun:
 						toggle_laser(true);
@@ -189,9 +222,6 @@ public class Player : MonoBehaviour {
 		if (!is_hit) {
 			spark_transform.localPosition = new Vector3(0, 0, weapons_range);
 			spark_light_transform.localPosition = new Vector3(0, 0, weapons_range - spark_light_distance);
-			
-			// laser.SetPosition(0, laser_transform.position);
-			// laser.SetPosition(1, spark_transform.position);
 			Vector3[] temp_laser_positions = {laser_transform.position, spark_transform.position};
 			laser.SetPositions(temp_laser_positions);
 
@@ -247,15 +277,21 @@ public class Player : MonoBehaviour {
 	}
 
 	void launch_rocket() {
-		GameObject rocket_obj = Instantiate(rocket_prefab);
-		Rocket rocket = rocket_obj.GetComponent<Rocket>();
-		rocket.launch(rocket_launcher_transform.position, spark_transform.position, transform);
-		is_shooting = false;
+		if (weapon_ammo[(int)weapon_index] > 0) {
+			GameObject rocket_obj = Instantiate(rocket_prefab);
+			Rocket rocket = rocket_obj.GetComponent<Rocket>();
+			rocket.launch(rocket_launcher_transform.position, spark_transform.position, transform, 0, 0);
+			is_shooting = false;
+
+			weapon_ammo[(int)Weapon_index.rocketlauncher] -= 1;
+			weapon_tmpro.SetText($"<size=64>{weapon_names[(int) Weapon_index.rocketlauncher]}</size>\n{weapon_ammo[(int) weapon_index]}");
+		}
 	}
 
 	void toggle_laser(bool state) {
 		laser_transform.gameObject.SetActive(state);
 		spark_light_transform.gameObject.SetActive(state);
+		is_shooting_laser = state;
 		if (state) {
 			spark.Play();
 			laser_asrc.Play();
@@ -268,9 +304,10 @@ public class Player : MonoBehaviour {
 
 	public void get_damage(float damage) {
 		health -= damage;
-		Debug.Log($"Get Damaged! : {health}");
+		// Debug.Log($"Get Damaged! : {health}");
+		hp_tmpro.SetText($"<size=64>HP</size>\n{(int)health}");
 		if (health <= 0) {
-			Debug.Log("Player Dead");
+			// Debug.Log("Player Dead");
 		}
 	}
 }

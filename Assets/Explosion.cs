@@ -15,6 +15,8 @@ public class Explosion : MonoBehaviour
 
 	float damage_time = 0.0f;
 	public float damage = 50.0f;
+	public float knockback_power = 0.0f;
+	public float knockback_radius = 10.0f;
 
 	float damage_range = 2.0f;
 	SphereCollider colid;
@@ -47,7 +49,7 @@ public class Explosion : MonoBehaviour
 	}
 
 	void OnTriggerEnter(Collider other) {
-		if (damage_time < 1.0f) {
+		if (damage_time < 0.0625f) {
 			if (other.transform.CompareTag("Actor") || other.transform.CompareTag("Player")) {
 				int index = other.GetInstanceID();
 				if (damaged_objects.FindIndex(x => x == index) == -1) {
@@ -64,11 +66,16 @@ public class Explosion : MonoBehaviour
 					float final_damage = dist * damage;
 					if (other.transform.CompareTag("Actor")) {
 						other.transform.gameObject.GetComponent<SpriteObject>().get_damage(final_damage);
+						if (other.transform.gameObject.GetComponent<SpriteObject>().is_ai_object) {
+							other.transform.gameObject.GetComponent<EnemyAITest>().toggle_rigid(false);
+							other.transform.position += new Vector3(0, 0.375f, 0);
+							// Debug.Log("gravity!");
+						}
 					}
 					else {
 						other.transform.gameObject.GetComponent<Player>().get_damage(final_damage);
 					}
-					other.gameObject.GetComponent<Rigidbody>().AddExplosionForce(2000.0f, transform.position, 10.0f, 1.0f);
+					other.gameObject.GetComponent<Rigidbody>().AddExplosionForce(knockback_power, transform.position, knockback_radius, 1.0f);
 				}
 			}
 		}

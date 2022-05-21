@@ -1,6 +1,4 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-Shader "Custom/Texture Splatting" {
+﻿Shader "Custom/Texture Splatting" {
 
 	Properties {
 		_MainTex ("Splat Map", 2D) = "white" {}

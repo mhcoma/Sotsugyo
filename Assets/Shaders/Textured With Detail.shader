@@ -1,6 +1,4 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-Shader "Custom/Textured With Detail" {
+﻿Shader "Custom/Textured With Detail" {
 
 	Properties {
 		_Tint ("Tint", Color) = (1, 1, 1, 1)

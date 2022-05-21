@@ -25,6 +25,11 @@ public class SpriteObject : MonoBehaviour {
 
 	public bool is_gas_explosion = false;
 
+	public bool is_ai_object;
+
+	EnemyAITest ai;
+	NonAIObject nonai;
+
 
 	void Start() {
 		rigid = GetComponent<Rigidbody>();
@@ -40,6 +45,7 @@ public class SpriteObject : MonoBehaviour {
 			sprites.Add(Resources.LoadAll<Sprite>(directory + "/diffuse"));
 		}
 		
+		is_ai_object = TryGetComponent<EnemyAITest>(out ai);
 	}
 
 	void Update() {
@@ -62,12 +68,14 @@ public class SpriteObject : MonoBehaviour {
 				if (!is_gas_explosion) {
 					explosion_explosion.set_size(2.0f, 0.1f);
 					explosion_explosion.set_lifetime(1.0f, 0.25f);
+					explosion_explosion.knockback_power = 100;
 				}
 				else {
 					explosion_explosion.set_size(2.0f, 0.1f);
 					explosion_explosion.set_lifetime(1.0f, 0.75f);
 					explosion_explosion.set_speed(0.0f, 7.5f);
 					explosion_explosion.damage = 50.0f;
+					explosion_explosion.knockback_power = 2000f;
 				}
 			}
 

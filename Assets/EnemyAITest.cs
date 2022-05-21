@@ -1,0 +1,182 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
+
+public class EnemyAITest : MonoBehaviour {
+	Rigidbody rigid;
+
+	public Transform player_transform;
+	public float finding_distance;
+	public float stopping_distance;
+	Player player;
+
+	float ground_drag = 10.0f;
+	float air_drag = 2.0f;
+	
+	float height = 2.0f;
+	float ground_distance = 0.3f;
+	public LayerMask ground_mask;
+	bool is_grounded;
+	bool toggle;
+	RaycastHit slope_hit;
+	LayerMask raycast_mask;
+
+	NavMeshAgent agent;
+
+	SpriteObject sobj;
+	float anim_time = 0.0f;
+	public int[] anim_frames;
+	int current_anim_frame;
+
+	public enum Act_state {
+		wait,
+		find,
+		attack,
+		dead
+	}
+	public Act_state state = Act_state.wait;
+
+	public enum Attack_type {
+		melee,
+		rocket,
+		laser,
+	}
+	public Attack_type type;
+	bool attackable = false;
+	public float attack_rate;
+	float attack_time = 0.0f;
+
+	ParticleSystem attack_effect;
+	public GameObject rocket_prefab;
+
+	AudioSource asrc;
+	public AudioClip attack_clip;
+
+	void Start() {
+		rigid = GetComponent<Rigidbody>();
+		agent = GetComponent<NavMeshAgent>();
+		sobj = GetComponent<SpriteObject>();
+		asrc = GetComponent<AudioSource>();
+
+		raycast_mask = ~(1 << LayerMask.NameToLayer("ProjectileSprite"));
+		player = player_transform.GetComponent<Player>();
+
+		if (type == Attack_type.melee)
+			attack_effect = transform.GetChild(2).GetComponent<ParticleSystem>();
+	}
+
+	void Update() {
+		bool temp = is_grounded;
+		is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
+		
+		temp = temp != is_grounded;
+
+		if (temp) {
+			rigid.drag = is_grounded ? ground_drag : air_drag;
+		}
+		
+		if ((temp || (!agent.enabled)) && is_stopped() && !agent.isOnOffMeshLink) {
+			toggle_rigid(is_grounded);
+		}
+		
+		float distance = Vector3.Distance(player_transform.position, transform.position);
+
+		switch (state) {
+			case Act_state.wait:
+				if (distance <= finding_distance) {
+					state = Act_state.find;
+				}
+				break;
+			case Act_state.find:
+				if (agent.enabled) agent.SetDestination(player_transform.position);
+				if (distance > finding_distance) {
+					state = Act_state.wait;
+				}
+				else if (distance <= stopping_distance + 0.25f) {
+					state = Act_state.attack;
+				}
+				break;
+			case Act_state.attack:
+				if (agent.enabled) agent.SetDestination(player_transform.position);
+				attackable = on_sight();
+				Debug.Log(attackable);
+				if (attackable) agent.stoppingDistance = stopping_distance;
+				else agent.stoppingDistance = 0;
+
+				if (distance > stopping_distance + 0.25f) {
+					state = Act_state.find;
+					attackable = false;
+				}
+				if (attackable) attack();
+				break;
+		}
+
+	}
+
+	void FixedUpdate() {
+		if (is_grounded && on_slope() && !agent.enabled) {
+			rigid.useGravity = false;
+		}
+		else {
+			rigid.useGravity = true;
+		}
+	}
+
+	bool is_stopped() {
+		return rigid.velocity.magnitude <= 0.0f;
+	}
+
+	bool on_slope() {
+		if (Physics.Raycast(transform.position, Vector3.down, out slope_hit, height / 2 + 0.5f, ground_mask)) {
+			if (slope_hit.normal != Vector3.up) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void toggle_rigid(bool toggle) {
+		rigid.isKinematic = toggle;
+		agent.enabled = toggle;
+		rigid.drag = toggle ? ground_drag : air_drag;
+	}
+
+	bool on_sight() {
+		RaycastHit hit;
+		Ray ray = new Ray(transform.position, player_transform.position - transform.position);
+
+		if (!Physics.Raycast(ray, out hit, Mathf.Infinity, raycast_mask)) return false;
+		Debug.Log(hit.transform);
+		if (hit.transform != player_transform) return false;
+		return true;
+	}
+
+	void attack() {
+		if (!sobj.is_alive) return;
+
+		attack_time += Time.deltaTime;
+		if (attack_time < attack_rate) return;
+
+		attack_time -= attack_rate;
+		switch (type) {
+			case Attack_type.melee:
+				attack_effect.Play();
+				asrc.PlayOneShot(attack_clip);
+				player.get_damage(10.0f);
+				break;
+			case Attack_type.rocket:
+				GameObject rocket_obj = Instantiate(rocket_prefab);
+				Rocket rocket = rocket_obj.GetComponent<Rocket>();
+				rocket.launch(
+					transform.position + new Vector3(0, 0.5f, 0),
+					player_transform.position,
+					transform,
+					10, 10
+				);
+				break;
+			case Attack_type.laser:
+				break;
+		}
+	}
+}

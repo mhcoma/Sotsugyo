@@ -26,7 +26,7 @@ Shader "Custom/LaserShader" {
 
 		fixed4 _Color;
 		UNITY_INSTANCING_BUFFER_START(Props)
-			// put more per-instance properties here
+		
 		UNITY_INSTANCING_BUFFER_END(Props)
 
 		void surf (Input IN, inout SurfaceOutput o) {

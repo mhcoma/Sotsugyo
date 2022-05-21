@@ -15,6 +15,7 @@ public class Rocket : MonoBehaviour {
 	Vector3 direction;
 	float speed = 20.0f;
 	float damage = 10.0f;
+	float explosion_damage = 10.0f;
 
 	AudioSource asrc;
 	public AudioClip rocket_boom_clip;
@@ -62,6 +63,9 @@ public class Rocket : MonoBehaviour {
 		explosion_explosion.set_size(2.0f, 0.1f);
 		explosion_explosion.set_lifetime(1.0f, 0.75f);
 		explosion_explosion.set_speed(0.0f, 7.5f);
+		explosion_explosion.knockback_power = 1000.0f;
+		explosion_explosion.damage = explosion_damage;
+
 
 		rocket_smoke.Stop(false);
 		rocket_collider.enabled = false;
@@ -72,10 +76,12 @@ public class Rocket : MonoBehaviour {
 		asrc.PlayOneShot(rocket_boom_clip);
 	}
 
-	public void launch(Vector3 start_pos, Vector3 dest_pos, Transform shooter) {
+	public void launch(Vector3 start_pos, Vector3 dest_pos, Transform shooter, float rocket_damage, float explosion_damage) {
 		destination_pos = dest_pos;
 		transform.position = start_pos;
 		this.shooter = shooter;
+		this.damage = rocket_damage;
+		this.explosion_damage = explosion_damage;
 		direction = (destination_pos - transform.position).normalized;
 		launched = true;
 	}

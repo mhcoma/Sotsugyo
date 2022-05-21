@@ -27,6 +27,10 @@ UnityLight create_light(v2f i) {
 	UNITY_LIGHT_ATTENUATION(attenuation, i, i.world_pos);
 
 	light.color = _LightColor0.rgb * attenuation;
+	
+	if (light.color.r > 1) { light.color /= light.color.r; }
+	if (light.color.g > 1) { light.color /= light.color.g; }
+	if (light.color.b > 1) { light.color /= light.color.b; }
 
 	light.ndotl = DotClamped(i.normal, light.dir);
 	return light;
