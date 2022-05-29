@@ -76,6 +76,8 @@ public class Player : MonoBehaviour {
 
 	AudioSource laser_asrc;
 
+	bool controlable = true;
+
 	void Start() {
 		rigid = GetComponent<Rigidbody>();
 		camhold = cam_holder_transform.GetComponent<CameraHolder>();
@@ -87,9 +89,6 @@ public class Player : MonoBehaviour {
 		spark = spark_transform.GetComponent<ParticleSystem>();
 		rocket_launcher_transform = cam_transform.GetChild(3);
 		spark_light_transform = cam_transform.GetChild(4);
-
-		Cursor.lockState = CursorLockMode.Locked;
-		Cursor.visible = false;
 
 		weapon_hud_sprites = Resources.LoadAll<Sprite>("Sprites/Weapons");
 
@@ -110,62 +109,64 @@ public class Player : MonoBehaviour {
 	}
 
 	void Update() {
-		// is_grounded = Physics.Raycast(transform.position, Vector3.down, player_height / 2 + 0.1f);
-		is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
+		if (Time.timeScale > 0) {
+			is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
 
-		key_direc = new Vector3 (Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-		
-		mouse_x += Input.GetAxis("Mouse X") * 10;
-		cam_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
-		move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
+			key_direc = new Vector3 (Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+			
+			mouse_x += Input.GetAxis("Mouse X") * 10;
+			cam_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
+			move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
 
-		if (is_grounded) {
-			rigid.drag = ground_drag;
+			if (is_grounded) {
+				rigid.drag = ground_drag;
+			}
+			else {
+				rigid.drag = air_drag;
+			}
+
+			if (Input.GetKeyDown(KeyCode.Space) && is_grounded) {
+				is_grounded = false;
+				rigid.AddForce(transform.up * jump_force, ForceMode.Impulse);
+			}
+
+			slope_move_amount = Vector3.ProjectOnPlane(move_amount, slope_hit.normal);
+
+			mouse_y += Input.GetAxis("Mouse Y") * 10;
+			mouse_y = Mathf.Clamp(mouse_y, -90.0f, 90.0f);
+			cam_transform.localEulerAngles = new Vector3(-mouse_y, 0, 0);
+
+			weapon_control();
 		}
-		else {
-			rigid.drag = air_drag;
-		}
-
-		if (Input.GetKeyDown(KeyCode.Space) && is_grounded) {
-			is_grounded = false;
-			rigid.AddForce(transform.up * jump_force, ForceMode.Impulse);
-		}
-
-		slope_move_amount = Vector3.ProjectOnPlane(move_amount, slope_hit.normal);
-
-		mouse_y += Input.GetAxis("Mouse Y") * 10;
-		mouse_y = Mathf.Clamp(mouse_y, -90.0f, 90.0f);
-		cam_transform.localEulerAngles = new Vector3(-mouse_y, 0, 0);
-
-		weapon_control();
 	}
 
 	void FixedUpdate() {
 		// rigid.MovePosition(transform.position + move_amount * Time.fixedDeltaTime * speed);
 		
-		if (is_grounded) {
-			if (on_slope()) {
-				rigid.AddForce(slope_move_amount * speed * movement_multiplier, ForceMode.Acceleration);
-				rigid.useGravity = false;
+		if (Time.timeScale > 0) {
+			if (is_grounded) {
+				if (on_slope()) {
+					rigid.AddForce(slope_move_amount * speed * movement_multiplier, ForceMode.Acceleration);
+					rigid.useGravity = false;
+				}
+				else {
+					rigid.AddForce(move_amount * speed * movement_multiplier, ForceMode.Acceleration);
+					rigid.useGravity = true;
+				}
 			}
 			else {
-				rigid.AddForce(move_amount * speed * movement_multiplier, ForceMode.Acceleration);
+				rigid.AddForce(move_amount * speed * movement_multiplier * air_multiplier, ForceMode.Acceleration);
 				rigid.useGravity = true;
 			}
-		}
-		else {
-			rigid.AddForce(move_amount * speed * movement_multiplier * air_multiplier, ForceMode.Acceleration);
-			rigid.useGravity = true;
-		}
-		
-		if (is_shooting_laser) {
-			if (weapon_ammo[(int)weapon_index] > 0) {
-				weapon_ammo[(int) WeaponIndex.lasergun] -= 1;
-				weapon_tmpro.SetText($"<size=64>{weapon_names[(int) WeaponIndex.lasergun]}</size>\n{weapon_ammo[(int) weapon_index]}");
-			}
-			else {
-				toggle_laser(false);
-				is_shooting = false;
+			if (is_shooting_laser) {
+				if (weapon_ammo[(int)weapon_index] > 0) {
+					weapon_ammo[(int) WeaponIndex.lasergun] -= 1;
+					weapon_tmpro.SetText($"<size=64>{weapon_names[(int) WeaponIndex.lasergun]}</size>\n{weapon_ammo[(int) weapon_index]}");
+				}
+				else {
+					toggle_laser(false);
+					is_shooting = false;
+				}
 			}
 		}
 	}
@@ -314,5 +315,17 @@ public class Player : MonoBehaviour {
 	public void get_ammo(WeaponIndex index, int value) {
 		weapon_ammo[(int) index] += value;
 		weapon_tmpro.SetText($"<size=64>{weapon_names[(int) index]}</size>\n{weapon_ammo[(int) index]}");
+	}
+
+	public void set_controllable(bool toggle) {
+		controlable = toggle;
+		if (is_shooting_laser) {
+			toggle_laser(toggle);
+		}
+		if (toggle) {
+		}
+		else {
+			
+		}
 	}
 }

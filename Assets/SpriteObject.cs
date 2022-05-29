@@ -49,42 +49,43 @@ public class SpriteObject : MonoBehaviour {
 	}
 
 	void Update() {
-		Vector3 angle = transform.eulerAngles;
+		if (Time.timeScale > 0) {
+			Vector3 angle = transform.eulerAngles;
 
-		Vector3 camera_plane_position = camera_transform.position;
-		camera_plane_position.y = 0;
-		Vector3 plane_position = transform.position;
-		plane_position.y = 0;
+			Vector3 camera_plane_position = camera_transform.position;
+			camera_plane_position.y = 0;
+			Vector3 plane_position = transform.position;
+			plane_position.y = 0;
 
-		float direction_angle_y = Quaternion.LookRotation((camera_plane_position - plane_position).normalized).eulerAngles.y;
-		int angle_index = ((sprite_side_count * 2) - Mathf.RoundToInt((direction_angle_y - angle.y) / 45)) % sprite_side_count;
-		sprite_box_transform.rotation = Quaternion.Euler(0, direction_angle_y + 180.0f, 0);
-		sprite_renderer.sprite = sprites[anim][angle_index];
+			float direction_angle_y = Quaternion.LookRotation((camera_plane_position - plane_position).normalized).eulerAngles.y;
+			int angle_index = ((sprite_side_count * 2) - Mathf.RoundToInt((direction_angle_y - angle.y) / 45)) % sprite_side_count;
+			sprite_box_transform.rotation = Quaternion.Euler(0, direction_angle_y + 180.0f, 0);
+			sprite_renderer.sprite = sprites[anim][angle_index];
 
-		if (!is_alive) {
-			if (dead_anim <= 0) {
-				GameObject explosion_object = Instantiate(explosion, transform.position, Quaternion.identity);
-				Explosion explosion_explosion = explosion_object.GetComponent<Explosion>();
-				if (!is_gas_explosion) {
-					explosion_explosion.set_size(2.0f, 0.1f);
-					explosion_explosion.set_lifetime(1.0f, 0.25f);
-					explosion_explosion.knockback_power = 100;
+			if (!is_alive) {
+				if (dead_anim <= 0) {
+					GameObject explosion_object = Instantiate(explosion, transform.position, Quaternion.identity);
+					Explosion explosion_explosion = explosion_object.GetComponent<Explosion>();
+					if (!is_gas_explosion) {
+						explosion_explosion.set_size(2.0f, 0.1f);
+						explosion_explosion.set_lifetime(1.0f, 0.25f);
+						explosion_explosion.knockback_power = 100;
+					}
+					else {
+						explosion_explosion.set_size(2.0f, 0.1f);
+						explosion_explosion.set_lifetime(1.0f, 0.75f);
+						explosion_explosion.set_speed(0.0f, 7.5f);
+						explosion_explosion.damage = 50.0f;
+						explosion_explosion.knockback_power = 2000f;
+					}
 				}
-				else {
-					explosion_explosion.set_size(2.0f, 0.1f);
-					explosion_explosion.set_lifetime(1.0f, 0.75f);
-					explosion_explosion.set_speed(0.0f, 7.5f);
-					explosion_explosion.damage = 50.0f;
-					explosion_explosion.knockback_power = 2000f;
+
+				dead_anim += Time.deltaTime * 0.2f;
+				sprite_renderer.material.SetFloat("_NoisePower", dead_anim);
+
+				if (dead_anim >= 1) {
+					Destroy(gameObject);
 				}
-			}
-
-			dead_anim += Time.deltaTime * 0.2f;
-			sprite_renderer.material.SetFloat("_NoisePower", dead_anim);
-
-
-			if (dead_anim >= 1) {
-				Destroy(gameObject);
 			}
 		}
 	}

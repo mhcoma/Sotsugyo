@@ -26,8 +26,10 @@ public class EnemyAITest : MonoBehaviour {
 
 	SpriteObject sobj;
 	float anim_time = 0.0f;
+	public float anim_rate;
 	public int[] anim_frames;
 	int current_anim_frame;
+	
 
 	public enum Act_state {
 		wait,
@@ -67,59 +69,70 @@ public class EnemyAITest : MonoBehaviour {
 	}
 
 	void Update() {
-		bool temp = is_grounded;
-		is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
-		
-		temp = temp != is_grounded;
+		if (Time.timeScale > 0) {
+			bool temp = is_grounded;
+			is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
+			
+			temp = temp != is_grounded;
 
-		if (temp) {
-			rigid.drag = is_grounded ? ground_drag : air_drag;
+			if (temp) {
+				rigid.drag = is_grounded ? ground_drag : air_drag;
+			}
+
+			if (agent.velocity.magnitude == 0.0f) {
+				Debug.Log(is_grounded && on_slope());
+			}
+
+			if ((temp || !agent.enabled || agent.isStopped) && is_stopped() && !agent.isOnOffMeshLink) {
+				toggle_rigid(is_grounded);
+			}
+			
+			float distance = Vector3.Distance(player_transform.position, transform.position);
+
+			switch (state) {
+				case Act_state.wait:
+					if (distance <= finding_distance) {
+						state = Act_state.find;
+					}
+					break;
+				case Act_state.find:
+					if (agent.enabled) agent.SetDestination(player_transform.position);
+					if (distance > finding_distance) {
+						state = Act_state.wait;
+					}
+					else if (distance <= stopping_distance + 0.25f) {
+						state = Act_state.attack;
+						agent.updateRotation = false;
+					}
+					break;
+				case Act_state.attack:
+					if (agent.enabled) {
+						agent.SetDestination(player_transform.position);
+					}
+					attackable = on_sight();
+					rotate();
+					if (attackable) agent.stoppingDistance = stopping_distance;
+					else agent.stoppingDistance = 0;
+
+					if (distance > stopping_distance + 0.25f) {
+						state = Act_state.find;
+						agent.updateRotation = true;
+						attackable = false;
+					}
+					if (attackable) attack();
+					break;
+			}
 		}
-		
-		if ((temp || (!agent.enabled)) && is_stopped() && !agent.isOnOffMeshLink) {
-			toggle_rigid(is_grounded);
-		}
-		
-		float distance = Vector3.Distance(player_transform.position, transform.position);
-
-		switch (state) {
-			case Act_state.wait:
-				if (distance <= finding_distance) {
-					state = Act_state.find;
-				}
-				break;
-			case Act_state.find:
-				if (agent.enabled) agent.SetDestination(player_transform.position);
-				if (distance > finding_distance) {
-					state = Act_state.wait;
-				}
-				else if (distance <= stopping_distance + 0.25f) {
-					state = Act_state.attack;
-				}
-				break;
-			case Act_state.attack:
-				if (agent.enabled) agent.SetDestination(player_transform.position);
-				attackable = on_sight();
-				Debug.Log(attackable);
-				if (attackable) agent.stoppingDistance = stopping_distance;
-				else agent.stoppingDistance = 0;
-
-				if (distance > stopping_distance + 0.25f) {
-					state = Act_state.find;
-					attackable = false;
-				}
-				if (attackable) attack();
-				break;
-		}
-
 	}
 
 	void FixedUpdate() {
-		if (is_grounded && on_slope() && !agent.enabled) {
-			rigid.useGravity = false;
-		}
-		else {
-			rigid.useGravity = true;
+		if (Time.timeScale > 0) {
+			if (is_grounded && on_slope() && (!agent.enabled || agent.velocity.magnitude == 0.0f)) {
+				rigid.useGravity = false;
+			}
+			else {
+				rigid.useGravity = true;
+			}
 		}
 	}
 
@@ -142,12 +155,38 @@ public class EnemyAITest : MonoBehaviour {
 		rigid.drag = toggle ? ground_drag : air_drag;
 	}
 
+	void rotate() {
+
+		Vector3 dir = (player_transform.position - transform.position).normalized;
+		dir.y = 0;
+
+		Quaternion rot = Quaternion.LookRotation(dir);
+
+		if (dir.magnitude != 0.0f) {
+			if (anim_frames.Length > 0) {
+				anim_time -= anim_rate;
+				current_anim_frame = (current_anim_frame + 1) % anim_frames.Length;
+				sobj.anim = anim_frames[current_anim_frame];
+			}
+		}
+		else {
+			if (anim_frames.Length > 0) {
+				current_anim_frame = 0;
+				sobj.anim = anim_frames[current_anim_frame];
+			}
+		}
+
+		Quaternion trot = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * agent.angularSpeed);
+		transform.rotation = trot;
+		transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
+	}
+
 	bool on_sight() {
 		RaycastHit hit;
 		Ray ray = new Ray(transform.position, player_transform.position - transform.position);
 
 		if (!Physics.Raycast(ray, out hit, Mathf.Infinity, raycast_mask)) return false;
-		Debug.Log(hit.transform);
+		// Debug.Log(hit.transform);
 		if (hit.transform != player_transform) return false;
 		return true;
 	}
