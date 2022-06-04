@@ -2,19 +2,19 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 
-public enum OffMeshLinkMoveMethod
+public enum oml_move_method_enum
 {
-	Teleport,
-	NormalSpeed,
-	Parabola,
-	Curve
+	teleport,
+	normal_speed,
+	parabola,
+	curve
 }
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class AgentLinkMover : MonoBehaviour
 {
-	public OffMeshLinkMoveMethod m_Method = OffMeshLinkMoveMethod.Parabola;
-	public AnimationCurve m_Curve = new AnimationCurve();
+	public oml_move_method_enum method = oml_move_method_enum.parabola;
+	public AnimationCurve curve = new AnimationCurve();
 
 	IEnumerator Start()
 	{
@@ -24,13 +24,15 @@ public class AgentLinkMover : MonoBehaviour
 		{
 			if (agent.isOnOffMeshLink)
 			{
-				if (m_Method == OffMeshLinkMoveMethod.NormalSpeed)
+				if (method == oml_move_method_enum.normal_speed)
 					yield return StartCoroutine(NormalSpeed(agent));
-				else if (m_Method == OffMeshLinkMoveMethod.Parabola)
+				else if (method == oml_move_method_enum.parabola)
 					yield return StartCoroutine(Parabola(agent, 2.0f, 0.5f));
-				else if (m_Method == OffMeshLinkMoveMethod.Curve)
+				else if (method == oml_move_method_enum.curve)
 					yield return StartCoroutine(Curve(agent, 0.5f));
-				agent.CompleteOffMeshLink();
+				if (agent.isOnNavMesh) {
+					agent.CompleteOffMeshLink();
+				}
 			}
 			yield return null;
 		}
@@ -39,10 +41,10 @@ public class AgentLinkMover : MonoBehaviour
 	IEnumerator NormalSpeed(NavMeshAgent agent)
 	{
 		OffMeshLinkData data = agent.currentOffMeshLinkData;
-		Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
-		while (agent.transform.position != endPos)
+		Vector3 end_pos = data.endPos + Vector3.up * agent.baseOffset;
+		while (agent.transform.position != end_pos)
 		{
-			agent.transform.position = Vector3.MoveTowards(agent.transform.position, endPos, agent.speed * Time.deltaTime);
+			agent.transform.position = Vector3.MoveTowards(agent.transform.position, end_pos, agent.speed * Time.deltaTime);
 			yield return null;
 		}
 	}
@@ -50,14 +52,14 @@ public class AgentLinkMover : MonoBehaviour
 	IEnumerator Parabola(NavMeshAgent agent, float height, float duration)
 	{
 		OffMeshLinkData data = agent.currentOffMeshLinkData;
-		Vector3 startPos = agent.transform.position;
-		Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
-		float normalizedTime = 0.0f;
-		while (normalizedTime < 1.0f)
+		Vector3 start_pos = agent.transform.position;
+		Vector3 end_pos = data.endPos + Vector3.up * agent.baseOffset;
+		float normalized_time = 0.0f;
+		while (normalized_time < 1.0f)
 		{
-			float yOffset = height * 4.0f * (normalizedTime - normalizedTime * normalizedTime);
-			agent.transform.position = Vector3.Lerp(startPos, endPos, normalizedTime) + yOffset * Vector3.up;
-			normalizedTime += Time.deltaTime / duration;
+			float yOffset = height * 4.0f * (normalized_time - normalized_time * normalized_time);
+			agent.transform.position = Vector3.Lerp(start_pos, end_pos, normalized_time) + yOffset * Vector3.up;
+			normalized_time += Time.deltaTime / duration;
 			yield return null;
 		}
 	}
@@ -65,14 +67,14 @@ public class AgentLinkMover : MonoBehaviour
 	IEnumerator Curve(NavMeshAgent agent, float duration)
 	{
 		OffMeshLinkData data = agent.currentOffMeshLinkData;
-		Vector3 startPos = agent.transform.position;
-		Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
-		float normalizedTime = 0.0f;
-		while (normalizedTime < 1.0f)
+		Vector3 start_pos = agent.transform.position;
+		Vector3 end_pos = data.endPos + Vector3.up * agent.baseOffset;
+		float normalized_time = 0.0f;
+		while (normalized_time < 1.0f)
 		{
-			float yOffset = m_Curve.Evaluate(normalizedTime);
-			agent.transform.position = Vector3.Lerp(startPos, endPos, normalizedTime) + yOffset * Vector3.up;
-			normalizedTime += Time.deltaTime / duration;
+			float yOffset = curve.Evaluate(normalized_time);
+			agent.transform.position = Vector3.Lerp(start_pos, end_pos, normalized_time) + yOffset * Vector3.up;
+			normalized_time += Time.deltaTime / duration;
 			yield return null;
 		}
 	}

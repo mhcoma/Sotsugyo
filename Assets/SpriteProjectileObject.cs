@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SpriteProjectileObject : MonoBehaviour {
-	public Transform camera_transform;
+	Transform camera_transform;
 	void Start() {
 		camera_transform = Camera.main.transform;
 	}

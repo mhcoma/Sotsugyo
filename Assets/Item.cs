@@ -15,18 +15,30 @@ public class Item : MonoBehaviour {
 
 	public int value;
 
+	AudioSource asrc;
+	public AudioClip get_clip;
+
+
+	SpriteRenderer spr;
+	bool alive = true;
+
 	void Start() {
-		
+		asrc = GetComponent<AudioSource>();
+		spr = GetComponent<SpriteRenderer>();
 	}
 
 	void Update() {
-		
+		if (!alive && !asrc.isPlaying) {
+			Destroy(gameObject);
+		}
 	}
 
 	void OnTriggerEnter(Collider other) {
-		if (other.transform.CompareTag("Player")) {
+		if (other.transform.CompareTag("Player") && alive) {
+			asrc.PlayOneShot(get_clip);
 			item_effect(other.transform);
-			Destroy(gameObject);
+			alive = false;
+			spr.enabled = false;
 		}
 	}
 

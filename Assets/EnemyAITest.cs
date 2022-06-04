@@ -79,10 +79,6 @@ public class EnemyAITest : MonoBehaviour {
 				rigid.drag = is_grounded ? ground_drag : air_drag;
 			}
 
-			if (agent.velocity.magnitude == 0.0f) {
-				Debug.Log(is_grounded && on_slope());
-			}
-
 			if ((temp || !agent.enabled || agent.isStopped) && is_stopped() && !agent.isOnOffMeshLink) {
 				toggle_rigid(is_grounded);
 			}
@@ -96,9 +92,14 @@ public class EnemyAITest : MonoBehaviour {
 					}
 					break;
 				case Act_state.find:
-					if (agent.enabled) agent.SetDestination(player_transform.position);
+					if (agent.enabled) {
+						agent.SetDestination(player_transform.position);
+						if (agent.velocity.magnitude != 0) animate();
+						else stop_animate();
+					}
 					if (distance > finding_distance) {
 						state = Act_state.wait;
+						stop_animate();
 					}
 					else if (distance <= stopping_distance + 0.25f) {
 						state = Act_state.attack;
@@ -108,6 +109,8 @@ public class EnemyAITest : MonoBehaviour {
 				case Act_state.attack:
 					if (agent.enabled) {
 						agent.SetDestination(player_transform.position);
+						if (agent.velocity.magnitude != 0) animate();
+						else stop_animate();
 					}
 					attackable = on_sight();
 					rotate();
@@ -163,17 +166,10 @@ public class EnemyAITest : MonoBehaviour {
 		Quaternion rot = Quaternion.LookRotation(dir);
 
 		if (dir.magnitude != 0.0f) {
-			if (anim_frames.Length > 0) {
-				anim_time -= anim_rate;
-				current_anim_frame = (current_anim_frame + 1) % anim_frames.Length;
-				sobj.anim = anim_frames[current_anim_frame];
-			}
+			animate();
 		}
 		else {
-			if (anim_frames.Length > 0) {
-				current_anim_frame = 0;
-				sobj.anim = anim_frames[current_anim_frame];
-			}
+			stop_animate();
 		}
 
 		Quaternion trot = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * agent.angularSpeed);
@@ -216,6 +212,24 @@ public class EnemyAITest : MonoBehaviour {
 				break;
 			case Attack_type.laser:
 				break;
+		}
+	}
+
+	void animate() {
+		if (anim_frames.Length > 0) {
+			anim_time -= Time.deltaTime;
+			if (anim_time < 0) {
+				anim_time += anim_rate;
+				current_anim_frame = (current_anim_frame + 1) % anim_frames.Length;
+				sobj.anim = anim_frames[current_anim_frame];
+			}
+		}
+	}
+
+	void stop_animate() {
+		if (anim_frames.Length > 0) {
+			current_anim_frame = 0;
+			sobj.anim = anim_frames[current_anim_frame];
 		}
 	}
 }
