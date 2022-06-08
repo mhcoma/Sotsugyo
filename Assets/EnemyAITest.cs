@@ -29,6 +29,8 @@ public class EnemyAITest : MonoBehaviour {
 	public float anim_rate;
 	public int[] anim_frames;
 	int current_anim_frame;
+
+	bool is_alive = true;
 	
 
 	public enum Act_state {
@@ -70,60 +72,62 @@ public class EnemyAITest : MonoBehaviour {
 
 	void Update() {
 		if (Time.timeScale > 0) {
-			bool temp = is_grounded;
-			is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
+			if (is_alive) {
+				bool temp = is_grounded;
+				is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
+				
+				temp = temp != is_grounded;
+
+				if (temp) {
+					rigid.drag = is_grounded ? ground_drag : air_drag;
+				}
+
+				if ((temp || !agent.enabled || agent.isStopped) && is_stopped() && !agent.isOnOffMeshLink) {
+					toggle_rigid(is_grounded);
+				}
 			
-			temp = temp != is_grounded;
+				float distance = Vector3.Distance(player_transform.position, transform.position);
 
-			if (temp) {
-				rigid.drag = is_grounded ? ground_drag : air_drag;
-			}
+				switch (state) {
+					case Act_state.wait:
+						if (distance <= finding_distance) {
+							state = Act_state.find;
+						}
+						break;
+					case Act_state.find:
+						if (agent.enabled) {
+							agent.SetDestination(player_transform.position);
+							if (agent.velocity.magnitude != 0) animate();
+							else stop_animate();
+						}
+						if (distance > finding_distance) {
+							state = Act_state.wait;
+							stop_animate();
+						}
+						else if (distance <= stopping_distance + 0.25f) {
+							state = Act_state.attack;
+							agent.updateRotation = false;
+						}
+						break;
+					case Act_state.attack:
+						if (agent.enabled) {
+							agent.SetDestination(player_transform.position);
+							if (agent.velocity.magnitude != 0) animate();
+							else stop_animate();
+						}
+						attackable = on_sight();
+						rotate();
+						if (attackable) agent.stoppingDistance = stopping_distance;
+						else agent.stoppingDistance = 0;
 
-			if ((temp || !agent.enabled || agent.isStopped) && is_stopped() && !agent.isOnOffMeshLink) {
-				toggle_rigid(is_grounded);
-			}
-			
-			float distance = Vector3.Distance(player_transform.position, transform.position);
-
-			switch (state) {
-				case Act_state.wait:
-					if (distance <= finding_distance) {
-						state = Act_state.find;
-					}
-					break;
-				case Act_state.find:
-					if (agent.enabled) {
-						agent.SetDestination(player_transform.position);
-						if (agent.velocity.magnitude != 0) animate();
-						else stop_animate();
-					}
-					if (distance > finding_distance) {
-						state = Act_state.wait;
-						stop_animate();
-					}
-					else if (distance <= stopping_distance + 0.25f) {
-						state = Act_state.attack;
-						agent.updateRotation = false;
-					}
-					break;
-				case Act_state.attack:
-					if (agent.enabled) {
-						agent.SetDestination(player_transform.position);
-						if (agent.velocity.magnitude != 0) animate();
-						else stop_animate();
-					}
-					attackable = on_sight();
-					rotate();
-					if (attackable) agent.stoppingDistance = stopping_distance;
-					else agent.stoppingDistance = 0;
-
-					if (distance > stopping_distance + 0.25f) {
-						state = Act_state.find;
-						agent.updateRotation = true;
-						attackable = false;
-					}
-					if (attackable) attack();
-					break;
+						if (distance > stopping_distance + 0.25f) {
+							state = Act_state.find;
+							agent.updateRotation = true;
+							attackable = false;
+						}
+						if (attackable) attack();
+						break;
+				}
 			}
 		}
 	}
@@ -231,5 +235,10 @@ public class EnemyAITest : MonoBehaviour {
 			current_anim_frame = 0;
 			sobj.anim = anim_frames[current_anim_frame];
 		}
+	}
+
+	public void die() {
+		toggle_rigid(false);
+		is_alive = false;
 	}
 }

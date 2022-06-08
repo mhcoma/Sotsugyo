@@ -20,6 +20,7 @@ public class SpriteObject : MonoBehaviour {
 	public float health = 100;
 	public bool is_alive = true;
 	float dead_anim = 0;
+	float dead_anim_speed = 1f;
 
 	public GameObject explosion;
 
@@ -29,6 +30,10 @@ public class SpriteObject : MonoBehaviour {
 
 	EnemyAITest ai;
 	NonAIObject nonai;
+
+	
+	AudioSource asrc;
+	public AudioClip dead_clip;
 
 
 	void Start() {
@@ -46,6 +51,8 @@ public class SpriteObject : MonoBehaviour {
 		}
 		
 		is_ai_object = TryGetComponent<EnemyAITest>(out ai);
+
+		asrc = GetComponent<AudioSource>();
 	}
 
 	void Update() {
@@ -66,6 +73,7 @@ public class SpriteObject : MonoBehaviour {
 				if (dead_anim <= 0) {
 					GameObject explosion_object = Instantiate(explosion, transform.position, Quaternion.identity);
 					Explosion explosion_explosion = explosion_object.GetComponent<Explosion>();
+					asrc.PlayOneShot(dead_clip);
 					if (!is_gas_explosion) {
 						explosion_explosion.set_size(2.0f, 0.1f);
 						explosion_explosion.set_lifetime(1.0f, 0.25f);
@@ -80,7 +88,7 @@ public class SpriteObject : MonoBehaviour {
 					}
 				}
 
-				dead_anim += Time.deltaTime * 0.2f;
+				dead_anim += Time.deltaTime * dead_anim_speed;
 				sprite_renderer.material.SetFloat("_NoisePower", dead_anim);
 
 				if (dead_anim >= 1) {
@@ -94,6 +102,7 @@ public class SpriteObject : MonoBehaviour {
 		health -= damage;
 		if (health <= 0) {
 			is_alive = false;
+			if (is_ai_object) ai.die();
 			rigid.isKinematic = true;
 			colid.enabled = false;
 			shadow_mesh_transform.gameObject.SetActive(false);

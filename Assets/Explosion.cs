@@ -22,6 +22,8 @@ public class Explosion : MonoBehaviour
 	SphereCollider colid;
 	List<int> damaged_objects = new List<int>();
 
+	AudioSource asrc;
+
 	void Start() {
 		sprite_particle = transform.GetChild(0).GetComponent<ParticleSystem>();
 		spark_particle = transform.GetChild(1).GetComponent<ParticleSystem>();
@@ -39,6 +41,8 @@ public class Explosion : MonoBehaviour
 		}
 
 		colid = GetComponent<SphereCollider>();
+		
+		asrc = GetComponent<AudioSource>();
 	}
 
 	void Update() {

@@ -18,7 +18,6 @@ public class Rocket : MonoBehaviour {
 	float explosion_damage = 10.0f;
 
 	AudioSource asrc;
-	public AudioClip rocket_boom_clip;
 
 	bool launched = false;
 
@@ -73,7 +72,6 @@ public class Rocket : MonoBehaviour {
 
 		speed = 0.0f;
 		rocket_light.enabled = false;
-		asrc.PlayOneShot(rocket_boom_clip);
 	}
 
 	public void launch(Vector3 start_pos, Vector3 dest_pos, Transform shooter, float rocket_damage, float explosion_damage) {

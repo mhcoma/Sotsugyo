@@ -255,7 +255,7 @@ public class Player : MonoBehaviour {
 					switch (weapon_index) {
 						case WeaponIndex.lasergun:
 							if (second_hit.transform.CompareTag("Actor")) {
-								second_hit.transform.gameObject.GetComponent<SpriteObject>().get_damage(0.1f);
+								second_hit.transform.gameObject.GetComponent<SpriteObject>().get_damage(10.0f * Time.deltaTime);
 							}
 							break;
 						case WeaponIndex.rocketlauncher:
