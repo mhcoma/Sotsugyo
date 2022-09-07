@@ -35,27 +35,31 @@ public class Item : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) {
 		if (other.transform.CompareTag("Player") && alive) {
-			asrc.PlayOneShot(get_clip);
-			item_effect(other.transform);
-			alive = false;
-			spr.enabled = false;
+			bool result = item_effect(other.transform);
+			if (result) {
+				asrc.PlayOneShot(get_clip);
+				alive = false;
+				spr.enabled = false;
+			}
 		}
 	}
 
-	void item_effect(Transform tr) {
+	bool item_effect(Transform tr) {
+		bool result = true;
 		Player player = tr.GetComponent<Player>();
 		switch (type) {
 			case item_type.health_pack:
-				player.get_damage(value);
+				result = player.get_damage(value);
 				break;
 			case item_type.laser_ammo:
-				player.get_ammo(Player.WeaponIndex.lasergun, value);
+				result = player.get_ammo(Player.WeaponIndex.lasergun, value);
 				break;
 			case item_type.rocket_ammo:
-				player.get_ammo(Player.WeaponIndex.rocketlauncher, value);
+				result = player.get_ammo(Player.WeaponIndex.rocketlauncher, value);
 				break;
 			case item_type.key:
 				break;
 		}
+		return result;
 	}
 }

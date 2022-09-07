@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class EnemyAITest : MonoBehaviour {
 	Rigidbody rigid;
 
-	public Transform player_transform;
+	Transform player_transform;
 	public float finding_distance;
 	public float stopping_distance;
 	Player player;
@@ -64,6 +64,9 @@ public class EnemyAITest : MonoBehaviour {
 		asrc = GetComponent<AudioSource>();
 
 		raycast_mask = ~(1 << LayerMask.NameToLayer("ProjectileSprite"));
+
+		player_transform = GameManager.instance.player_transform;
+
 		player = player_transform.GetComponent<Player>();
 
 		if (type == Attack_type.melee)
@@ -77,7 +80,7 @@ public class EnemyAITest : MonoBehaviour {
 				is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
 				
 				temp = temp != is_grounded;
-
+				// temp : is_grounded가 변경되었을 때
 				if (temp) {
 					rigid.drag = is_grounded ? ground_drag : air_drag;
 				}

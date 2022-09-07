@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SpriteObject : MonoBehaviour {
 
-	public Transform camera_transform;
+	private Transform camera_transform;
 	private Transform sprite_box_transform;
 	private Transform sprite_transform;
 	private Transform shadow_mesh_transform;
@@ -37,6 +37,8 @@ public class SpriteObject : MonoBehaviour {
 
 
 	void Start() {
+		camera_transform = GameManager.instance.camera_transform;
+
 		rigid = GetComponent<Rigidbody>();
 		colid = GetComponent<CapsuleCollider>();
 

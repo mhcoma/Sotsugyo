@@ -5,10 +5,13 @@ using UnityEngine.Audio;
 using TMPro;
 
 public class GameManager : MonoBehaviour {
+	public static GameManager instance = null;
 
 	public Transform pause_menu_transform;
 	public Transform player_transform;
 	Player player;
+
+	public Transform camera_transform;
 
 	Transform pause_group_transform;
 	Transform option_group_transform;
@@ -31,6 +34,14 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public menu_state_enum menu_state = menu_state_enum.none;
+
+	void Awake() {
+		if (instance == null) {
+			instance = this;
+			DontDestroyOnLoad(this.gameObject);
+		}
+		else Destroy(this.gameObject);
+	}
 
 	void Start() {
 		player = player_transform.GetComponent<Player>();
