@@ -65,7 +65,7 @@ public class Explosion : MonoBehaviour
 					Vector3 temp2 = transform.position;
 					temp2.y = 0;
 
-					float dist = 0.5f - (Vector3.Distance(temp1, temp2) / (damage_range * Mathf.Sqrt(2) * 2));
+					float dist = Mathf.Clamp(0.5f - (Vector3.Distance(temp1, temp2) / (damage_range * Mathf.Sqrt(2) * 2)), 0.0f, 1.0f);
 
 					float final_damage = dist * damage;
 					if (other.transform.CompareTag("Actor")) {
