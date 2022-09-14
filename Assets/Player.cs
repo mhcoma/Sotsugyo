@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class Player : MonoBehaviour {
@@ -339,7 +340,7 @@ public class Player : MonoBehaviour {
 		// Debug.Log($"Get Damaged! : {health}");
 		hp_tmpro.SetText($"<size=64>HP</size>\n{(int)health}");
 		if (health <= 0) {
-			// Debug.Log("Player Dead");
+			kill_player();
 		}
 
 		return true;
@@ -370,5 +371,9 @@ public class Player : MonoBehaviour {
 		else {
 			
 		}
+	}
+
+	public void kill_player() {
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 }
