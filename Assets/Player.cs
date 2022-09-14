@@ -374,6 +374,6 @@ public class Player : MonoBehaviour {
 	}
 
 	public void kill_player() {
-		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+		// SceneManager.LoadScene("Scenes/Test", LoadSceneMode.Single);
 	}
 }

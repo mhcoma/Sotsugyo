@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class GameManager : MonoBehaviour {
@@ -36,6 +37,7 @@ public class GameManager : MonoBehaviour {
 	public menu_state_enum menu_state = menu_state_enum.none;
 
 	void Awake() {
+		// instance = this;
 		if (instance == null) {
 			instance = this;
 			DontDestroyOnLoad(this.gameObject);
@@ -44,7 +46,21 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Start() {
+		// Init();
+	}
+
+	void OnEnable() {
+		SceneManager.sceneLoaded += OnSceneLoaded;
+	}
+
+	void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+		Init();
+		Debug.Log("Loaded!!\n");
+	}
+
+	void Init() {
 		player = player_transform.GetComponent<Player>();
+		Debug.Log(player);
 
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;

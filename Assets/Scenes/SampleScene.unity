@@ -4060,7 +4060,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 1, g: 0.49803922, b: 0.24705882, a: 1}
+  m_Color: {r: 1, g: 0.7490196, b: 0.49803922, a: 1}
   m_Intensity: 1
   m_Range: 25
   m_SpotAngle: 7.5
@@ -18998,7 +18998,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh17906
+  m_Name: pb_Mesh21628
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
