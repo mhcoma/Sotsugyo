@@ -7,7 +7,6 @@ public class Actor : MonoBehaviour {
 		
 	}
 
-	// Update is called once per frame
 	void Update() {
 		
 	}

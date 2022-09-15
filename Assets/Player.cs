@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 
 public class Player : MonoBehaviour {
-	// Start is called before the first frame update
+	public static Player instance = null;
 	Rigidbody rigid;
 
 	Vector3 key_direc = new Vector3(0, 0, 0);
@@ -86,7 +86,16 @@ public class Player : MonoBehaviour {
 
 	bool controlable = true;
 
+	void Awake() {
+		if (instance == null) {
+			instance = this;
+			DontDestroyOnLoad(this.gameObject);
+		}
+		else Destroy(this.gameObject);
+	}
+
 	void Start() {
+		Debug.Log("Player Start!");
 		rigid = GetComponent<Rigidbody>();
 		camhold = cam_holder_transform.GetComponent<CameraHolder>();
 		cam_transform = cam_holder_transform.GetChild(0);
@@ -138,6 +147,8 @@ public class Player : MonoBehaviour {
 				rigid.AddForce(transform.up * jump_force, ForceMode.Impulse);
 				jumped = true;
 			}
+
+			if (Input.GetKeyDown(KeyCode.K)) kill_player();
 
 			slope_move_amount = Vector3.ProjectOnPlane(move_amount, slope_hit.normal);
 
@@ -374,6 +385,10 @@ public class Player : MonoBehaviour {
 	}
 
 	public void kill_player() {
-		// SceneManager.LoadScene("Scenes/Test", LoadSceneMode.Single);
+		// GameManager.instance.restart_level();
+	}
+
+	public void rebirth() {
+		
 	}
 }

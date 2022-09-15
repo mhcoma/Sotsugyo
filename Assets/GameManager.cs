@@ -37,7 +37,6 @@ public class GameManager : MonoBehaviour {
 	public menu_state_enum menu_state = menu_state_enum.none;
 
 	void Awake() {
-		// instance = this;
 		if (instance == null) {
 			instance = this;
 			DontDestroyOnLoad(this.gameObject);
@@ -46,7 +45,6 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Start() {
-		// Init();
 	}
 
 	void OnEnable() {
@@ -60,7 +58,6 @@ public class GameManager : MonoBehaviour {
 
 	void Init() {
 		player = player_transform.GetComponent<Player>();
-		Debug.Log(player);
 
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
@@ -130,5 +127,11 @@ public class GameManager : MonoBehaviour {
 
 	float get_gain(float volume) {
 		return 20 * (Mathf.Log(volume / 100) / Mathf.Log(10));
+	}
+
+	public void restart_level() {
+		player.rebirth();
+		SceneManager.LoadScene("Scenes/SampleScene", LoadSceneMode.Single);
+		
 	}
 }
