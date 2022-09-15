@@ -2,10 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraHolder : MonoBehaviour {
-	public static CameraHolder instance = null;
-	public Transform camera_position_transform;
-
+public class Canvas : MonoBehaviour {
+	public static Canvas instance = null;
 
 	void Awake() {
 		if (instance == null) {
@@ -19,7 +17,6 @@ public class CameraHolder : MonoBehaviour {
 	}
 
 	void Update() {
-		transform.position = camera_position_transform.position;
 	}
 
 }
