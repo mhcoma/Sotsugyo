@@ -95,7 +95,10 @@ public class Player : MonoBehaviour {
 	}
 
 	void Start() {
-		Debug.Log("Player Start!");
+		Init();
+	}
+
+	void Init() {
 		rigid = GetComponent<Rigidbody>();
 		camhold = cam_holder_transform.GetComponent<CameraHolder>();
 		cam_transform = cam_holder_transform.GetChild(0);
@@ -116,13 +119,10 @@ public class Player : MonoBehaviour {
 		hp_tmpro = HUD_transform.GetChild(0).GetComponent<TextMeshProUGUI>();
 		weapon_tmpro = HUD_transform.GetChild(1).GetComponent<TextMeshProUGUI>();
 
-		hp_tmpro.SetText($"<size=64>HP</size>\n{(int)health}");
-		weapon_tmpro.SetText($"<size=64>{weapon_names[(int) weapon_index]}</size>\n{weapon_ammo[(int) weapon_index]}");
-
-		// Debug.Log(HUD_transform.GetChild(0));
-
 		AudioSource[] asrcs = GetComponents<AudioSource>();
 		laser_asrc = asrcs[0];
+
+		rebirth();
 	}
 
 	void Update() {
@@ -385,10 +385,14 @@ public class Player : MonoBehaviour {
 	}
 
 	public void kill_player() {
-		// GameManager.instance.restart_level();
+		GameManager.instance.toggle_gameover(true);
 	}
 
 	public void rebirth() {
-		
+		rigid.velocity = Vector3.zero;
+		health = 100;
+		hp_tmpro.SetText($"<size=64>HP</size>\n{(int)health}");
+		weapon_tmpro.SetText($"<size=64>{weapon_names[(int) weapon_index]}</size>\n{weapon_ammo[(int) weapon_index]}");
+		transform.position = GameManager.instance.player_spawn_point_transform.position;
 	}
 }

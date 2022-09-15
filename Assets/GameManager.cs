@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour {
 
 	Transform pause_group_transform;
 	Transform option_group_transform;
+	Transform gameover_screen_transform;
+	public Transform player_spawn_point_transform;
 
 	TextMeshProUGUI title_tmpro;
 	TextMeshProUGUI music_volume_tmpro;
@@ -31,7 +33,8 @@ public class GameManager : MonoBehaviour {
 	public enum menu_state_enum {
 		none,
 		pause,
-		option
+		option,
+		gameover
 	}
 
 	public menu_state_enum menu_state = menu_state_enum.none;
@@ -58,12 +61,14 @@ public class GameManager : MonoBehaviour {
 
 	void Init() {
 		player = player_transform.GetComponent<Player>();
+		player_spawn_point_transform = transform.GetChild(0);
 
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 
 		pause_group_transform = pause_menu_transform.Find("PauseGroup");
 		option_group_transform = pause_menu_transform.Find("OptionGroup");
+		gameover_screen_transform = pause_menu_transform.Find("GameOverGroup");
 		title_tmpro = pause_menu_transform.Find("Title").GetComponent<TextMeshProUGUI>();
 
 		music_volume_tmpro = option_group_transform.Find("MusicVolumeText").GetComponent<TextMeshProUGUI>();
@@ -87,6 +92,11 @@ public class GameManager : MonoBehaviour {
 					toggle_option(false);
 				}
 				break;
+			case menu_state_enum.gameover:
+				if (Input.GetButtonDown("Cancel")) {
+					
+				}
+				break;
 		}
 	}
 
@@ -106,6 +116,21 @@ public class GameManager : MonoBehaviour {
 		option_group_transform.gameObject.SetActive(toggle);
 		menu_state = toggle ? menu_state_enum.option : menu_state_enum.pause;
 		title_tmpro.text = toggle ? "OPTION" : "PAUSE";
+	}
+	
+	public void toggle_gameover(bool toggle) {
+		menu_toggle = toggle;
+		pause_menu_transform.gameObject.SetActive(toggle);
+		Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
+		Cursor.visible = toggle;
+		Time.timeScale = toggle ? 0 : 1;
+		player.set_controllable(!toggle);
+
+		gameover_screen_transform.gameObject.SetActive(toggle);
+		pause_group_transform.gameObject.SetActive(!toggle);
+		option_group_transform.gameObject.SetActive(false);
+		menu_state = toggle ? menu_state_enum.gameover : menu_state_enum.none;
+		title_tmpro.text = "GAME OVER";
 	}
 
 	public void change_music_volume(float volume) {
@@ -131,7 +156,7 @@ public class GameManager : MonoBehaviour {
 
 	public void restart_level() {
 		player.rebirth();
+		toggle_gameover(false);
 		SceneManager.LoadScene("Scenes/SampleScene", LoadSceneMode.Single);
-		
 	}
 }
