@@ -130,7 +130,7 @@ public class GameManager : MonoBehaviour {
 		pause_group_transform.gameObject.SetActive(!toggle);
 		option_group_transform.gameObject.SetActive(false);
 		menu_state = toggle ? menu_state_enum.gameover : menu_state_enum.none;
-		title_tmpro.text = "GAME OVER";
+		title_tmpro.text = toggle ? "GAME OVER" : "";
 	}
 
 	public void change_music_volume(float volume) {
@@ -155,8 +155,12 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void restart_level() {
+		move_level(SceneManager.GetActiveScene().name);
+	}
+
+	public void move_level(string level_name) {
 		player.rebirth();
 		toggle_gameover(false);
-		SceneManager.LoadScene("Scenes/SampleScene", LoadSceneMode.Single);
+		SceneManager.LoadScene(level_name, LoadSceneMode.Single);
 	}
 }
