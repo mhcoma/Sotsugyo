@@ -163,4 +163,12 @@ public class GameManager : MonoBehaviour {
 		toggle_gameover(false);
 		SceneManager.LoadScene(level_name, LoadSceneMode.Single);
 	}
+
+	public void quit() {
+		#if UNITY_EDITOR
+			UnityEditor.EditorApplication.isPlaying = false;
+		#else
+			Application.Quit();
+		#endif
+	}
 }
