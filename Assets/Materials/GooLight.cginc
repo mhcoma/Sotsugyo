@@ -66,23 +66,26 @@ v2f vert(appdata_full v){
 }
 
 fixed4 frag(v2f i) : SV_Target {
+
+	fixed time = int(_Time.x * 128) / 16.0f;
+
 	i.normal = (
 		create_normal(
 			_NormalMap1,
-			float2(i.uv.x + _Time.x * 2, i.uv.y),
+			float2(i.uv.x + time, i.uv.y),
 			i
 		) +
 		create_normal(
 			_NormalMap2,
-			float2(i.uv.x, i.uv.y + _Time.x * 2),
+			float2(i.uv.x, i.uv.y + time),
 			i
 		)
 	) / 2.0f;
 
 
-	fixed noise = tex2D(_NoiseMap,
-		float2(i.uv.x + _Time.x, i.uv.y - _Time.x)
-	).r;
+	fixed noise = int(tex2D(_NoiseMap,
+		float2(i.uv.x + time, i.uv.y - time)
+	).r * 16) / 16.0f;
 
 	half3 albedo = tex2D(_MainTex, i.uv + noise).rgb * _Color.rgb;
 
