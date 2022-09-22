@@ -118,9 +118,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
   m_Name: Font_White
   m_EditorClassIdentifier: 
-  hashCode: -1993410494
+  hashCode: 1692901643
   material: {fileID: -7138322001739263308}
-  materialHashCode: -238173662
+  materialHashCode: -1132893237
   m_Version: 1.1.0
   m_SourceFontFileGUID: 049250139d1723542aced23c4c0aa827
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: 049250139d1723542aced23c4c0aa827, type: 3}
