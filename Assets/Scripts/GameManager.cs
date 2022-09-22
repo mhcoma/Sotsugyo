@@ -8,7 +8,8 @@ using TMPro;
 public class GameManager : MonoBehaviour {
 	public static GameManager instance = null;
 
-	public Transform pause_menu_transform;
+	public Transform canvas_transform;
+	Transform pause_menu_transform;
 	public Transform player_transform;
 	Player player;
 
@@ -17,6 +18,9 @@ public class GameManager : MonoBehaviour {
 	Transform pause_group_transform;
 	Transform option_group_transform;
 	Transform gameover_screen_transform;
+
+	Transform caption_transform;
+
 	public Transform player_spawn_point_transform;
 
 	TextMeshProUGUI title_tmpro;
@@ -61,10 +65,11 @@ public class GameManager : MonoBehaviour {
 
 	void Init() {
 		player = player_transform.GetComponent<Player>();
-		player_spawn_point_transform = transform.GetChild(0);
 
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
+
+		pause_menu_transform = canvas_transform.GetChild(4);
 
 		pause_group_transform = pause_menu_transform.Find("PauseGroup");
 		option_group_transform = pause_menu_transform.Find("OptionGroup");
@@ -73,6 +78,8 @@ public class GameManager : MonoBehaviour {
 
 		music_volume_tmpro = option_group_transform.Find("MusicVolumeText").GetComponent<TextMeshProUGUI>();
 		effect_volume_tmpro = option_group_transform.Find("EffectVolumeText").GetComponent<TextMeshProUGUI>();
+
+		caption_transform = canvas_transform.GetChild(3);
 	}
 
 	void Update() {
