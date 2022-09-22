@@ -33,6 +33,9 @@ public class GameManager : MonoBehaviour {
 	
 
 	bool menu_toggle = false;
+	bool caption_toggle = false;
+
+	Caption caption;
 
 	public enum menu_state_enum {
 		none,
@@ -80,6 +83,7 @@ public class GameManager : MonoBehaviour {
 		effect_volume_tmpro = option_group_transform.Find("EffectVolumeText").GetComponent<TextMeshProUGUI>();
 
 		caption_transform = canvas_transform.GetChild(3);
+		caption = caption_transform.GetComponent<Caption>();
 	}
 
 	void Update() {
@@ -108,12 +112,13 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void toggle_pause(bool toggle) {
+		bool temp_tot = toggle || caption_toggle;
 		menu_toggle = toggle;
 		pause_menu_transform.gameObject.SetActive(toggle);
 		Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
 		Cursor.visible = toggle;
-		Time.timeScale = toggle ? 0 : 1;
-		player.set_controllable(!toggle);
+		Time.timeScale = temp_tot ? 0 : 1;
+		player.set_controllable(!temp_tot);
 		menu_state = toggle ? menu_state_enum.pause : menu_state_enum.none;
 		title_tmpro.text = toggle ? "PAUSE" : "";
 	}
@@ -126,12 +131,13 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	public void toggle_gameover(bool toggle) {
+		bool temp_tot = toggle || caption_toggle;
 		menu_toggle = toggle;
 		pause_menu_transform.gameObject.SetActive(toggle);
 		Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
 		Cursor.visible = toggle;
-		Time.timeScale = toggle ? 0 : 1;
-		player.set_controllable(!toggle);
+		Time.timeScale = temp_tot ? 0 : 1;
+		player.set_controllable(!temp_tot);
 
 		gameover_screen_transform.gameObject.SetActive(toggle);
 		pause_group_transform.gameObject.SetActive(!toggle);
@@ -177,5 +183,19 @@ public class GameManager : MonoBehaviour {
 		#else
 			Application.Quit();
 		#endif
+	}
+
+	public void toggle_caption(bool toggle) {
+		bool temp_tot = toggle || menu_toggle;
+		caption_toggle = toggle;
+		Time.timeScale = temp_tot ? 0 : 1;
+		player.set_controllable(!temp_tot);
+		caption_transform.gameObject.SetActive(toggle);
+	}
+
+	public void caption_addtext(string str) {
+		toggle_caption(true);
+
+		caption.add_text(str);
 	}
 }

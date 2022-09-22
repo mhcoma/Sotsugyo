@@ -149,6 +149,11 @@ public class Player : MonoBehaviour {
 			}
 
 			if (Input.GetKeyDown(KeyCode.K)) kill_player();
+			if (Input.GetKeyDown(KeyCode.L)) {
+				GameManager.instance.caption_addtext("Hello");
+				GameManager.instance.caption_addtext("Hello");
+				GameManager.instance.caption_addtext("Hello");
+			}
 
 			slope_move_amount = Vector3.ProjectOnPlane(move_amount, slope_hit.normal);
 
