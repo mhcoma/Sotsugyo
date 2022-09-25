@@ -198,4 +198,8 @@ public class GameManager : MonoBehaviour {
 
 		caption.add_text(str);
 	}
+
+	public bool controlable() {
+		return player.controllable;
+	}
 }

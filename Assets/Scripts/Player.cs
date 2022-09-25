@@ -81,10 +81,12 @@ public class Player : MonoBehaviour {
 	public float health = 100;
 	float max_health = 100;
 
+	float interact_range = 3.0f;
+
 
 	AudioSource laser_asrc;
 
-	bool controlable = true;
+	public bool controllable = true;
 
 	void Awake() {
 		if (instance == null) {
@@ -126,7 +128,7 @@ public class Player : MonoBehaviour {
 	}
 
 	void Update() {
-		if (Time.timeScale > 0) {
+		if (controllable) {
 			is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
 
 			key_direc = new Vector3 (Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
@@ -142,17 +144,14 @@ public class Player : MonoBehaviour {
 				rigid.drag = air_drag;
 			}
 
-			if (Input.GetKeyDown(KeyCode.Space) && is_grounded) {
+			if (Input.GetButtonDown("Jump") && is_grounded) {
 				is_grounded = false;
 				rigid.AddForce(transform.up * jump_force, ForceMode.Impulse);
 				jumped = true;
 			}
 
-			if (Input.GetKeyDown(KeyCode.K)) kill_player();
-			if (Input.GetKeyDown(KeyCode.L)) {
-				GameManager.instance.caption_addtext("Hello");
-				GameManager.instance.caption_addtext("Hello");
-				GameManager.instance.caption_addtext("Hello");
+			if (Input.GetButtonDown("Interact")) {
+				interact();
 			}
 
 			slope_move_amount = Vector3.ProjectOnPlane(move_amount, slope_hit.normal);
@@ -166,8 +165,6 @@ public class Player : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
-		// rigid.MovePosition(transform.position + move_amount * Time.fixedDeltaTime * speed);
-		
 		if (Time.timeScale > 0) {
 			if (is_grounded) {
 				if (on_slope()) {
@@ -220,7 +217,7 @@ public class Player : MonoBehaviour {
 		}
 
 		if (!weapon_hud_sprite_manager.is_changing_weapon()) {
-			if (Input.GetMouseButtonDown(0) && weapon_ammo[(int)weapon_index] > 0) {
+			if (Input.GetButtonDown("Fire") && weapon_ammo[(int)weapon_index] > 0) {
 				is_shooting = true;
 				switch (weapon_index) {
 					case WeaponIndex.lasergun:
@@ -230,7 +227,7 @@ public class Player : MonoBehaviour {
 						break;
 				}
 			}
-			if (Input.GetMouseButtonUp(0)) {
+			if (Input.GetButtonUp("Fire")) {
 				is_shooting = false;
 				switch (weapon_index) {
 					case WeaponIndex.lasergun:
@@ -266,18 +263,16 @@ public class Player : MonoBehaviour {
 		Transform out_transform = null;
 		bool is_hit = false;
 		Ray second_ray = new Ray(origin, direction);
-		if (Physics.Raycast(second_ray, out second_hit, Mathf.Infinity, raycast_mask)) {
-			if (second_hit.distance < weapons_range) {
-				laser.SetPosition(0, laser_transform.position);
-				laser.SetPosition(1, second_hit.point);
-				spark_transform.position = second_hit.point;
+		if (Physics.Raycast(second_ray, out second_hit, weapons_range, raycast_mask)) {
+			laser.SetPosition(0, laser_transform.position);
+			laser.SetPosition(1, second_hit.point);
+			spark_transform.position = second_hit.point;
 
-				Vector3 temp_distance = -((second_hit.point - cam_transform.position).normalized) * spark_light_distance;
-				spark_light_transform.position = second_hit.point + temp_distance;
-				Transform objectHit = second_hit.transform;
-				is_hit = true;
-				out_transform = second_hit.transform;
-			}
+			Vector3 temp_distance = -((second_hit.point - cam_transform.position).normalized) * spark_light_distance;
+			spark_light_transform.position = second_hit.point + temp_distance;
+			Transform objectHit = second_hit.transform;
+			is_hit = true;
+			out_transform = second_hit.transform;
 		}
 
 		if (!is_hit) {
@@ -347,6 +342,25 @@ public class Player : MonoBehaviour {
 		}
 	}
 
+	void interact() {
+		RaycastHit hit;
+		Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+		if (Physics.Raycast(ray, out hit, interact_range, raycast_mask)) {
+			if (hit.transform != null) {
+				InteractableObject interobj;
+
+				interobj = hit.transform.GetComponent<InteractableObject>();
+				if (interobj != null) {
+					interobj.OnInteract.Invoke();
+				}
+			}
+		}
+		else {
+
+		}
+
+	}
+
 	public bool get_damage(float damage) {
 		if (damage <= 0 && health == max_health) {
 			return false;
@@ -378,7 +392,7 @@ public class Player : MonoBehaviour {
 	}
 
 	public void set_controllable(bool toggle) {
-		controlable = toggle;
+		controllable = toggle;
 		if (is_shooting_laser) {
 			toggle_laser(toggle);
 		}
