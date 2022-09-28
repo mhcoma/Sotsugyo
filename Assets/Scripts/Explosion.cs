@@ -53,6 +53,7 @@ public class Explosion : MonoBehaviour
 	}
 
 	void OnTriggerEnter(Collider other) {
+
 		if (damage_time < 0.0625f) {
 			if (other.transform.CompareTag("Actor") || other.transform.CompareTag("Player")) {
 				int index = other.GetInstanceID();
@@ -66,20 +67,27 @@ public class Explosion : MonoBehaviour
 					temp2.y = 0;
 
 					float dist = Mathf.Clamp(0.5f - (Vector3.Distance(temp1, temp2) / (damage_range * Mathf.Sqrt(2) * 2)), 0.0f, 1.0f);
+					
+					Rigidbody other_rigid = other.gameObject.GetComponent<Rigidbody>();
+					SpriteObject other_spriteobj = other.transform.gameObject.GetComponent<SpriteObject>();
+					EnemyAITest other_ai = other.transform.gameObject.GetComponent<EnemyAITest>();
 
 					float final_damage = dist * damage;
 					if (other.transform.CompareTag("Actor")) {
-						other.transform.gameObject.GetComponent<SpriteObject>().get_damage(final_damage);
-						if (other.transform.gameObject.GetComponent<SpriteObject>().is_ai_object) {
-							other.transform.gameObject.GetComponent<EnemyAITest>().toggle_rigid(false);
+						other_spriteobj.get_damage(final_damage);
+						if (other_spriteobj.is_ai_object) {
+							other_ai.toggle_rigid(false);
 							other.transform.position += new Vector3(0, 0.375f, 0);
-							// Debug.Log("gravity!");
 						}
+						other_rigid.AddExplosionForce(knockback_power, transform.position, knockback_radius, 1.0f);
 					}
 					else {
-						other.transform.gameObject.GetComponent<Player>().get_damage(final_damage);
+						Player player = other.transform.gameObject.GetComponent<Player>();
+						player.get_damage(final_damage);
+						
+						if (player.is_alive())
+							other_rigid.AddExplosionForce(knockback_power, transform.position, knockback_radius, 1.0f);
 					}
-					other.gameObject.GetComponent<Rigidbody>().AddExplosionForce(knockback_power, transform.position, knockback_radius, 1.0f);
 				}
 			}
 		}

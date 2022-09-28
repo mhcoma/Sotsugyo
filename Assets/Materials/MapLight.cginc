@@ -42,8 +42,11 @@ float4 _SpecMap_ST;
 
 v2f vert(appdata_full v){
 	v2f o;
+
+	o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 	o.pos = UnityObjectToClipPos(v.vertex);
 	o.world_pos = mul(unity_ObjectToWorld, v.vertex);
+
 	half3 worldNormal = UnityObjectToWorldNormal(v.normal);
 	o.normal = worldNormal;
 
@@ -54,8 +57,6 @@ v2f vert(appdata_full v){
 		o.binormal = create_binormal(i.normal, i.tangent, v.tangent.w);
 	#endif
 
-	o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
-
 	TRANSFER_SHADOW(o);
 
 	compute_vertex_light_color(o);
@@ -63,20 +64,7 @@ v2f vert(appdata_full v){
 }
 
 fixed4 frag(v2f i) : SV_Target {
-
-	float3 tangent_space_normal = normalize(UnpackNormal(tex2D(_NormalMap, i.uv)));
-
-	#if defined(BINORMAL_PER_FRAGMENT)
-		float3 binormal = create_binormal(i.normal, i.tangent.xyz, i.tangent.w);
-	#else
-		float3 binormal = i.binormal;
-	#endif
-
-	i.normal = normalize(
-		tangent_space_normal.x * i.tangent +
-		tangent_space_normal.y * binormal +
-		tangent_space_normal.z * i.normal
-	);
+	i.normal = create_normal(_NormalMap, i.uv, i);
 
 	half3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;
 
@@ -95,12 +83,15 @@ fixed4 frag(v2f i) : SV_Target {
 
 	float specular_level = tex2D(_SpecMap, i.uv).rgb;
 
-	return UNITY_BRDF_PBS(
+	fixed4 result = UNITY_BRDF_PBS(
 		albedo, specular_tint,
 		omr, specular_level,
 		i.normal, view_dir,
 		light, indirect
 	);
+	
+	result = make_retro(result);
+	return result;
 }
 
 #endif

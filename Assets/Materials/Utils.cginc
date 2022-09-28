@@ -110,4 +110,8 @@ float3 create_normal(sampler2D tex, float2 uv, v2f i) {
 	);
 }
 
+fixed4 make_retro(fixed4 input) {
+	return floor(input * 8) / 8;
+}
+
 #endif

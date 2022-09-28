@@ -6901,7 +6901,7 @@ MonoBehaviour:
   canvas_transform: {fileID: 1826427008}
   weapon_ammo: 00000000e803000032000000
   rocket_prefab: {fileID: 3119731440945254318, guid: f6269c4610965bd478cde573a479750b, type: 3}
-  health: 100
+  max_health: 1
   controllable: 1
 --- !u!136 &1647823190
 CapsuleCollider:
@@ -6939,7 +6939,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh21182
+  m_Name: pb_Mesh32980
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -7630,7 +7630,7 @@ MeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: bc6fa045a8fea8e40aa6bd922e4dc229, type: 2}
   - {fileID: 2100000, guid: 817e06f65f3b32844ae032becc5fc5d3, type: 2}
-  - {fileID: 2100000, guid: 51d9e2cc60e206f46a9437c624e73b17, type: 2}
+  - {fileID: 2100000, guid: dc7d356c7ff9772479469e68fbec6e12, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -104,12 +104,15 @@ fixed4 frag(v2f i) : SV_Target {
 
 	float specular_level = 1.0f;
 
-	return UNITY_BRDF_PBS(
+	fixed4 result = UNITY_BRDF_PBS(
 		albedo, specular_tint,
 		omr, specular_level,
 		i.normal, view_dir,
 		light, indirect
 	);
+	
+	result = make_retro(result);
+	return result;
 }
 
 #endif

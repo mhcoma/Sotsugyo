@@ -78,8 +78,8 @@ public class Player : MonoBehaviour {
 	
 	LayerMask raycast_mask;
 
-	public float health = 100;
-	float max_health = 100;
+	float health;
+	public float max_health;
 
 	float interact_range = 3.0f;
 
@@ -405,13 +405,18 @@ public class Player : MonoBehaviour {
 
 	public void kill_player() {
 		GameManager.instance.toggle_gameover(true);
+		rigid.velocity = Vector3.zero;
 	}
 
 	public void rebirth() {
-		rigid.velocity = Vector3.zero;
-		health = 100;
+		health = max_health;
 		hp_tmpro.SetText($"<size=64>HP</size>\n{(int)health}");
 		weapon_tmpro.SetText($"<size=64>{weapon_names[(int) weapon_index]}</size>\n{weapon_ammo[(int) weapon_index]}");
 		transform.position = GameManager.instance.player_spawn_point_transform.position;
+		rigid.velocity = Vector3.zero;
+	}
+
+	public bool is_alive() {
+		return health >= 0;
 	}
 }

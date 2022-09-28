@@ -83,20 +83,7 @@ v2f vert(appdata_full v){
 }
 
 fixed4 frag(v2f i) : SV_Target {
-
-	float3 tangent_space_normal = normalize(UnpackNormal(tex2D(_NormalMap, i.uv)));
-
-	#if defined(BINORMAL_PER_FRAGMENT)
-		float3 binormal = create_binormal(i.normal, i.tangent.xyz, i.tangent.w);
-	#else
-		float3 binormal = i.binormal;
-	#endif
-
-	i.normal = normalize(
-		tangent_space_normal.x * i.tangent +
-		tangent_space_normal.y * binormal +
-		tangent_space_normal.z * i.normal
-	);
+	i.normal = create_normal(_NormalMap, i.uv, i);
 
 	float2 screen_uv = (i.screen_pos.xy) / i.screen_pos.w;
 
@@ -141,12 +128,15 @@ fixed4 frag(v2f i) : SV_Target {
 	float specular_level = tex2D(_SpecMap, i.uv).rgb;
 	clip(alpha - 0.5);
 
-	return UNITY_BRDF_PBS(
+	fixed4 result = UNITY_BRDF_PBS(
 		albedo, specular_tint,
 		omr, specular_level,
 		i.normal, view_dir,
 		light, indirect
 	) + emission;
+
+	result = make_retro(result);
+	return result;
 }
 
 #endif
