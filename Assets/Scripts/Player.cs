@@ -144,7 +144,7 @@ public class Player : MonoBehaviour {
 				rigid.drag = air_drag;
 			}
 
-			if ((Input.GetButtonDown("Jump") || (Input.GetAxis("Mouse ScrollWheel")) != 0) && is_grounded) {
+			if (Input.GetButtonDown("Jump") && is_grounded) {
 				rigid.velocity = new Vector3(rigid.velocity.x, 0, rigid.velocity.z);
 				rigid.AddForce(transform.up * jump_force, ForceMode.Impulse);
 				is_grounded = false;
