@@ -25,7 +25,6 @@ public class Caption : MonoBehaviour {
 
 	void Update() {
 		if (GameManager.instance.menu_state == GameManager.menu_state_enum.none) {
-			Debug.Log(Input.GetButtonDown("Submit") || Input.GetButtonDown("Fire"));
 			if (!string.IsNullOrEmpty(line_buffer)) {
 				if (Input.GetButtonDown("Submit") || Input.GetButtonDown("Fire")) {
 					lines_display.Last.Value = new string(line_buffer);

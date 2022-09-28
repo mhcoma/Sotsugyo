@@ -189,7 +189,6 @@ public class EnemyAITest : MonoBehaviour {
 		Ray ray = new Ray(transform.position, player_transform.position - transform.position);
 
 		if (!Physics.Raycast(ray, out hit, Mathf.Infinity, raycast_mask)) return false;
-		// Debug.Log(hit.transform);
 		if (hit.transform != player_transform) return false;
 		return true;
 	}

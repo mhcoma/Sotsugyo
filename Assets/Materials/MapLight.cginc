@@ -71,6 +71,7 @@ fixed4 frag(v2f i) : SV_Target {
 	float3 view_dir = normalize(_WorldSpaceCameraPos - i.world_pos);
 
 	UnityLight light = create_light(i);
+	
 	UnityIndirect indirect = create_indirect(i, view_dir);
 
 	float3 specular_tint;

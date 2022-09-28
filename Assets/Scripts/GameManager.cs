@@ -63,7 +63,6 @@ public class GameManager : MonoBehaviour {
 
 	void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
 		Init();
-		Debug.Log("Loaded!!\n");
 	}
 
 	void Init() {

@@ -24,6 +24,7 @@ public class Player : MonoBehaviour {
 	float player_height = 2.0f;
 	float ground_distance = 0.3f;
 	public LayerMask ground_mask;
+	public Transform ground_check_transform;
 	bool is_grounded;
 	RaycastHit slope_hit;
 	Vector3 slope_move_amount;
@@ -129,8 +130,7 @@ public class Player : MonoBehaviour {
 
 	void Update() {
 		if (controllable) {
-			is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
-
+			is_grounded = Physics.CheckSphere(ground_check_transform.position, ground_distance, ground_mask);
 			key_direc = new Vector3 (Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
 			
 			mouse_x += Input.GetAxis("Mouse X") * 10;
@@ -144,9 +144,10 @@ public class Player : MonoBehaviour {
 				rigid.drag = air_drag;
 			}
 
-			if (Input.GetButtonDown("Jump") && is_grounded) {
-				is_grounded = false;
+			if ((Input.GetButtonDown("Jump") || (Input.GetAxis("Mouse ScrollWheel")) != 0) && is_grounded) {
+				rigid.velocity = new Vector3(rigid.velocity.x, 0, rigid.velocity.z);
 				rigid.AddForce(transform.up * jump_force, ForceMode.Impulse);
+				is_grounded = false;
 				jumped = true;
 			}
 
@@ -367,7 +368,6 @@ public class Player : MonoBehaviour {
 		}
 		health -= damage;
 		if (health > max_health) health = max_health;
-		// Debug.Log($"Get Damaged! : {health}");
 		hp_tmpro.SetText($"<size=64>HP</size>\n{(int)health}");
 		if (health <= 0) {
 			kill_player();
