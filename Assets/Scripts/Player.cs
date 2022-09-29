@@ -43,7 +43,6 @@ public class Player : MonoBehaviour {
 	float spark_light_distance = 0.25f;
 
 	float weapons_range = 100.0f;
-	Sprite[] weapon_hud_sprites;
 
 
 	public Transform canvas_transform;
@@ -68,6 +67,9 @@ public class Player : MonoBehaviour {
 		{WeaponIndex.lasergun, "Laser"},
 		{WeaponIndex.rocketlauncher, "Rocket"}
 	};
+	
+	// Sprite[] weapon_hud_sprites;
+	Dictionary<WeaponIndex, Sprite> weapon_hud_sprites = new Dictionary<WeaponIndex, Sprite>();
 
 	public Dictionary<WeaponIndex, int> weapon_ammo = new Dictionary<WeaponIndex, int> {
 		{WeaponIndex.none, 0},
@@ -142,7 +144,11 @@ public class Player : MonoBehaviour {
 		rocket_launcher_transform = cam_transform.GetChild(3);
 		spark_light_transform = cam_transform.GetChild(4);
 
-		weapon_hud_sprites = Resources.LoadAll<Sprite>("Sprites/Weapons");
+		Sprite[] temp = Resources.LoadAll<Sprite>("Sprites/Weapons");
+
+		foreach (WeaponIndex index in System.Enum.GetValues(typeof(WeaponIndex))) {
+			weapon_hud_sprites[index] = temp[(int) index];
+		}
 
 		raycast_mask = ~(1 << LayerMask.NameToLayer("ProjectileSprite"));
 
@@ -233,7 +239,7 @@ public class Player : MonoBehaviour {
 			is_shooting = false;
 			toggle_laser(false);
 			weapon_index = WeaponIndex.lasergun;
-			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[(int)WeaponIndex.lasergun]);
+			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[WeaponIndex.lasergun]);
 			weapon_tmpro.SetText($"<size=64>{weapon_names[weapon_index]}</size>\n{weapon_ammo[weapon_index]}");
 			shoot_time = 0;
 		}
@@ -241,7 +247,7 @@ public class Player : MonoBehaviour {
 			is_shooting = false;
 			toggle_laser(false);
 			weapon_index = WeaponIndex.rocketlauncher;
-			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[(int)WeaponIndex.rocketlauncher]);
+			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[WeaponIndex.rocketlauncher]);
 			weapon_tmpro.SetText($"<size=64>{weapon_names[weapon_index]}</size>\n{weapon_ammo[weapon_index]}");
 			shoot_time = 0;
 		}
