@@ -43,7 +43,6 @@ public class Player : MonoBehaviour {
 	float spark_light_distance = 0.25f;
 
 	float weapons_range = 100.0f;
-	Sprite[] weapon_hud_sprites;
 
 
 	public Transform canvas_transform;
@@ -62,18 +61,50 @@ public class Player : MonoBehaviour {
 		lasergun,
 		rocketlauncher
 	}
-	static string[] weapon_names = {
-		"None",
-		"Laser",
-		"Rocket"
+
+	public Dictionary<WeaponIndex, string> weapon_names = new Dictionary<WeaponIndex, string> {
+		{WeaponIndex.none, "None"},
+		{WeaponIndex.lasergun, "Laser"},
+		{WeaponIndex.rocketlauncher, "Rocket"}
 	};
-	public int[] weapon_ammo;
-	int[] weapon_ammo_full = {0, 1000, 50};
-	float[] weapon_interval = {0, 0, 0.5f};
-	float[] weapon_damage = {0, 10, 20};
-	WeaponIndex weapon_index = WeaponIndex.none;
 	
+	// Sprite[] weapon_hud_sprites;
+	Dictionary<WeaponIndex, Sprite> weapon_hud_sprites = new Dictionary<WeaponIndex, Sprite>();
+
+	public Dictionary<WeaponIndex, int> weapon_ammo = new Dictionary<WeaponIndex, int> {
+		{WeaponIndex.none, 0},
+		{WeaponIndex.lasergun, 0},
+		{WeaponIndex.rocketlauncher, 0}
+	};
+	
+	Dictionary<WeaponIndex, int> weapon_ammo_full = new Dictionary<WeaponIndex, int> {
+		{WeaponIndex.none, 0},
+		{WeaponIndex.lasergun, 1000},
+		{WeaponIndex.rocketlauncher, 50}
+	};
+	Dictionary<WeaponIndex, float> weapon_interval = new Dictionary<WeaponIndex, float> {
+		{WeaponIndex.none, 0},
+		{WeaponIndex.lasergun, 0},
+		{WeaponIndex.rocketlauncher, 0.5f}
+	};
+	Dictionary<WeaponIndex, float> weapon_damage = new Dictionary<WeaponIndex, float> {
+		{WeaponIndex.none, 0},
+		{WeaponIndex.lasergun, 10},
+		{WeaponIndex.rocketlauncher, 20}
+	};
+	WeaponIndex weapon_index = WeaponIndex.none;
 	float shoot_time = 0;
+
+	public enum ItemIndex {
+		none,
+		key,
+		gold
+	}
+	Dictionary<ItemIndex, int> item_inventory = new Dictionary<ItemIndex, int> {
+		{ItemIndex.none, 0},
+		{ItemIndex.key, 0},
+		{ItemIndex.gold, 0}
+	};
 
 	public GameObject rocket_prefab;
 	
@@ -113,7 +144,11 @@ public class Player : MonoBehaviour {
 		rocket_launcher_transform = cam_transform.GetChild(3);
 		spark_light_transform = cam_transform.GetChild(4);
 
-		weapon_hud_sprites = Resources.LoadAll<Sprite>("Sprites/Weapons");
+		Sprite[] temp = Resources.LoadAll<Sprite>("Sprites/Weapons");
+
+		foreach (WeaponIndex index in System.Enum.GetValues(typeof(WeaponIndex))) {
+			weapon_hud_sprites[index] = temp[(int) index];
+		}
 
 		raycast_mask = ~(1 << LayerMask.NameToLayer("ProjectileSprite"));
 
@@ -187,9 +222,9 @@ public class Player : MonoBehaviour {
 				rigid.useGravity = true;
 			}
 			if (is_shooting_laser) {
-				if (weapon_ammo[(int)weapon_index] > 0) {
-					weapon_ammo[(int) WeaponIndex.lasergun] -= 1;
-					weapon_tmpro.SetText($"<size=64>{weapon_names[(int) WeaponIndex.lasergun]}</size>\n{weapon_ammo[(int) weapon_index]}");
+				if (weapon_ammo[weapon_index] > 0) {
+					weapon_ammo[WeaponIndex.lasergun] -= 1;
+					weapon_tmpro.SetText($"<size=64>{weapon_names[WeaponIndex.lasergun]}</size>\n{weapon_ammo[weapon_index]}");
 				}
 				else {
 					toggle_laser(false);
@@ -200,25 +235,19 @@ public class Player : MonoBehaviour {
 	}
 
 	void weapon_control() {
-		if (Input.GetKeyDown(KeyCode.Alpha1) && weapon_index != WeaponIndex.lasergun) {
-			is_shooting = false;
-			toggle_laser(false);
-			weapon_index = WeaponIndex.lasergun;
-			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[(int)WeaponIndex.lasergun]);
-			weapon_tmpro.SetText($"<size=64>{weapon_names[(int) weapon_index]}</size>\n{weapon_ammo[(int) weapon_index]}");
-			shoot_time = 0;
+		foreach (WeaponIndex index in System.Enum.GetValues(typeof(WeaponIndex))) {
+			if (Input.GetButtonDown($"Weapon {(int) index}") && weapon_index != index) {
+				is_shooting = false;
+				toggle_laser(false);
+				weapon_index = index;
+				weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[index]);
+				weapon_tmpro.SetText($"<size=64>{weapon_names[index]}</size>\n{weapon_ammo[index]}");
+				shoot_time = 0;
+			}
 		}
-		if (Input.GetKeyDown(KeyCode.Alpha2) && weapon_index != WeaponIndex.rocketlauncher) {
-			is_shooting = false;
-			toggle_laser(false);
-			weapon_index = WeaponIndex.rocketlauncher;
-			weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[(int)WeaponIndex.rocketlauncher]);
-			weapon_tmpro.SetText($"<size=64>{weapon_names[(int) weapon_index]}</size>\n{weapon_ammo[(int) weapon_index]}");
-			shoot_time = 0;
-		}
-
+		
 		if (!weapon_hud_sprite_manager.is_changing_weapon()) {
-			if (Input.GetButtonDown("Fire") && weapon_ammo[(int)weapon_index] > 0) {
+			if (Input.GetButtonDown("Fire") && weapon_ammo[weapon_index] > 0) {
 				is_shooting = true;
 				switch (weapon_index) {
 					case WeaponIndex.lasergun:
@@ -292,7 +321,7 @@ public class Player : MonoBehaviour {
 				if (is_shooting) {
 					if (shoot_time < 0) {
 						launch_rocket();
-						shoot_time += weapon_interval[(int)WeaponIndex.rocketlauncher];
+						shoot_time += weapon_interval[WeaponIndex.rocketlauncher];
 					}
 				}
 				else if (shoot_time < 0) shoot_time = 0;
@@ -301,7 +330,7 @@ public class Player : MonoBehaviour {
 				if (is_shooting) {
 					if (hit_transform != null) {
 						if (hit_transform.CompareTag("Actor")) {
-							hit_transform.gameObject.GetComponent<SpriteObject>().get_damage(weapon_damage[(int) WeaponIndex.lasergun] * Time.deltaTime);
+							hit_transform.gameObject.GetComponent<SpriteObject>().get_damage(weapon_damage[WeaponIndex.lasergun] * Time.deltaTime);
 						}
 					}
 				}
@@ -319,13 +348,13 @@ public class Player : MonoBehaviour {
 	}
 
 	void launch_rocket() {
-		if (weapon_ammo[(int)weapon_index] > 0) {
+		if (weapon_ammo[weapon_index] > 0) {
 			GameObject rocket_obj = Instantiate(rocket_prefab);
 			Rocket rocket = rocket_obj.GetComponent<Rocket>();
-			rocket.launch(rocket_launcher_transform.position, spark_transform.position, transform, weapon_damage[(int) WeaponIndex.rocketlauncher], weapon_damage[(int) WeaponIndex.rocketlauncher]);
+			rocket.launch(rocket_launcher_transform.position, spark_transform.position, transform, weapon_damage[WeaponIndex.rocketlauncher], weapon_damage[WeaponIndex.rocketlauncher]);
 
-			weapon_ammo[(int)WeaponIndex.rocketlauncher] -= 1;
-			weapon_tmpro.SetText($"<size=64>{weapon_names[(int) WeaponIndex.rocketlauncher]}</size>\n{weapon_ammo[(int) weapon_index]}");
+			weapon_ammo[WeaponIndex.rocketlauncher] -= 1;
+			weapon_tmpro.SetText($"<size=64>{weapon_names[WeaponIndex.rocketlauncher]}</size>\n{weapon_ammo[weapon_index]}");
 		}
 	}
 
@@ -377,18 +406,23 @@ public class Player : MonoBehaviour {
 	}
 
 	public bool get_ammo(WeaponIndex index, int value) {
-		if (weapon_ammo[(int) index] != weapon_ammo_full[(int) index]) {
-			weapon_ammo[(int) index] += value;
+		if (weapon_ammo[index] != weapon_ammo_full[index]) {
+			weapon_ammo[index] += value;
 
-			if (weapon_ammo[(int) index] > weapon_ammo_full[(int) index])
-				weapon_ammo[(int) index] = weapon_ammo_full[(int) index];
+			if (weapon_ammo[index] > weapon_ammo_full[index])
+				weapon_ammo[index] = weapon_ammo_full[index];
 
 			if (index == weapon_index) {
-				weapon_tmpro.SetText($"<size=64>{weapon_names[(int) index]}</size>\n{weapon_ammo[(int) index]}");
+				weapon_tmpro.SetText($"<size=64>{weapon_names[index]}</size>\n{weapon_ammo[index]}");
 			}
 			return true;
 		}
 		return false;
+	}
+
+	public bool get_item(ItemIndex index, int value) {
+		item_inventory[index] += value;
+		return true;
 	}
 
 	public void set_controllable(bool toggle) {
@@ -405,13 +439,12 @@ public class Player : MonoBehaviour {
 
 	public void kill_player() {
 		GameManager.instance.toggle_gameover(true);
-		rigid.velocity = Vector3.zero;
 	}
 
 	public void rebirth() {
 		health = max_health;
 		hp_tmpro.SetText($"<size=64>HP</size>\n{(int)health}");
-		weapon_tmpro.SetText($"<size=64>{weapon_names[(int) weapon_index]}</size>\n{weapon_ammo[(int) weapon_index]}");
+		weapon_tmpro.SetText($"<size=64>{weapon_names[weapon_index]}</size>\n{weapon_ammo[weapon_index]}");
 		transform.position = GameManager.instance.player_spawn_point_transform.position;
 		rigid.velocity = Vector3.zero;
 	}
