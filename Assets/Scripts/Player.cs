@@ -19,13 +19,17 @@ public class Player : MonoBehaviour {
 	float jump_force = 15.0f;
 	float movement_multiplier = 10.0f;
 	float air_multiplier = 0.2f;
+	float liquid_multiplier = 0.8f;
+	bool jump_button = false;
 	Vector3 move_amount = Vector3.zero;
 
 	float player_height = 2.0f;
 	float ground_distance = 0.3f;
 	public LayerMask ground_mask;
+	public LayerMask liquid_mask;
 	public Transform ground_check_transform;
 	bool is_grounded;
+	bool is_liquided;
 	RaycastHit slope_hit;
 	Vector3 slope_move_amount;
 
@@ -149,7 +153,7 @@ public class Player : MonoBehaviour {
 			weapon_hud_sprites[index] = temp[(int) index];
 		}
 
-		raycast_mask = ~(1 << LayerMask.NameToLayer("ProjectileSprite"));
+		raycast_mask = ~(1 << LayerMask.NameToLayer("ProjectileSprite")) & ~(1 << LayerMask.NameToLayer("Liquid"));
 
 		weapon_hud_sprite_manager = canvas_transform.GetChild(0).GetComponent<WeaponHUDSprite>();
 		HUD_transform = canvas_transform.GetChild(1);
@@ -165,25 +169,22 @@ public class Player : MonoBehaviour {
 	void Update() {
 		if (controllable) {
 			is_grounded = Physics.CheckSphere(ground_check_transform.position, ground_distance, ground_mask);
+			is_liquided = Physics.CheckSphere(ground_check_transform.position, ground_distance, liquid_mask);
 			key_direc = new Vector3 (Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
 			
 			mouse_x += Input.GetAxis("Mouse X") * 10;
 			cam_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
 			move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
 
-			if (is_grounded) {
+			if (is_grounded || is_liquided) {
 				rigid.drag = ground_drag;
 			}
 			else {
 				rigid.drag = air_drag;
 			}
 
-			if (Input.GetButtonDown("Jump") && is_grounded) {
-				rigid.velocity = new Vector3(rigid.velocity.x, 0, rigid.velocity.z);
-				rigid.AddForce(transform.up * jump_force, ForceMode.Impulse);
-				is_grounded = false;
-				jumped = true;
-			}
+			if (Input.GetButtonDown("Jump")) jump_button = true;
+			if (Input.GetButtonUp("Jump")) jump_button = false;
 
 			if (Input.GetButtonDown("Interact")) {
 				interact();
@@ -200,8 +201,22 @@ public class Player : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
+		float temp_multiplier;
 		if (Time.timeScale > 0) {
+			if (jump_button) {
+				if (is_liquided) {
+					rigid.AddForce(transform.up * jump_force * 0.1f, ForceMode.Impulse);
+				}
+				if (is_grounded) {
+					rigid.velocity = new Vector3(rigid.velocity.x, 0, rigid.velocity.z);
+					rigid.AddForce(transform.up * jump_force, ForceMode.Impulse);
+					is_grounded = false;
+					jumped = true;
+				}
+			}
+
 			if (is_grounded) {
+				temp_multiplier = is_liquided ? liquid_multiplier : 1.0f;
 				if (on_slope()) {
 					if (jumped) {
 						rigid.AddForce(move_amount * speed * movement_multiplier, ForceMode.Acceleration);
@@ -217,7 +232,8 @@ public class Player : MonoBehaviour {
 				}
 			}
 			else {
-				rigid.AddForce(move_amount * speed * movement_multiplier * air_multiplier, ForceMode.Acceleration);
+				temp_multiplier = is_liquided ? liquid_multiplier : air_multiplier;
+				rigid.AddForce(move_amount * speed * movement_multiplier * temp_multiplier, ForceMode.Acceleration);
 				rigid.useGravity = true;
 			}
 			if (is_shooting_laser) {

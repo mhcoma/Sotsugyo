@@ -15,9 +15,12 @@ public class EnemyAITest : MonoBehaviour {
 	float air_drag = 2.0f;
 	
 	float height = 2.0f;
-	float ground_distance = 0.3f;
+	public Transform ground_check_transform;
 	public LayerMask ground_mask;
+	public LayerMask liquid_mask;
 	bool is_grounded;
+	bool is_liquided;
+	float ground_distance = 0.3f;
 	bool toggle;
 	RaycastHit slope_hit;
 	LayerMask raycast_mask;
@@ -76,16 +79,19 @@ public class EnemyAITest : MonoBehaviour {
 	void Update() {
 		if (Time.timeScale > 0) {
 			if (is_alive) {
-				bool temp = is_grounded;
-				is_grounded = Physics.CheckSphere(transform.position - Vector3.up, ground_distance, ground_mask);
+				bool temp_grounded = is_grounded;
+				bool temp_liquided = is_liquided;
+				is_grounded = Physics.CheckSphere(ground_check_transform.position, ground_distance, ground_mask);
+				is_liquided = Physics.CheckSphere(ground_check_transform.position, ground_distance, liquid_mask);
 				
-				temp = temp != is_grounded;
+				temp_grounded = temp_grounded != is_grounded;
+				temp_liquided = temp_liquided != is_liquided;
 				// temp : is_grounded가 변경되었을 때
-				if (temp) {
-					rigid.drag = is_grounded ? ground_drag : air_drag;
+				if (temp_grounded || temp_liquided) {
+					rigid.drag = (is_grounded || is_liquided) ? ground_drag : air_drag;
 				}
 
-				if ((temp || !agent.enabled || agent.isStopped) && is_stopped() && !agent.isOnOffMeshLink) {
+				if ((temp_grounded || !agent.enabled || agent.isStopped) && is_stopped() && !agent.isOnOffMeshLink) {
 					toggle_rigid(is_grounded);
 				}
 			
