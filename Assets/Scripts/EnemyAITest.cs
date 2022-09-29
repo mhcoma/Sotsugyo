@@ -12,6 +12,7 @@ public class EnemyAITest : MonoBehaviour {
 	Player player;
 
 	float ground_drag = 10.0f;
+	float liquid_multiplier = 4.0f;
 	float air_drag = 2.0f;
 	
 	float height = 2.0f;
@@ -24,6 +25,7 @@ public class EnemyAITest : MonoBehaviour {
 	bool toggle;
 	RaycastHit slope_hit;
 	LayerMask raycast_mask;
+	public float speed;
 
 	NavMeshAgent agent;
 
@@ -86,9 +88,9 @@ public class EnemyAITest : MonoBehaviour {
 				
 				temp_grounded = temp_grounded != is_grounded;
 				temp_liquided = temp_liquided != is_liquided;
-				// temp : is_grounded가 변경되었을 때
 				if (temp_grounded || temp_liquided) {
-					rigid.drag = (is_grounded || is_liquided) ? ground_drag : air_drag;
+					rigid.drag = is_grounded ? ground_drag : air_drag;
+					rigid.drag *= is_liquided ? liquid_multiplier : 0.0f;
 				}
 
 				if ((temp_grounded || !agent.enabled || agent.isStopped) && is_stopped() && !agent.isOnOffMeshLink) {

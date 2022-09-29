@@ -14,12 +14,14 @@ public class Player : MonoBehaviour {
 	bool jumped = false;
 
 	float ground_drag = 10.0f;
+	float liquid_drag = 4.0f;
 	float air_drag = 2.0f;
 	float speed = 10.0f;
 	float jump_force = 15.0f;
 	float movement_multiplier = 10.0f;
 	float air_multiplier = 0.2f;
-	float liquid_multiplier = 0.8f;
+	float liquid_jump_multiplier = 0.075f;
+	float liquid_move_multiplier = 0.6f;
 	bool jump_button = false;
 	Vector3 move_amount = Vector3.zero;
 
@@ -176,12 +178,8 @@ public class Player : MonoBehaviour {
 			cam_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
 			move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
 
-			if (is_grounded || is_liquided) {
-				rigid.drag = ground_drag;
-			}
-			else {
-				rigid.drag = air_drag;
-			}
+			rigid.drag = is_grounded ? ground_drag : air_drag;
+			rigid.drag += is_liquided ? liquid_drag : 0.0f;
 
 			if (Input.GetButtonDown("Jump")) jump_button = true;
 			if (Input.GetButtonUp("Jump")) jump_button = false;
@@ -205,7 +203,7 @@ public class Player : MonoBehaviour {
 		if (Time.timeScale > 0) {
 			if (jump_button) {
 				if (is_liquided) {
-					rigid.AddForce(transform.up * jump_force * 0.1f, ForceMode.Impulse);
+					rigid.AddForce(transform.up * jump_force * liquid_jump_multiplier, ForceMode.Impulse);
 				}
 				if (is_grounded) {
 					rigid.velocity = new Vector3(rigid.velocity.x, 0, rigid.velocity.z);
@@ -216,7 +214,6 @@ public class Player : MonoBehaviour {
 			}
 
 			if (is_grounded) {
-				temp_multiplier = is_liquided ? liquid_multiplier : 1.0f;
 				if (on_slope()) {
 					if (jumped) {
 						rigid.AddForce(move_amount * speed * movement_multiplier, ForceMode.Acceleration);
@@ -232,7 +229,7 @@ public class Player : MonoBehaviour {
 				}
 			}
 			else {
-				temp_multiplier = is_liquided ? liquid_multiplier : air_multiplier;
+				temp_multiplier = is_liquided ? liquid_move_multiplier : air_multiplier;
 				rigid.AddForce(move_amount * speed * movement_multiplier * temp_multiplier, ForceMode.Acceleration);
 				rigid.useGravity = true;
 			}
@@ -462,6 +459,8 @@ public class Player : MonoBehaviour {
 		weapon_tmpro.SetText($"<size=64>{weapon_names[weapon_index]}</size>\n{weapon_ammo[weapon_index]}");
 		transform.position = GameManager.instance.player_spawn_point_transform.position;
 		rigid.velocity = Vector3.zero;
+		jump_button = false;
+		jumped = false;
 	}
 
 	public bool is_alive() {

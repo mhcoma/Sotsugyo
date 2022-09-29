@@ -6,6 +6,7 @@ public class NonAIObject : MonoBehaviour {
 	Rigidbody rigid;
 	float ground_drag = 10.0f;
 	float air_drag = 2.0f;
+	float liquid_multiplier = 4.0f;
 	float ground_distance = 0.3f;
 	public Transform ground_check_transform;
 	public LayerMask ground_mask;
@@ -19,11 +20,7 @@ public class NonAIObject : MonoBehaviour {
 	void Update() {
 		is_grounded = Physics.CheckSphere(ground_check_transform.position, ground_distance, ground_mask);
 		is_liquided = Physics.CheckSphere(ground_check_transform.position, ground_distance, liquid_mask);
-		if (is_grounded || is_liquided) {
-			rigid.drag = ground_drag;
-		}
-		else {
-			rigid.drag = air_drag;
-		}
+		rigid.drag = is_grounded ? ground_drag : air_drag;
+		rigid.drag *= is_liquided ? liquid_multiplier : 0.0f;
 	}
 }
