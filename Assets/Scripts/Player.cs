@@ -235,23 +235,6 @@ public class Player : MonoBehaviour {
 	}
 
 	void weapon_control() {
-		// if (Input.GetKeyDown(KeyCode.Alpha1) && weapon_index != WeaponIndex.lasergun) {
-		// 	is_shooting = false;
-		// 	toggle_laser(false);
-		// 	weapon_index = WeaponIndex.lasergun;
-		// 	weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[WeaponIndex.lasergun]);
-		// 	weapon_tmpro.SetText($"<size=64>{weapon_names[weapon_index]}</size>\n{weapon_ammo[weapon_index]}");
-		// 	shoot_time = 0;
-		// }
-		// if (Input.GetKeyDown(KeyCode.Alpha2) && weapon_index != WeaponIndex.rocketlauncher) {
-		// 	is_shooting = false;
-		// 	toggle_laser(false);
-		// 	weapon_index = WeaponIndex.rocketlauncher;
-		// 	weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[WeaponIndex.rocketlauncher]);
-		// 	weapon_tmpro.SetText($"<size=64>{weapon_names[weapon_index]}</size>\n{weapon_ammo[weapon_index]}");
-		// 	shoot_time = 0;
-		// }
-
 		foreach (WeaponIndex index in System.Enum.GetValues(typeof(WeaponIndex))) {
 			if (Input.GetButtonDown($"Weapon {(int) index}") && weapon_index != index) {
 				is_shooting = false;
