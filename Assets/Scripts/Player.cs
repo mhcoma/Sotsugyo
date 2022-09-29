@@ -68,7 +68,6 @@ public class Player : MonoBehaviour {
 		{WeaponIndex.rocketlauncher, "Rocket"}
 	};
 	
-	// Sprite[] weapon_hud_sprites;
 	Dictionary<WeaponIndex, Sprite> weapon_hud_sprites = new Dictionary<WeaponIndex, Sprite>();
 
 	public Dictionary<WeaponIndex, int> weapon_ammo = new Dictionary<WeaponIndex, int> {
