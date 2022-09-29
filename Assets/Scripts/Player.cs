@@ -19,7 +19,7 @@ public class Player : MonoBehaviour {
 	float speed = 10.0f;
 	float jump_force = 15.0f;
 	float movement_multiplier = 10.0f;
-	float air_multiplier = 0.2f;
+	float air_multiplier = 0.25f;
 	float liquid_jump_multiplier = 0.075f;
 	float liquid_move_multiplier = 0.6f;
 	bool jump_button = false;

@@ -7283,6 +7283,9 @@ MonoBehaviour:
   ground_mask:
     serializedVersion: 2
     m_Bits: 256
+  liquid_mask:
+    serializedVersion: 2
+    m_Bits: 2048
   ground_check_transform: {fileID: 1200031324}
   cam_holder_transform: {fileID: 1872402042}
   canvas_transform: {fileID: 1826427008}
@@ -14391,6 +14394,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3517350711181375564, guid: ddde691fe6b5fc643ab82ad64c28757e, type: 3}
+      propertyPath: speed
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3517350711181375571, guid: ddde691fe6b5fc643ab82ad64c28757e, type: 3}
       propertyPath: m_RootOrder
       value: 8
