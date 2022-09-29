@@ -245,7 +245,7 @@ public class Player : MonoBehaviour {
 				shoot_time = 0;
 			}
 		}
-
+		
 		if (!weapon_hud_sprite_manager.is_changing_weapon()) {
 			if (Input.GetButtonDown("Fire") && weapon_ammo[weapon_index] > 0) {
 				is_shooting = true;
