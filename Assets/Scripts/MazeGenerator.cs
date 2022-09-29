@@ -36,7 +36,9 @@ public class MazeGenerator : MonoBehaviour {
 
 		List<Vector2Int> temp_list = new List<Vector2Int>();
 
-		if (is_valid_node(up) && maze[p.x, p.y])
+		if (is_valid_node(up) && maze[p.x, p.y]) {
+			
+		}
 
 		Random.Range(0, 4);
 
