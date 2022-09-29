@@ -91,14 +91,18 @@ public class Player : MonoBehaviour {
 		{WeaponIndex.rocketlauncher, 20}
 	};
 	WeaponIndex weapon_index = WeaponIndex.none;
+	float shoot_time = 0;
 
 	public enum ItemIndex {
 		none,
 		redkey,
 		bluekey
 	}
-	
-	float shoot_time = 0;
+	Dictionary<ItemIndex, int> item_inventory = new Dictionary<ItemIndex, int> {
+		{ItemIndex.none, 0},
+		{ItemIndex.redkey, 0},
+		{ItemIndex.bluekey, 0}
+	};
 
 	public GameObject rocket_prefab;
 	
