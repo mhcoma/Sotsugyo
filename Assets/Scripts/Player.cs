@@ -95,13 +95,13 @@ public class Player : MonoBehaviour {
 
 	public enum ItemIndex {
 		none,
-		redkey,
-		bluekey
+		key,
+		gold
 	}
 	Dictionary<ItemIndex, int> item_inventory = new Dictionary<ItemIndex, int> {
 		{ItemIndex.none, 0},
-		{ItemIndex.redkey, 0},
-		{ItemIndex.bluekey, 0}
+		{ItemIndex.key, 0},
+		{ItemIndex.gold, 0}
 	};
 
 	public GameObject rocket_prefab;
@@ -418,6 +418,11 @@ public class Player : MonoBehaviour {
 			return true;
 		}
 		return false;
+	}
+
+	public bool get_item(ItemIndex index, int value) {
+		item_inventory[index] += value;
+		return true;
 	}
 
 	public void set_controllable(bool toggle) {

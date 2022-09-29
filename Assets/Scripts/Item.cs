@@ -58,6 +58,7 @@ public class Item : MonoBehaviour {
 				result = player.get_ammo(Player.WeaponIndex.rocketlauncher, value);
 				break;
 			case item_type.key:
+				player.get_item(Player.ItemIndex.key, value);
 				break;
 		}
 		return result;
