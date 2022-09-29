@@ -71,7 +71,14 @@ public class Player : MonoBehaviour {
 	int[] weapon_ammo_full = {0, 1000, 50};
 	float[] weapon_interval = {0, 0, 0.5f};
 	float[] weapon_damage = {0, 10, 20};
+	
 	WeaponIndex weapon_index = WeaponIndex.none;
+
+	public enum ItemIndex {
+		none,
+		redkey,
+		bluekey
+	}
 	
 	float shoot_time = 0;
 
