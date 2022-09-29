@@ -61,5 +61,6 @@ public class MazeGenerator : MonoBehaviour {
 
 	bool is_visited(Vector2Int p) {
 		// maze'[p.x, p.y]
+		return true;
 	}
 }
