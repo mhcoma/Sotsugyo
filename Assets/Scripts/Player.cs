@@ -430,7 +430,6 @@ public class Player : MonoBehaviour {
 
 	public void kill_player() {
 		GameManager.instance.toggle_gameover(true);
-		rigid.velocity = Vector3.zero;
 	}
 
 	public void rebirth() {
