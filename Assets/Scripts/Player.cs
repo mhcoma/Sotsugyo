@@ -125,7 +125,7 @@ public class Player : MonoBehaviour {
 	AudioSource asrc;
 	public AudioClip water_splashes_aclip;
 	float water_splashes_time = 0.0f;
-	float water_splashes_interval = 10.0f;
+	float water_splashes_interval = 0.5f;
 
 	public bool controllable = true;
 

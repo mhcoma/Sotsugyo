@@ -447,6 +447,7 @@ MonoBehaviour:
   liquid_mask:
     serializedVersion: 2
     m_Bits: 2048
+  speed: 0
   anim_rate: 0
   anim_frames: 
   state: 0
@@ -454,6 +455,7 @@ MonoBehaviour:
   attack_rate: 0.75
   rocket_prefab: {fileID: 3119731440945254318, guid: f6269c4610965bd478cde573a479750b, type: 3}
   attack_clip: {fileID: 0}
+  water_splashes_aclip: {fileID: 8300000, guid: 9b58bdbac2d8e1447b9dd4ae2a3e0e20, type: 3}
 --- !u!114 &3487128960617349470
 MonoBehaviour:
   m_ObjectHideFlags: 0

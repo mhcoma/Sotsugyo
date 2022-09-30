@@ -537,6 +537,7 @@ MonoBehaviour:
   liquid_mask:
     serializedVersion: 2
     m_Bits: 2048
+  water_splashes_aclip: {fileID: 8300000, guid: 9b58bdbac2d8e1447b9dd4ae2a3e0e20, type: 3}
 --- !u!1 &8804730980941524049
 GameObject:
   m_ObjectHideFlags: 0
