@@ -157,8 +157,8 @@ public class Player : MonoBehaviour {
 
 		raycast_mask = ~(1 << LayerMask.NameToLayer("ProjectileSprite")) & ~(1 << LayerMask.NameToLayer("Liquid"));
 
-		weapon_hud_sprite_manager = canvas_transform.GetChild(0).GetComponent<WeaponHUDSprite>();
-		HUD_transform = canvas_transform.GetChild(1);
+		weapon_hud_sprite_manager = canvas_transform.Find("WeaponImage").GetComponent<WeaponHUDSprite>();
+		HUD_transform = canvas_transform.Find("HUD");
 		hp_tmpro = HUD_transform.GetChild(0).GetComponent<TextMeshProUGUI>();
 		weapon_tmpro = HUD_transform.GetChild(1).GetComponent<TextMeshProUGUI>();
 

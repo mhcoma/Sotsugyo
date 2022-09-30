@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour {
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 
-		pause_menu_transform = canvas_transform.GetChild(4);
+		pause_menu_transform = canvas_transform.Find("PauseMenu");
 
 		pause_group_transform = pause_menu_transform.Find("PauseGroup");
 		option_group_transform = pause_menu_transform.Find("OptionGroup");
@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour {
 		music_volume_tmpro = option_group_transform.Find("MusicVolumeText").GetComponent<TextMeshProUGUI>();
 		effect_volume_tmpro = option_group_transform.Find("EffectVolumeText").GetComponent<TextMeshProUGUI>();
 
-		caption_transform = canvas_transform.GetChild(3);
+		caption_transform = canvas_transform.Find("Caption");
 		caption = caption_transform.GetComponent<Caption>();
 	}
 

@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: UIBlurMaterial
-  m_Shader: {fileID: 4800000, guid: ead2dbbcf3735bf4e83439a252fda284, type: 3}
+  m_Name: UnderwaterShader
+  m_Shader: {fileID: 4800000, guid: 4a480ff86a1ab8745baf0fa54667eb82, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -49,8 +49,12 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NoiseMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 6b2f562c8a8b4294a8d970981f325448, type: 3}
         m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: 06342ac2fabdf214896fa7d7c0b4e628, type: 3}
+        m_Scale: {x: 2, y: 2}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
@@ -73,16 +77,14 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _Radius: 10
-    - _Size: 1
+    - _Power: 2
+    - _Radius: 4
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _AddColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0, g: 0, b: 0, a: 0.44705883}
+    - _Color: {r: 0.05882353, g: 0.12156863, b: 0.24705882, a: 0.49803922}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MulColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
