@@ -111,7 +111,7 @@ float3 create_normal(sampler2D tex, float2 uv, v2f i) {
 }
 
 fixed4 make_retro(fixed4 input) {
-	fixed retro_coef = 8;
+	fixed retro_coef = 16;
 	return floor(input * retro_coef) / retro_coef;
 }
 
