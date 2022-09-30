@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyAI : MonoBehaviour {
+public class EnemyAITest : MonoBehaviour {
 	Rigidbody rigid;
 
 	Transform player_transform;
