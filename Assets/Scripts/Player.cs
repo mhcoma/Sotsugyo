@@ -122,6 +122,10 @@ public class Player : MonoBehaviour {
 
 
 	AudioSource laser_asrc;
+	AudioSource asrc;
+	public AudioClip water_splashes_aclip;
+	float water_splashes_time = 0.0f;
+	float water_splashes_interval = 10.0f;
 
 	public bool controllable = true;
 
@@ -163,23 +167,40 @@ public class Player : MonoBehaviour {
 		weapon_tmpro = HUD_transform.GetChild(1).GetComponent<TextMeshProUGUI>();
 
 		AudioSource[] asrcs = GetComponents<AudioSource>();
+		
 		laser_asrc = asrcs[0];
+		asrc = asrcs[1];
 
 		rebirth();
 	}
 
 	void Update() {
 		if (controllable) {
+			bool temp_grounded = is_grounded;
+			bool temp_liquided = is_liquided;
+
 			is_grounded = Physics.CheckSphere(ground_check_transform.position, ground_distance, ground_mask);
 			is_liquided = Physics.CheckSphere(ground_check_transform.position, ground_distance, liquid_mask);
-			key_direc = new Vector3 (Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-			
-			mouse_x += Input.GetAxis("Mouse X") * 10;
-			cam_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
-			move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
+
+			temp_grounded = temp_grounded != is_grounded;
+			temp_liquided = temp_liquided != is_liquided;
 
 			rigid.drag = is_grounded ? ground_drag : air_drag;
 			rigid.drag += is_liquided ? liquid_drag : 0.0f;
+
+			if (water_splashes_time >= 0.0f) {
+				water_splashes_time -= Time.deltaTime;
+			}
+
+			if (temp_liquided && water_splashes_time <= 0.0f) {
+				asrc.PlayOneShot(water_splashes_aclip);
+				water_splashes_time += water_splashes_interval;
+			}
+
+			key_direc = new Vector3 (Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+			mouse_x += Input.GetAxis("Mouse X") * 10;
+			cam_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
+			move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
 
 			if (Input.GetButtonDown("Jump")) jump_button = true;
 			if (Input.GetButtonUp("Jump")) jump_button = false;

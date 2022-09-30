@@ -61,6 +61,7 @@ public class EnemyAITest : MonoBehaviour {
 
 	AudioSource asrc;
 	public AudioClip attack_clip;
+	public AudioClip water_splashes_aclip;
 
 	void Start() {
 		rigid = GetComponent<Rigidbody>();
@@ -83,15 +84,18 @@ public class EnemyAITest : MonoBehaviour {
 			if (is_alive) {
 				bool temp_grounded = is_grounded;
 				bool temp_liquided = is_liquided;
+
 				is_grounded = Physics.CheckSphere(ground_check_transform.position, ground_distance, ground_mask);
 				is_liquided = Physics.CheckSphere(ground_check_transform.position, ground_distance, liquid_mask);
 				
 				temp_grounded = temp_grounded != is_grounded;
 				temp_liquided = temp_liquided != is_liquided;
 				
-				if (temp_grounded || temp_liquided) {
-					rigid.drag = is_grounded ? ground_drag : air_drag;
-					rigid.drag += is_liquided ? liquid_drag : 0.0f;
+				rigid.drag = is_grounded ? ground_drag : air_drag;
+				rigid.drag += is_liquided ? liquid_drag : 0.0f;
+				
+				if (temp_liquided) {
+					asrc.PlayOneShot(water_splashes_aclip);
 				}
 
 				if ((temp_grounded || !agent.enabled || agent.isStopped) && is_stopped() && !agent.isOnOffMeshLink) {
