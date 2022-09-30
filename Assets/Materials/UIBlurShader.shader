@@ -6,7 +6,7 @@ Shader "Unlit/UIBlurShader" {
 
 	Category {
 		Tags{
-			"Queue" = "Transparent"
+			"Queue" = "Overlay"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Opaque"
 		}
