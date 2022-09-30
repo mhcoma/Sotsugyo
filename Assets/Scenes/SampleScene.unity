@@ -2161,12 +2161,12 @@ GameObject:
   - component: {fileID: 380775650}
   - component: {fileID: 380775649}
   m_Layer: 5
-  m_Name: Underwater
+  m_Name: UnderwaterEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &380775648
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8364,6 +8364,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camera_position_transform: {fileID: 1957482669}
+  underwater_transform: {fileID: 380775648}
+  liquid_mask:
+    serializedVersion: 2
+    m_Bits: 2048
 --- !u!1 &1891154806
 GameObject:
   m_ObjectHideFlags: 0
