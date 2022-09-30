@@ -91,7 +91,7 @@ public class EnemyAITest : MonoBehaviour {
 				
 				if (temp_grounded || temp_liquided) {
 					rigid.drag = is_grounded ? ground_drag : air_drag;
-					rigid.drag *= is_liquided ? liquid_drag : 0.0f;
+					rigid.drag += is_liquided ? liquid_drag : 0.0f;
 				}
 
 				if ((temp_grounded || !agent.enabled || agent.isStopped) && is_stopped() && !agent.isOnOffMeshLink) {
