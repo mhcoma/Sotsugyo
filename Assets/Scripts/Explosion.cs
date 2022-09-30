@@ -70,7 +70,7 @@ public class Explosion : MonoBehaviour
 					
 					Rigidbody other_rigid = other.gameObject.GetComponent<Rigidbody>();
 					SpriteObject other_spriteobj = other.transform.gameObject.GetComponent<SpriteObject>();
-					EnemyAI other_ai = other.transform.gameObject.GetComponent<EnemyAI>();
+					EnemyAITest other_ai = other.transform.gameObject.GetComponent<EnemyAITest>();
 
 					float final_damage = dist * damage;
 					if (other.transform.CompareTag("Actor")) {
