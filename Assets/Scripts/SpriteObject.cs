@@ -28,7 +28,7 @@ public class SpriteObject : MonoBehaviour {
 
 	public bool is_ai_object;
 
-	EnemyAITest ai;
+	EnemyAI ai;
 	NonAIObject nonai;
 
 	
@@ -52,7 +52,7 @@ public class SpriteObject : MonoBehaviour {
 			sprites.Add(Resources.LoadAll<Sprite>(directory + "/diffuse"));
 		}
 		
-		is_ai_object = TryGetComponent<EnemyAITest>(out ai);
+		is_ai_object = TryGetComponent<EnemyAI>(out ai);
 
 		asrc = GetComponent<AudioSource>();
 	}
