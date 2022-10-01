@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering.PostProcessing;
 using TMPro;
 
 public class Player : MonoBehaviour {
@@ -118,6 +119,11 @@ public class Player : MonoBehaviour {
 	float health;
 	public float max_health;
 
+	PostProcessVolume post_volume;
+	Vignette vignette;
+	public AudioClip damaged_aclip;
+	float damage_scale = 0.0f;
+
 	float interact_range = 3.0f;
 
 
@@ -126,6 +132,10 @@ public class Player : MonoBehaviour {
 	public AudioClip water_splashes_aclip;
 	float water_splashes_time = 0.0f;
 	float water_splashes_interval = 0.5f;
+	
+	float goo_damage_interval = 0.5f;
+	float goo_damage_time = 0.0f;
+	float goo_damage = 2.5f;
 
 	public bool controllable = true;
 
@@ -171,6 +181,9 @@ public class Player : MonoBehaviour {
 		laser_asrc = asrcs[0];
 		asrc = asrcs[1];
 
+		post_volume = cam.GetComponent<PostProcessVolume>();
+		vignette = post_volume.profile.GetSetting<Vignette>();
+
 		rebirth();
 	}
 
@@ -192,8 +205,17 @@ public class Player : MonoBehaviour {
 				water_splashes_time -= Time.deltaTime;
 			}
 
+			if (is_liquided) {
+				if (goo_damage_time >= 0.0f)
+					goo_damage_time -= Time.deltaTime;
+				if (goo_damage_time <= 0.0f) {
+					get_damage(goo_damage);
+					goo_damage_time += goo_damage_interval;
+				}
+			}
+
 			if (temp_liquided && water_splashes_time <= 0.0f) {
-				asrc.PlayOneShot(water_splashes_aclip);
+				asrc.PlayOneShot(water_splashes_aclip, 0.25f);
 				water_splashes_time += water_splashes_interval;
 			}
 
@@ -216,6 +238,12 @@ public class Player : MonoBehaviour {
 			cam_transform.localEulerAngles = new Vector3(-mouse_y, 0, 0);
 
 			weapon_control();
+
+			if (damage_scale > 0.0f) {
+				damage_scale -= Time.deltaTime;
+				if (damage_scale < 0.0f) damage_scale = 0.0f;
+				vignette.intensity.value = damage_scale;
+			}
 		}
 	}
 
@@ -431,6 +459,11 @@ public class Player : MonoBehaviour {
 		health -= damage;
 		if (health > max_health) health = max_health;
 		hp_tmpro.SetText($"<size=64>HP</size>\n{(int)health}");
+
+		if (damage > 0) {
+			damage_scale = Mathf.Max(Mathf.Min(Mathf.Max(damage / 20.0f, 0.5f), 1.0f), damage_scale);
+			asrc.PlayOneShot(damaged_aclip, damage_scale);
+		}
 		if (health <= 0) {
 			kill_player();
 		}
@@ -486,5 +519,30 @@ public class Player : MonoBehaviour {
 
 	public bool is_alive() {
 		return health >= 0;
+	}
+
+	public Vector3 next_position(Vector3 launcher_pos, float projectile_speed) {
+
+		Vector3 next_pos = transform.position;
+		float distance = Vector3.Distance(next_pos, launcher_pos);
+		float time = 0.0f;
+		float collision_time = distance / projectile_speed;
+
+		int count = 0;
+
+		while ((time < collision_time) && count < 100) {
+			next_pos += rigid.velocity * Time.fixedDeltaTime;
+			distance = Vector3.Distance(next_pos, launcher_pos);
+			time += Time.fixedDeltaTime;
+			collision_time = distance / projectile_speed;
+			count++;
+		}
+
+		next_pos.y = transform.position.y;
+		Debug.Log(count);
+
+		next_pos = Vector3.Lerp(next_pos, transform.position, 0.5f);
+
+		return next_pos;
 	}
 }

@@ -222,9 +222,10 @@ public class EnemyAITest : MonoBehaviour {
 			case Attack_type.rocket:
 				GameObject rocket_obj = Instantiate(rocket_prefab);
 				Rocket rocket = rocket_obj.GetComponent<Rocket>();
+				Vector3 launcher_pos = transform.position + new Vector3(0, 0.5f, 0);
 				rocket.launch(
-					transform.position + new Vector3(0, 0.5f, 0),
-					player_transform.position,
+					launcher_pos,
+					player.next_position(launcher_pos, Rocket.speed),
 					transform,
 					10, 10
 				);

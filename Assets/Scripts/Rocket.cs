@@ -13,7 +13,8 @@ public class Rocket : MonoBehaviour {
 
 	Vector3 destination_pos;
 	Vector3 direction;
-	float speed = 20.0f;
+	public static float speed = 20.0f;
+	float this_speed;
 	float damage = 10.0f;
 	float explosion_damage = 10.0f;
 
@@ -28,6 +29,8 @@ public class Rocket : MonoBehaviour {
 		rocket_light = GetComponent<Light>();
 		
 		asrc = GetComponent<AudioSource>();
+
+		this_speed = speed;
 	}
 
 	void Update() {
@@ -39,7 +42,7 @@ public class Rocket : MonoBehaviour {
 				launched = false;
 				asrc.Play();
 			}
-			transform.position += direction * Time.deltaTime * speed;
+			transform.position += direction * Time.deltaTime * this_speed;
 		}
 	}
 
@@ -70,7 +73,7 @@ public class Rocket : MonoBehaviour {
 		rocket_collider.enabled = false;
 		rocket_sprite.enabled = false;
 
-		speed = 0.0f;
+		this_speed = 0.0f;
 		rocket_light.enabled = false;
 	}
 

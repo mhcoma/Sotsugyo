@@ -11,12 +11,17 @@ public class CameraHolder : MonoBehaviour {
 	public Transform underwater_transform;
 
 	AudioSource underwater_asrc;
+	AudioSource effect_asrc;
+	public AudioClip water_splashes_aclip;
 	
 	public AudioMixer mixer;
 	
 	public LayerMask liquid_mask;
 
 	bool underwater = false;
+
+	float water_splashes_time = 0.0f;
+	float water_splashes_interval = 0.5f;
 
 
 	void Awake() {
@@ -28,7 +33,9 @@ public class CameraHolder : MonoBehaviour {
 	}
 	
 	void Start() {
-		underwater_asrc = GetComponent<AudioSource>();
+		AudioSource[] asrcs = GetComponents<AudioSource>();
+		underwater_asrc = asrcs[0];
+		effect_asrc = asrcs[1];
 	}
 
 	void Update() {
@@ -38,14 +45,26 @@ public class CameraHolder : MonoBehaviour {
 		underwater_transform.gameObject.SetActive(underwater);
 		
 		temp = temp != underwater;
+
+		if (water_splashes_time >= 0.0f) {
+			water_splashes_time -= Time.deltaTime;
+		}
 		
 		if (temp) {
 			if (underwater) {
 				underwater_asrc.Play();
+				if (water_splashes_time <= 0.0f) {
+					effect_asrc.PlayOneShot(water_splashes_aclip, 0.125f);
+					water_splashes_time += water_splashes_interval;
+				}
 				mixer.SetFloat("UnderwaterLowpass", 0.0f);
 			}
 			else {
 				underwater_asrc.Stop();
+				if (water_splashes_time <= 0.0f) {
+					effect_asrc.PlayOneShot(water_splashes_aclip, 0.125f);
+					water_splashes_time += water_splashes_interval;
+				}
 				mixer.SetFloat("UnderwaterLowpass", -80.0f);
 			}
 		}
