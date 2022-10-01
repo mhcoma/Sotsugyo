@@ -539,9 +539,7 @@ public class Player : MonoBehaviour {
 		}
 
 		next_pos.y = transform.position.y;
-		Debug.Log(count);
-
-		next_pos = Vector3.Lerp(next_pos, transform.position, 0.5f);
+		next_pos = Vector3.Lerp(next_pos, transform.position, Random.Range(0.0f, 0.5f));
 
 		return next_pos;
 	}
