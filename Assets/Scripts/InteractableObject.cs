@@ -12,9 +12,9 @@ public class InteractableObject : MonoBehaviour {
 	void Update() {
 	}
 
-	public void inter() {
-		GameManager.instance.caption_addtext("Hello");
-		GameManager.instance.caption_addtext("Hello");
-		GameManager.instance.caption_addtext("Hello");
+	public void event_test() {
+		GameManager.instance.caption_addtext("Test");
+		GameManager.instance.caption_addtext("Test");
+		GameManager.instance.caption_addtext("Test");
 	}
 }
