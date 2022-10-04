@@ -77,7 +77,13 @@ public class Player : MonoBehaviour {
 	
 	Dictionary<WeaponIndex, Sprite> weapon_hud_sprites = new Dictionary<WeaponIndex, Sprite>();
 
-	public Dictionary<WeaponIndex, int> weapon_ammo = new Dictionary<WeaponIndex, int> {
+	Dictionary<WeaponIndex, int> weapon_ammo = new Dictionary<WeaponIndex, int> {
+		{WeaponIndex.none, 0},
+		{WeaponIndex.lasergun, 0},
+		{WeaponIndex.rocketlauncher, 0}
+	};
+
+	Dictionary<WeaponIndex, int> weapon_ammo_last = new Dictionary<WeaponIndex, int> {
 		{WeaponIndex.none, 0},
 		{WeaponIndex.lasergun, 0},
 		{WeaponIndex.rocketlauncher, 0}
@@ -510,7 +516,13 @@ public class Player : MonoBehaviour {
 	public void rebirth() {
 		health = max_health;
 		hp_tmpro.SetText($"<size=64>HP</size>\n{(int)health}");
+
+		foreach (WeaponIndex index in System.Enum.GetValues(typeof(WeaponIndex))) {
+			weapon_ammo[index] = weapon_ammo_last[index];
+		}
+		weapon_index = WeaponIndex.none;
 		weapon_tmpro.SetText($"<size=64>{weapon_names[weapon_index]}</size>\n{weapon_ammo[weapon_index]}");
+
 		transform.position = GameManager.instance.player_spawn_point_transform.position;
 		rigid.velocity = Vector3.zero;
 		jump_button = false;
