@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SpriteObject : MonoBehaviour {
 
@@ -34,6 +35,8 @@ public class SpriteObject : MonoBehaviour {
 	
 	AudioSource asrc;
 	public AudioClip dead_clip;
+
+	public UnityEvent OnDead;
 
 
 	void Start() {
@@ -108,6 +111,7 @@ public class SpriteObject : MonoBehaviour {
 			rigid.isKinematic = true;
 			colid.enabled = false;
 			shadow_mesh_transform.gameObject.SetActive(false);
+			OnDead.Invoke();
 		}
 	}
 }

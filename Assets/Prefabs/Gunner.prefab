@@ -401,9 +401,9 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 2
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &3487128960617349469
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -426,6 +426,9 @@ MonoBehaviour:
   is_gas_explosion: 0
   is_ai_object: 0
   dead_clip: {fileID: 8300000, guid: 838b60c2ce6facb40b5e014cb8abcbcf, type: 3}
+  OnDead:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &3487128960617349456
 MonoBehaviour:
   m_ObjectHideFlags: 0

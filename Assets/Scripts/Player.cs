@@ -101,7 +101,7 @@ public class Player : MonoBehaviour {
 	};
 	Dictionary<WeaponIndex, float> weapon_damage = new Dictionary<WeaponIndex, float> {
 		{WeaponIndex.none, 0},
-		{WeaponIndex.lasergun, 10},
+		{WeaponIndex.lasergun, 20},
 		{WeaponIndex.rocketlauncher, 20}
 	};
 	WeaponIndex weapon_index = WeaponIndex.none;
@@ -291,7 +291,7 @@ public class Player : MonoBehaviour {
 			if (is_shooting_laser) {
 				if (weapon_ammo[weapon_index] > 0) {
 					weapon_ammo[WeaponIndex.lasergun] -= 1;
-					weapon_tmpro.SetText($"<size=64>{weapon_names[WeaponIndex.lasergun]}</size>\n{weapon_ammo[weapon_index]}");
+					refresh_display_ammo();
 				}
 				else {
 					toggle_laser(false);
@@ -421,7 +421,7 @@ public class Player : MonoBehaviour {
 			rocket.launch(rocket_launcher_transform.position, spark_transform.position, transform, weapon_damage[WeaponIndex.rocketlauncher], weapon_damage[WeaponIndex.rocketlauncher]);
 
 			weapon_ammo[WeaponIndex.rocketlauncher] -= 1;
-			weapon_tmpro.SetText($"<size=64>{weapon_names[WeaponIndex.rocketlauncher]}</size>\n{weapon_ammo[weapon_index]}");
+			refresh_display_ammo();
 		}
 	}
 
@@ -452,10 +452,6 @@ public class Player : MonoBehaviour {
 				}
 			}
 		}
-		else {
-
-		}
-
 	}
 
 	public bool get_damage(float damage) {
@@ -485,7 +481,7 @@ public class Player : MonoBehaviour {
 				weapon_ammo[index] = weapon_ammo_full[index];
 
 			if (index == weapon_index) {
-				weapon_tmpro.SetText($"<size=64>{weapon_names[index]}</size>\n{weapon_ammo[index]}");
+				refresh_display_ammo();
 			}
 			return true;
 		}
@@ -521,7 +517,7 @@ public class Player : MonoBehaviour {
 			weapon_ammo[index] = weapon_ammo_last[index];
 		}
 		weapon_index = WeaponIndex.none;
-		weapon_tmpro.SetText($"<size=64>{weapon_names[weapon_index]}</size>\n{weapon_ammo[weapon_index]}");
+		refresh_display_ammo();
 
 		transform.position = GameManager.instance.player_spawn_point_transform.position;
 		rigid.velocity = Vector3.zero;
@@ -554,5 +550,9 @@ public class Player : MonoBehaviour {
 		next_pos = Vector3.Lerp(next_pos, transform.position, Random.Range(0.0f, 0.5f));
 
 		return next_pos;
+	}
+
+	public void refresh_display_ammo() {
+		weapon_tmpro.SetText($"<size=64>{weapon_names[weapon_index]}</size>\n{weapon_ammo[weapon_index]}");
 	}
 }

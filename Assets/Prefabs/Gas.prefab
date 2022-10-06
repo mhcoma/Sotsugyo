@@ -502,6 +502,9 @@ MonoBehaviour:
   is_gas_explosion: 1
   is_ai_object: 0
   dead_clip: {fileID: 8300000, guid: 838b60c2ce6facb40b5e014cb8abcbcf, type: 3}
+  OnDead:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!208 &8804730980534130094
 NavMeshObstacle:
   m_ObjectHideFlags: 0
