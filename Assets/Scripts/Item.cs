@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Item : MonoBehaviour {
 	public enum item_type {
@@ -22,6 +23,8 @@ public class Item : MonoBehaviour {
 	SpriteRenderer spr;
 	bool alive = true;
 
+	public UnityEvent on_get;
+
 	void Start() {
 		asrc = GetComponent<AudioSource>();
 		spr = GetComponent<SpriteRenderer>();
@@ -37,6 +40,7 @@ public class Item : MonoBehaviour {
 		if (other.transform.CompareTag("Player") && alive) {
 			bool result = item_effect(other.transform);
 			if (result) {
+				on_get.Invoke();
 				asrc.PlayOneShot(get_clip);
 				alive = false;
 				spr.enabled = false;

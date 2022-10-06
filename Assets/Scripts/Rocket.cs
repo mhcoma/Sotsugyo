@@ -48,8 +48,11 @@ public class Rocket : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) {
 		
-		if (other.transform.gameObject == shooter.gameObject)
-			return;
+		if (!ReferenceEquals(other.transform, null)) {
+			if (other.transform.gameObject == shooter.gameObject) {
+				return;
+			}
+		}
 		
 		if (other.transform.CompareTag("Actor")) {
 			other.transform.gameObject.GetComponent<SpriteObject>().get_damage(damage);

@@ -45,8 +45,8 @@ GameObject:
   - component: {fileID: 4977751207723688405}
   - component: {fileID: 4977751207723688413}
   - component: {fileID: 4977751207723688402}
-  - component: {fileID: 4977751207723688412}
   - component: {fileID: 4977751207723688415}
+  - component: {fileID: 4977751207723688412}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Actor
@@ -124,6 +124,9 @@ MonoBehaviour:
   is_gas_explosion: 0
   is_ai_object: 0
   dead_clip: {fileID: 8300000, guid: 838b60c2ce6facb40b5e014cb8abcbcf, type: 3}
+  on_dead:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!208 &4977751207723688413
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -160,6 +163,21 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   water_splashes_aclip: {fileID: 8300000, guid: 9b58bdbac2d8e1447b9dd4ae2a3e0e20, type: 3}
+--- !u!114 &4977751207723688415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4977751207723688404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d2d1039db60a124787f2483b617b80f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  on_interact:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!82 &4977751207723688412
 AudioSource:
   m_ObjectHideFlags: 0
@@ -256,33 +274,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &4977751207723688415
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4977751207723688404}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d2d1039db60a124787f2483b617b80f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnInteract:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4977751207723688415}
-        m_TargetAssemblyTypeName: InteractableObject, Assembly-CSharp
-        m_MethodName: event_test
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 1000
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &4977751208611730489
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,9 +11,12 @@ public class TutorialScene : MonoBehaviour {
 		
 	}
 
-	public void door_open_event() {
-		GameManager.instance.caption_addtext("Test");
-		GameManager.instance.caption_addtext("Test");
-		GameManager.instance.caption_addtext("Test");
+	public void laser_ammo_get_event() {
+		GameManager.instance.caption_addtext("안녕하세요");
+	}
+
+	public void health_pack_get_event(Door door) {
+		GameManager.instance.caption_addtext("This is ");
+		door.open();
 	}
 }

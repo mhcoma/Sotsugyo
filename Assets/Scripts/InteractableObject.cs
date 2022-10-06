@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public class InteractableObject : MonoBehaviour {
-	public UnityEvent OnInteract;
+	public UnityEvent on_interact;
 
 	void Start() {
 	}

@@ -194,6 +194,9 @@ public class Player : MonoBehaviour {
 	}
 
 	void Update() {
+		if (Input.GetButtonDown("Jump")) jump_button = true;
+		if (Input.GetButtonUp("Jump")) jump_button = false;
+
 		if (controllable) {
 			bool temp_grounded = is_grounded;
 			bool temp_liquided = is_liquided;
@@ -229,9 +232,6 @@ public class Player : MonoBehaviour {
 			mouse_x += Input.GetAxis("Mouse X") * 10;
 			cam_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
 			move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
-
-			if (Input.GetButtonDown("Jump")) jump_button = true;
-			if (Input.GetButtonUp("Jump")) jump_button = false;
 
 			if (Input.GetButtonDown("Interact")) {
 				interact();
@@ -448,7 +448,7 @@ public class Player : MonoBehaviour {
 
 				interobj = hit.transform.GetComponent<InteractableObject>();
 				if (interobj != null) {
-					interobj.OnInteract.Invoke();
+					interobj.on_interact.Invoke();
 				}
 			}
 		}
@@ -517,6 +517,7 @@ public class Player : MonoBehaviour {
 			weapon_ammo[index] = weapon_ammo_last[index];
 		}
 		weapon_index = WeaponIndex.none;
+		weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[weapon_index]);
 		refresh_display_ammo();
 
 		transform.position = GameManager.instance.player_spawn_point_transform.position;

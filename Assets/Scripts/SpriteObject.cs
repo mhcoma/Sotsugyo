@@ -36,7 +36,7 @@ public class SpriteObject : MonoBehaviour {
 	AudioSource asrc;
 	public AudioClip dead_clip;
 
-	public UnityEvent OnDead;
+	public UnityEvent on_dead;
 
 
 	void Start() {
@@ -97,7 +97,7 @@ public class SpriteObject : MonoBehaviour {
 				sprite_renderer.material.SetFloat("_NoisePower", dead_anim);
 
 				if (dead_anim >= 1) {
-					OnDead.Invoke();
+					on_dead.Invoke();
 					Destroy(gameObject);
 				}
 			}
