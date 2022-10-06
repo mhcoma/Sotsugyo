@@ -97,6 +97,7 @@ public class SpriteObject : MonoBehaviour {
 				sprite_renderer.material.SetFloat("_NoisePower", dead_anim);
 
 				if (dead_anim >= 1) {
+					OnDead.Invoke();
 					Destroy(gameObject);
 				}
 			}
@@ -111,7 +112,6 @@ public class SpriteObject : MonoBehaviour {
 			rigid.isKinematic = true;
 			colid.enabled = false;
 			shadow_mesh_transform.gameObject.SetActive(false);
-			OnDead.Invoke();
 		}
 	}
 }

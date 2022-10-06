@@ -30,16 +30,18 @@ public class Caption : MonoBehaviour {
 					lines_display.Last.Value = new string(line_buffer);
 					type_index = line_buffer.Length;
 					skip_text();
-					caption_tmpro.text = string.Join("\n", lines_display);
+					caption_tmpro.text = lines_display.Last.Value;
 				}
 				else {
-					type_time -= Time.unscaledDeltaTime;
-					if (type_time < 0) {
-						lines_display.Last.Value += line_buffer[type_index];
-						type_time += type_interval;
-						type_index++;
-						skip_text();
-						caption_tmpro.text = string.Join("\n", lines_display);
+					if (type_index < line_buffer.Length) {
+						type_time -= Time.unscaledDeltaTime;
+						if (type_time < 0) {
+							lines_display.Last.Value += line_buffer[type_index];
+							type_time += type_interval;
+							type_index++;
+							if (lines_buffer.Count > 0) skip_text();
+							caption_tmpro.text = lines_display.Last.Value;
+						}
 					}
 				}
 			}
