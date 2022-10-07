@@ -66,4 +66,11 @@ public class InputManager : MonoBehaviour {
 	public static KeyCode secondary_key(string button_name) {
 		return key_mapping[button_name].secondary;
 	}
+
+	public static string key_name(string button_name) {
+		if (secondary_key(button_name) == KeyCode.None) {
+			return $"{primary_key(button_name)}";
+		}
+		return $"{primary_key(button_name)} or {secondary_key(button_name)}";
+	}
 }
