@@ -194,8 +194,8 @@ public class Player : MonoBehaviour {
 	}
 
 	void Update() {
-		if (InputManager.get_key_down("jump")) jump_button = true;
-		if (InputManager.get_key_up("jump")) jump_button = false;
+		if (InputManager.get_button_down("jump")) jump_button = true;
+		if (InputManager.get_button_up("jump")) jump_button = false;
 
 		if (controllable) {
 			bool temp_grounded = is_grounded;
@@ -228,12 +228,12 @@ public class Player : MonoBehaviour {
 				water_splashes_time += water_splashes_interval;
 			}
 
-			key_direc = new Vector3 (Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+			key_direc = new Vector3 (InputManager.get_axis("horizontal"), 0, InputManager.get_axis("vertical")).normalized;
 			mouse_x += Input.GetAxis("Mouse X") * 10;
 			cam_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
 			move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
 
-			if (InputManager.get_key_down("interact")) {
+			if (InputManager.get_button_down("interact")) {
 				interact();
 			}
 
@@ -303,7 +303,7 @@ public class Player : MonoBehaviour {
 
 	void weapon_control() {
 		foreach (WeaponIndex index in System.Enum.GetValues(typeof(WeaponIndex))) {
-			if (InputManager.get_key_down($"weapon {(int) index}") && weapon_index != index) {
+			if (InputManager.get_button_down($"weapon {(int) index}") && weapon_index != index) {
 				is_shooting = false;
 				toggle_laser(false);
 				weapon_index = index;
@@ -314,7 +314,7 @@ public class Player : MonoBehaviour {
 		}
 		
 		if (!weapon_hud_sprite_manager.is_changing_weapon()) {
-			if (InputManager.get_key_down("fire") && weapon_ammo[weapon_index] > 0) {
+			if (InputManager.get_button_down("fire") && weapon_ammo[weapon_index] > 0) {
 				is_shooting = true;
 				switch (weapon_index) {
 					case WeaponIndex.lasergun:
@@ -324,7 +324,7 @@ public class Player : MonoBehaviour {
 						break;
 				}
 			}
-			if (InputManager.get_key_up("fire")) {
+			if (InputManager.get_button_up("fire")) {
 				is_shooting = false;
 				switch (weapon_index) {
 					case WeaponIndex.lasergun:

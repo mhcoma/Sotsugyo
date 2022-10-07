@@ -82,6 +82,6 @@ public class Caption : MonoBehaviour {
 	}
 
 	bool is_pressed_skip_button() {
-		return InputManager.get_key_down("submit") || InputManager.get_key_down("fire");
+		return InputManager.get_button_down("submit") || InputManager.get_button_down("fire");
 	}
 }

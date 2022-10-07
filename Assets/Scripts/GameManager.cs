@@ -88,22 +88,22 @@ public class GameManager : MonoBehaviour {
 	void Update() {
 		switch (menu_state) {
 			case menu_state_enum.none:
-				if (InputManager.get_key_down("cancel")) {
+				if (InputManager.get_button_down("cancel")) {
 					toggle_pause(true);
 				}
 				break;
 			case menu_state_enum.pause:
-				if (InputManager.get_key_down("cancel")) {
+				if (InputManager.get_button_down("cancel")) {
 					toggle_pause(false);
 				}
 				break;
 			case menu_state_enum.option:
-				if (InputManager.get_key_down("cancel")) {
+				if (InputManager.get_button_down("cancel")) {
 					toggle_option(false);
 				}
 				break;
 			case menu_state_enum.gameover:
-				if (InputManager.get_key_down("cancel")) {
+				if (InputManager.get_button_down("cancel")) {
 					
 				}
 				break;

@@ -1,0 +1,14 @@
+{
+	"axises" : [
+		{
+			"axis_name" : "horizontal",
+			"positive_button" : "right",
+			"negative_button" : "left"
+		},
+		{
+			"axis_name" : "vertical",
+			"positive_button" : "up",
+			"negative_button" : "down"
+		}
+	]
+}
