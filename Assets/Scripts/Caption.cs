@@ -24,7 +24,7 @@ public class Caption : MonoBehaviour {
 
 	int type_index = 0;
 	float type_time = 0.0f;
-	float type_interval = 0.125f;
+	float type_interval = 0.015625f;
 
 	TextMeshProUGUI caption_tmpro;
 
@@ -82,6 +82,6 @@ public class Caption : MonoBehaviour {
 	}
 
 	bool is_pressed_skip_button() {
-		return Input.GetButtonDown("Submit") || Input.GetButtonDown("Fire");
+		return InputManager.get_key_down("submit") || InputManager.get_key_down("fire");
 	}
 }

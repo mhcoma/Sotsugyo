@@ -194,8 +194,8 @@ public class Player : MonoBehaviour {
 	}
 
 	void Update() {
-		if (Input.GetButtonDown("Jump")) jump_button = true;
-		if (Input.GetButtonUp("Jump")) jump_button = false;
+		if (InputManager.get_key_down("jump")) jump_button = true;
+		if (InputManager.get_key_up("jump")) jump_button = false;
 
 		if (controllable) {
 			bool temp_grounded = is_grounded;
@@ -233,7 +233,7 @@ public class Player : MonoBehaviour {
 			cam_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
 			move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
 
-			if (Input.GetButtonDown("Interact")) {
+			if (InputManager.get_key_down("interact")) {
 				interact();
 			}
 
@@ -303,7 +303,7 @@ public class Player : MonoBehaviour {
 
 	void weapon_control() {
 		foreach (WeaponIndex index in System.Enum.GetValues(typeof(WeaponIndex))) {
-			if (Input.GetButtonDown($"Weapon {(int) index}") && weapon_index != index) {
+			if (InputManager.get_key_down($"weapon {(int) index}") && weapon_index != index) {
 				is_shooting = false;
 				toggle_laser(false);
 				weapon_index = index;
@@ -314,7 +314,7 @@ public class Player : MonoBehaviour {
 		}
 		
 		if (!weapon_hud_sprite_manager.is_changing_weapon()) {
-			if (Input.GetButtonDown("Fire") && weapon_ammo[weapon_index] > 0) {
+			if (InputManager.get_key_down("fire") && weapon_ammo[weapon_index] > 0) {
 				is_shooting = true;
 				switch (weapon_index) {
 					case WeaponIndex.lasergun:
@@ -324,7 +324,7 @@ public class Player : MonoBehaviour {
 						break;
 				}
 			}
-			if (Input.GetButtonUp("Fire")) {
+			if (InputManager.get_key_up("fire")) {
 				is_shooting = false;
 				switch (weapon_index) {
 					case WeaponIndex.lasergun:

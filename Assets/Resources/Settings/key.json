@@ -1,0 +1,44 @@
+{
+	"keys" : [
+		{
+			"button_name" : "fire",
+			"primary_key" : "Mouse0",
+			"secondary_key" : "None"
+		},
+		{
+			"button_name" : "interact",
+			"primary_key" : "E",
+			"secondary_key" : "None"
+		},
+		{
+			"button_name" : "submit",
+			"primary_key" : "Space",
+			"secondary_key" : "Return"
+		},
+		{
+			"button_name" : "cancel",
+			"primary_key" : "Escape",
+			"secondary_key" : "None"
+		},
+		{
+			"button_name" : "jump",
+			"primary_key" : "Space",
+			"secondary_key" : "None"
+		},
+		{
+			"button_name" : "weapon 0",
+			"primary_key" : "BackQuote",
+			"secondary_key" : "None"
+		},
+		{
+			"button_name" : "weapon 1",
+			"primary_key" : "Alpha1",
+			"secondary_key" : "None"
+		},
+		{
+			"button_name" : "weapon 2",
+			"primary_key" : "Alpha2",
+			"secondary_key" : "None"
+		}
+	]
+}
