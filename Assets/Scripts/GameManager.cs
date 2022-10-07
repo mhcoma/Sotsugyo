@@ -192,10 +192,10 @@ public class GameManager : MonoBehaviour {
 		caption_transform.gameObject.SetActive(toggle);
 	}
 
-	public void caption_addtext(string str) {
+	public void caption_addtext(params string[] strs) {
 		toggle_caption(true);
 
-		caption.add_text(str);
+		caption.add_text(string.Join("\n", strs));
 	}
 
 	public bool controlable() {

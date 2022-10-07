@@ -105,7 +105,7 @@ public class InputManager : MonoBehaviour {
 		if (get_button_secondary_key_code(button_name) == KeyCode.None) {
 			return $"{get_button_primary_key_code(button_name)}";
 		}
-		return $"{get_button_primary_key_code(button_name)} or {get_button_secondary_key_code(button_name)}";
+		return $"{get_button_primary_key_code(button_name)} 또는 {get_button_secondary_key_code(button_name)}";
 	}
 
 	public static float get_axis(string axis_name) {

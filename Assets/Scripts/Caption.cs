@@ -4,20 +4,6 @@ using UnityEngine;
 using TMPro;
 
 public class Caption : MonoBehaviour {
-
-	// LinkedList<string> lines_buffer = new LinkedList<string>();
-	// LinkedList<string> lines_display = new LinkedList<string>();
-	// string line_buffer = "";
-
-	// int type_index = 0;
-
-	// const int MAX_LINE = 4;
-	
-	// float type_time = 0.0f;
-	// float type_interval = 0.125f;
-
-	// TextMeshProUGUI caption_tmpro;
-
 	Queue<string> text_queue = new Queue<string>();
 	string display_text;
 	string buffer_text;
@@ -27,9 +13,13 @@ public class Caption : MonoBehaviour {
 	float type_interval = 0.015625f;
 
 	TextMeshProUGUI caption_tmpro;
+	TextMeshProUGUI skip_tmpro;
 
 	void Start() {
-		caption_tmpro = transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+		caption_tmpro = transform.Find("Text").GetComponent<TextMeshProUGUI>();
+		skip_tmpro = transform.Find("Skip").GetComponent<TextMeshProUGUI>();
+
+		skip_tmpro.text = $"[{InputManager.get_button_key_names("submit")} 또는 {InputManager.get_button_key_names("fire")}] 키를 눌러 넘기기...";
 	}
 
 	void Update() {
