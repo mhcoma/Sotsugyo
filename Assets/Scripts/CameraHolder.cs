@@ -6,9 +6,9 @@ using UnityEngine.Audio;
 
 public class CameraHolder : MonoBehaviour {
 	public static CameraHolder instance = null;
-	public Transform camera_position_transform;
+	Transform camera_position_transform;
 
-	public Transform underwater_transform;
+	Transform underwater_transform;
 
 	AudioSource underwater_asrc;
 	AudioSource effect_asrc;
@@ -36,6 +36,9 @@ public class CameraHolder : MonoBehaviour {
 		AudioSource[] asrcs = GetComponents<AudioSource>();
 		underwater_asrc = asrcs[0];
 		effect_asrc = asrcs[1];
+
+		underwater_transform = GameManager.instance.canvas_transform.Find("UnderwaterEffect");
+		camera_position_transform = GameManager.instance.player_transform.Find("CameraPosition");
 	}
 
 	void Update() {

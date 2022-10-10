@@ -13,7 +13,16 @@ public class GameManager : MonoBehaviour {
 	public Transform player_transform;
 	Player player;
 
+	public Transform camera_holder_transform;
+
+	[System.NonSerialized]
 	public Transform camera_transform;
+
+	Transform player_spawn_point_transform;
+	public Vector3 get_player_spawn_point {
+		get { return player_spawn_point_transform.position; }
+	}
+
 
 	Transform pause_group_transform;
 	Transform option_group_transform;
@@ -21,7 +30,7 @@ public class GameManager : MonoBehaviour {
 
 	Transform caption_transform;
 
-	public Transform player_spawn_point_transform;
+	Transform crosshair_transform;
 
 	TextMeshProUGUI title_tmpro;
 	TextMeshProUGUI music_volume_tmpro;
@@ -30,7 +39,15 @@ public class GameManager : MonoBehaviour {
 	public AudioMixer mixer;
 	float music_volume = 100;
 	float effect_volume = 100;
-	
+
+	List<System.ValueTuple<int, int>> screen_res_list = new List<(int, int)> {
+		(1280, 720),
+		(1920, 1080),
+		(2560, 1440),
+		(3840, 2160)
+	};
+	UnityEngine.UI.Slider screen_res_slider;
+	TextMeshProUGUI screen_res_tmpro;
 
 	bool menu_toggle = false;
 	bool caption_toggle = false;
@@ -68,6 +85,10 @@ public class GameManager : MonoBehaviour {
 	void Init() {
 		player = player_transform.GetComponent<Player>();
 
+		camera_transform = camera_holder_transform.Find("PlayerCamera");
+
+		player_spawn_point_transform = transform.Find("PlayerSpawnPoint");
+
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 
@@ -83,6 +104,17 @@ public class GameManager : MonoBehaviour {
 
 		caption_transform = canvas_transform.Find("Caption");
 		caption = caption_transform.GetComponent<Caption>();
+
+		crosshair_transform = canvas_transform.Find("Crosshair");
+
+		screen_res_slider = option_group_transform.Find("ScreenResSlider").GetComponent<UnityEngine.UI.Slider>();
+		// Debug.Log(option_group_transform.Find("ScreenResText"));
+		screen_res_slider.maxValue = screen_res_list.Count - 1;
+		// screen_res_slider.value = 1;
+		Debug.Log(screen_res_slider);
+		screen_res_tmpro = option_group_transform.Find("ScreenResText").GetComponent<TextMeshProUGUI>();
+		Debug.Log(screen_res_tmpro);
+		screen_res_tmpro.text = get_screen_res_text((int)screen_res_slider.maxValue);
 	}
 
 	void Update() {
@@ -160,6 +192,15 @@ public class GameManager : MonoBehaviour {
 		}
 		mixer.SetFloat("Effect", effect_volume);
 		effect_volume_tmpro.SetText($"Effect Volume - {(int) volume}%");
+	}
+
+	public void change_screen_res(float index) {
+		Screen.SetResolution(screen_res_list[(int) index].Item1, screen_res_list[(int) index].Item2, true);
+		screen_res_tmpro.text = get_screen_res_text((int) index);
+	}
+
+	string get_screen_res_text(int index) {
+		return $"{screen_res_list[index].Item1}×{screen_res_list[index].Item2}";
 	}
 
 	float get_gain(float volume) {

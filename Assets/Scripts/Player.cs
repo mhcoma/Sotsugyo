@@ -30,14 +30,14 @@ public class Player : MonoBehaviour {
 	float ground_distance = 0.3f;
 	public LayerMask ground_mask;
 	public LayerMask liquid_mask;
-	public Transform ground_check_transform;
+	Transform ground_check_transform;
 	bool is_grounded;
 	bool is_liquided;
 	RaycastHit slope_hit;
 	Vector3 slope_move_amount;
 
 
-	public Transform cam_holder_transform;
+	Transform camera_holder_transform;
 	CameraHolder camhold;
 	Transform cam_transform;
 	Camera cam;
@@ -52,7 +52,7 @@ public class Player : MonoBehaviour {
 	float weapons_range = 100.0f;
 
 
-	public Transform canvas_transform;
+	Transform canvas_transform;
 	WeaponHUDSprite weapon_hud_sprite_manager;
 	Transform HUD_transform;
 	TextMeshProUGUI hp_tmpro;
@@ -158,9 +158,11 @@ public class Player : MonoBehaviour {
 	}
 
 	void Init() {
+		camera_holder_transform = GameManager.instance.camera_holder_transform;
+
 		rigid = GetComponent<Rigidbody>();
-		camhold = cam_holder_transform.GetComponent<CameraHolder>();
-		cam_transform = cam_holder_transform.GetChild(0);
+		camhold = camera_holder_transform.GetComponent<CameraHolder>();
+		cam_transform = camera_holder_transform.GetChild(0);
 		cam = cam_transform.GetComponent<Camera>();
 		laser_transform = cam_transform.GetChild(1);
 		laser = laser_transform.GetComponent<LineRenderer>();
@@ -176,6 +178,10 @@ public class Player : MonoBehaviour {
 		}
 
 		raycast_mask = ~(1 << LayerMask.NameToLayer("ProjectileSprite")) & ~(1 << LayerMask.NameToLayer("Liquid"));
+
+		ground_check_transform = transform.Find("GroundChecker");
+
+		canvas_transform = GameManager.instance.canvas_transform;
 
 		weapon_hud_sprite_manager = canvas_transform.Find("WeaponImage").GetComponent<WeaponHUDSprite>();
 		HUD_transform = canvas_transform.Find("HUD");
@@ -230,7 +236,7 @@ public class Player : MonoBehaviour {
 
 			key_direc = new Vector3 (InputManager.get_axis("horizontal"), 0, InputManager.get_axis("vertical")).normalized;
 			mouse_x += Input.GetAxis("Mouse X") * 10;
-			cam_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
+			camera_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
 			move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
 
 			if (InputManager.get_button_down("interact")) {
@@ -520,7 +526,7 @@ public class Player : MonoBehaviour {
 		weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[weapon_index]);
 		refresh_display_ammo();
 
-		transform.position = GameManager.instance.player_spawn_point_transform.position;
+		transform.position = GameManager.instance.get_player_spawn_point;
 		rigid.velocity = Vector3.zero;
 		jump_button = false;
 		jumped = false;
