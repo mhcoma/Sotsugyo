@@ -41,11 +41,21 @@ public class GameManager : MonoBehaviour {
 	float music_volume = 100;
 	float effect_volume = 100;
 
-	List<System.ValueTuple<int, int>> screen_res_list = new List<(int, int)> {
-		(1280, 720),
-		(1920, 1080),
-		(2560, 1440),
-		(3840, 2160)
+
+	public struct ScreenRes {
+		public int width;
+		public int height;
+		public ScreenRes(int w, int h) {
+			width = w;
+			height = h;
+		}
+	}
+
+	List<ScreenRes> screen_res_list = new List<ScreenRes> {
+		new ScreenRes(1280, 720),
+		new ScreenRes(1920, 1080),
+		new ScreenRes(2560, 1440),
+		new ScreenRes(3840, 2160)
 	};
 	Slider screen_res_slider;
 	Slider fullscreen_slider;
@@ -79,15 +89,14 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Start() {
-		
-		Resolution real_creen_res = Screen.currentResolution;
+		ScreenRes screen_res = new ScreenRes(Screen.width, Screen.height);
 		int temp_index = 0;
 
 		for (int i = 0; i < screen_res_list.Count; i++) {
-			System.ValueTuple<int, int> temp_res = screen_res_list[i];
-			if (temp_res.Item1 == real_creen_res.width) {
+			ScreenRes temp_res = screen_res_list[i];
+			if (temp_res.width == screen_res.width) {
 				temp_index = i;
-				if (temp_res.Item2 == real_creen_res.height) {
+				if (temp_res.height == screen_res.height) {
 					screen_res_index = i;
 					break;
 				}
@@ -99,8 +108,9 @@ public class GameManager : MonoBehaviour {
 		screen_res_slider.value = (int) screen_res_index;
 		change_screen_res(screen_res_slider.value);
 
-		fullscreen_slider.maxValue = System.Enum.GetNames(typeof(FullScreenMode)).Length - 1;
-		fullscreen_slider.value = (float) FullScreenMode.ExclusiveFullScreen;
+		fullscreen_slider.maxValue = System.Enum.GetNames(typeof(FullScreenMode)).Length - 2;
+		fullscreen_slider.value = (float) Screen.fullScreenMode;
+		if (fullscreen_slider.value >= (float) FullScreenMode.MaximizedWindow) fullscreen_slider.value += 1.0f;
 		change_fullscreen(fullscreen_slider.value);
 	}
 
@@ -238,6 +248,7 @@ public class GameManager : MonoBehaviour {
 
 	public void change_fullscreen(float index) {
 		foreach (FullScreenMode mode in System.Enum.GetValues(typeof(FullScreenMode))) {
+			if ((FullScreenMode) index == FullScreenMode.MaximizedWindow) index += 1;
 			if ((int) index == (int) mode) {
 				temp_fullscreen_mode = mode;
 				break;
@@ -249,11 +260,11 @@ public class GameManager : MonoBehaviour {
 	public void apply_screen_res() {
 		screen_res_index = temp_screen_res_index;
 		fullscreen_mode = temp_fullscreen_mode;
-		Screen.SetResolution(screen_res_list[screen_res_index].Item1, screen_res_list[screen_res_index].Item2, fullscreen_mode);
+		Screen.SetResolution(screen_res_list[screen_res_index].width, screen_res_list[screen_res_index].height, fullscreen_mode);
 	}
 
 	string get_screen_res_text(int index) {
-		return $"{screen_res_list[index].Item1}×{screen_res_list[index].Item2}";
+		return $"{screen_res_list[index].width}×{screen_res_list[index].height}";
 	}
 
 	float get_gain(float volume) {
