@@ -5,7 +5,6 @@ using TMPro;
 
 public class Caption : MonoBehaviour {
 	Queue<string> text_queue = new Queue<string>();
-	string display_text;
 	string buffer_text;
 
 	int type_index = 0;
@@ -57,10 +56,7 @@ public class Caption : MonoBehaviour {
 
 	void skip_text() {
 		caption_tmpro.text = "";
-		if (text_queue.TryDequeue(out buffer_text)) {
-		}
-		else {
-			clear();
+		if (!text_queue.TryDequeue(out buffer_text)) {
 			GameManager.instance.toggle_caption(false);
 		}
 		type_index = 0;
@@ -68,7 +64,8 @@ public class Caption : MonoBehaviour {
 	}
 
 	public void clear() {
-		
+		text_queue.Clear();
+		skip_text();
 	}
 
 	bool is_pressed_skip_button() {
