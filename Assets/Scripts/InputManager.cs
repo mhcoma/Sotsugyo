@@ -48,26 +48,8 @@ public class InputManager : MonoBehaviour {
 	}
 
 	void Start() {
-		TextAsset key_mapping_file = Resources.Load<TextAsset>("Settings/button");
-		Buttons key_mapping_list = JsonUtility.FromJson<Buttons>(key_mapping_file.text);
-
-		foreach (Button k in key_mapping_list.buttons) {
-			KeyPair kp = new KeyPair();
-			kp.primary_key_code = (KeyCode) System.Enum.Parse(typeof(KeyCode), k.primary_key);
-			kp.secondary_key_code = (KeyCode) System.Enum.Parse(typeof(KeyCode), k.secondary_key);
-			key_mapping[k.button_name] = kp;
-		}
-
-		TextAsset axis_mapping_file = Resources.Load<TextAsset>("Settings/axis");
-		Axises axis_mapping_list = JsonUtility.FromJson<Axises>(axis_mapping_file.text);
-
-		foreach (Axis a in axis_mapping_list.axises) {
-			AxisPair ap = new AxisPair();
-			ap.positive_button_name = a.positive_button;
-			ap.negative_button_name = a.negative_button;
-			axis_mapping[a.axis_name] = ap;
-		}
-
+		load_deafult_button_mapping();
+		load_default_axis_mapping();
 	}
 
 	void Update() {
@@ -149,5 +131,29 @@ public class InputManager : MonoBehaviour {
 			temp.primary_key_code = key;
 		else 
 			temp.secondary_key_code = key;
+	}
+
+	public static void load_deafult_button_mapping() {
+		TextAsset button_mapping_file = Resources.Load<TextAsset>("Settings/button");
+		Buttons button_mapping_list = JsonUtility.FromJson<Buttons>(button_mapping_file.text);
+
+		foreach (Button k in button_mapping_list.buttons) {
+			KeyPair kp = new KeyPair();
+			kp.primary_key_code = (KeyCode) System.Enum.Parse(typeof(KeyCode), k.primary_key);
+			kp.secondary_key_code = (KeyCode) System.Enum.Parse(typeof(KeyCode), k.secondary_key);
+			key_mapping[k.button_name] = kp;
+		}
+	}
+
+	public static void load_default_axis_mapping() {
+		TextAsset axis_mapping_file = Resources.Load<TextAsset>("Settings/axis");
+		Axises axis_mapping_list = JsonUtility.FromJson<Axises>(axis_mapping_file.text);
+
+		foreach (Axis a in axis_mapping_list.axises) {
+			AxisPair ap = new AxisPair();
+			ap.positive_button_name = a.positive_button;
+			ap.negative_button_name = a.negative_button;
+			axis_mapping[a.axis_name] = ap;
+		}
 	}
 }
