@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour {
 
 	Transform pause_group_transform;
 	Transform option_group_transform;
+	Transform input_group_transform;
 	Transform gameover_screen_transform;
 
 	Transform caption_transform;
@@ -75,6 +76,7 @@ public class GameManager : MonoBehaviour {
 		none,
 		pause,
 		option,
+		input,
 		gameover
 	}
 
@@ -137,6 +139,7 @@ public class GameManager : MonoBehaviour {
 
 		pause_group_transform = pause_menu_transform.Find("PauseGroup");
 		option_group_transform = pause_menu_transform.Find("OptionGroup");
+		input_group_transform = pause_menu_transform.Find("InputOptionGroup");
 		gameover_screen_transform = pause_menu_transform.Find("GameOverGroup");
 		title_tmpro = pause_menu_transform.Find("Title").GetComponent<TextMeshProUGUI>();
 
@@ -206,6 +209,10 @@ public class GameManager : MonoBehaviour {
 			change_screen_res(screen_res_slider.value);
 			change_fullscreen(fullscreen_slider.value);
 		}
+	}
+
+	public void toggle_input_option(bool toggle) {
+		
 	}
 	
 	public void toggle_gameover(bool toggle) {
