@@ -55,7 +55,8 @@ public class Caption : MonoBehaviour {
 	}
 
 	void skip_text() {
-		caption_tmpro.text = "";
+		if (caption_tmpro != null)
+			caption_tmpro.text = "";
 		if (!text_queue.TryDequeue(out buffer_text)) {
 			GameManager.instance.toggle_caption(false);
 		}

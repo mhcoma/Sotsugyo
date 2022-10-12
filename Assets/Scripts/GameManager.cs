@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour {
 	[System.NonSerialized]
 	public Transform camera_transform;
 
-	Transform player_spawn_point_transform;
+	public Transform player_spawn_point_transform;
 	public Vector3 get_player_spawn_point {
 		get { return player_spawn_point_transform.position; }
 	}
@@ -140,8 +140,6 @@ public class GameManager : MonoBehaviour {
 		player = player_transform.GetComponent<Player>();
 
 		camera_transform = camera_holder_transform.Find("PlayerCamera");
-
-		player_spawn_point_transform = transform.Find("PlayerSpawnPoint");
 
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour {
+	public static InputManager instance = null;
 
 	[System.Serializable]
 	public class Button {
@@ -35,8 +36,6 @@ public class InputManager : MonoBehaviour {
 		public string positive_button_name;
 		public string negative_button_name;
 	}
-
-	public static InputManager instance = null;
 	public static Dictionary<string, KeyPair> key_mapping = new Dictionary<string, KeyPair>();
 	public static Dictionary<string, AxisPair> axis_mapping = new Dictionary<string, AxisPair>();
 

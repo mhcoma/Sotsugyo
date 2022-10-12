@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Canvas : MonoBehaviour {
 	public static Canvas instance = null;
-
+	
 	void Awake() {
 		if (instance == null) {
 			instance = this;

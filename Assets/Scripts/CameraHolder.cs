@@ -22,8 +22,7 @@ public class CameraHolder : MonoBehaviour {
 
 	float water_splashes_time = 0.0f;
 	float water_splashes_interval = 0.5f;
-
-
+	
 	void Awake() {
 		if (instance == null) {
 			instance = this;
@@ -31,7 +30,7 @@ public class CameraHolder : MonoBehaviour {
 		}
 		else Destroy(this.gameObject);
 	}
-	
+
 	void Start() {
 		AudioSource[] asrcs = GetComponents<AudioSource>();
 		underwater_asrc = asrcs[0];
