@@ -267,8 +267,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1932148090}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: toggle_input_option
-        m_Mode: 6
+        m_MethodName: reset_input_option
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -7870,7 +7870,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &908100490
 RectTransform:
   m_ObjectHideFlags: 0
@@ -14954,7 +14954,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1891154807
 RectTransform:
   m_ObjectHideFlags: 0
@@ -22506,7 +22506,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2285644707220980960
 MonoBehaviour:
   m_ObjectHideFlags: 0

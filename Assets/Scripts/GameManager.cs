@@ -428,14 +428,13 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void cancel_input_option() {
-		foreach (string button_name in button_names) {
-			key_button_texts[button_name].text = $"{InputManager.get_button_primary_key_code(button_name)}";
-		}
+		initialize_input_button_texts();
 		change_input_option_back_button_text(false);
 	}
 
 	public void reset_input_option() {
 		InputManager.load_deafult_button_mapping();
+		initialize_input_button_texts();
 	}
 
 	public void initialize_input_button_texts() {
