@@ -15,7 +15,7 @@ public class InputManager : MonoBehaviour {
 		public Button[] buttons;
 	}
 
-	public struct key_pair {
+	public struct KeyPair {
 		public KeyCode primary_key_code;
 		public KeyCode secondary_key_code;
 	}
@@ -31,14 +31,14 @@ public class InputManager : MonoBehaviour {
 		public Axis[] axises;
 	}
 
-	public struct axis_pair {
+	public struct AxisPair {
 		public string positive_button_name;
 		public string negative_button_name;
 	}
 
 	public static InputManager instance = null;
-	public static Dictionary<string, key_pair> key_mapping = new Dictionary<string, key_pair>();
-	public static Dictionary<string, axis_pair> axis_mapping = new Dictionary<string, axis_pair>();
+	public static Dictionary<string, KeyPair> key_mapping = new Dictionary<string, KeyPair>();
+	public static Dictionary<string, AxisPair> axis_mapping = new Dictionary<string, AxisPair>();
 
 	void Awake() {
 		if (instance == null) {
@@ -53,7 +53,7 @@ public class InputManager : MonoBehaviour {
 		Buttons key_mapping_list = JsonUtility.FromJson<Buttons>(key_mapping_file.text);
 
 		foreach (Button k in key_mapping_list.buttons) {
-			key_pair kp = new key_pair();
+			KeyPair kp = new KeyPair();
 			kp.primary_key_code = (KeyCode) System.Enum.Parse(typeof(KeyCode), k.primary_key);
 			kp.secondary_key_code = (KeyCode) System.Enum.Parse(typeof(KeyCode), k.secondary_key);
 			key_mapping[k.button_name] = kp;
@@ -63,7 +63,7 @@ public class InputManager : MonoBehaviour {
 		Axises axis_mapping_list = JsonUtility.FromJson<Axises>(axis_mapping_file.text);
 
 		foreach (Axis a in axis_mapping_list.axises) {
-			axis_pair ap = new axis_pair();
+			AxisPair ap = new AxisPair();
 			ap.positive_button_name = a.positive_button;
 			ap.negative_button_name = a.negative_button;
 			axis_mapping[a.axis_name] = ap;
@@ -131,5 +131,13 @@ public class InputManager : MonoBehaviour {
 
 	public static string get_axis_negative_key_names(string axis_name) {
 		return get_button_key_names(get_axis_negative_button(axis_name));
+	}
+
+	public static void change_key(string button_name, KeyCode key, bool primary = true) {
+		KeyPair temp = key_mapping[button_name];
+		if (primary)
+			temp.primary_key_code = key;
+		else 
+			temp.secondary_key_code = key;
 	}
 }

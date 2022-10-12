@@ -27,13 +27,19 @@ public class GameManager : MonoBehaviour {
 
 	Transform pause_group_transform;
 	Transform option_group_transform;
-	Transform input_group_transform;
+	Transform input_option_group_transform;
 	Transform gameover_screen_transform;
 
 	Transform caption_transform;
 
 	Transform crosshair_transform;
 
+	TextMeshProUGUI option_back_button_tmpro;
+	TextMeshProUGUI input_option_back_button_tmpro;
+
+
+	Slider music_volume_slider;
+	Slider effect_volume_slider;
 	TextMeshProUGUI title_tmpro;
 	TextMeshProUGUI music_volume_tmpro;
 	TextMeshProUGUI effect_volume_tmpro;
@@ -41,6 +47,9 @@ public class GameManager : MonoBehaviour {
 	public AudioMixer mixer;
 	float music_volume = 100;
 	float effect_volume = 100;
+
+	float temp_music_volume = 0;
+	float temp_effect_volume = 0;
 
 
 	public struct ScreenRes {
@@ -76,7 +85,7 @@ public class GameManager : MonoBehaviour {
 		none,
 		pause,
 		option,
-		input,
+		input_option,
 		gameover
 	}
 
@@ -114,6 +123,8 @@ public class GameManager : MonoBehaviour {
 		fullscreen_slider.value = (float) Screen.fullScreenMode;
 		if (fullscreen_slider.value >= (float) FullScreenMode.MaximizedWindow) fullscreen_slider.value += 1.0f;
 		change_fullscreen(fullscreen_slider.value);
+
+		apply_option();
 	}
 
 	void OnEnable() {
@@ -135,29 +146,38 @@ public class GameManager : MonoBehaviour {
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 
-		pause_menu_transform = canvas_transform.Find("PauseMenu");
-
-		pause_group_transform = pause_menu_transform.Find("PauseGroup");
-		option_group_transform = pause_menu_transform.Find("OptionGroup");
-		input_group_transform = pause_menu_transform.Find("InputOptionGroup");
-		gameover_screen_transform = pause_menu_transform.Find("GameOverGroup");
-		title_tmpro = pause_menu_transform.Find("Title").GetComponent<TextMeshProUGUI>();
-
-		music_volume_tmpro = option_group_transform.Find("MusicVolumeText").GetComponent<TextMeshProUGUI>();
-		effect_volume_tmpro = option_group_transform.Find("EffectVolumeText").GetComponent<TextMeshProUGUI>();
-
 		caption_transform = canvas_transform.Find("Caption");
 		caption = caption_transform.GetComponent<Caption>();
 
 		crosshair_transform = canvas_transform.Find("Crosshair");
 
+		pause_menu_transform = canvas_transform.Find("PauseMenu");
 
+		pause_group_transform = pause_menu_transform.Find("PauseGroup");
+		option_group_transform = pause_menu_transform.Find("OptionGroup");
+		input_option_group_transform = pause_menu_transform.Find("InputOptionGroup");
+		gameover_screen_transform = pause_menu_transform.Find("GameOverGroup");
+
+		title_tmpro = pause_menu_transform.Find("Title").GetComponent<TextMeshProUGUI>();
+
+
+		music_volume_slider = option_group_transform.Find("MusicVolumeSlider").GetComponent<Slider>();
+		music_volume_tmpro = option_group_transform.Find("MusicVolumeText").GetComponent<TextMeshProUGUI>();
+
+		effect_volume_slider = option_group_transform.Find("EffectVolumeSlider").GetComponent<Slider>();
+		effect_volume_tmpro = option_group_transform.Find("EffectVolumeText").GetComponent<TextMeshProUGUI>();
 
 		screen_res_slider = option_group_transform.Find("ScreenResSlider").GetComponent<Slider>();
 		screen_res_tmpro = option_group_transform.Find("ScreenResText").GetComponent<TextMeshProUGUI>();
 
 		fullscreen_slider = option_group_transform.Find("FullscreenSlider").GetComponent<Slider>();
 		fullscreen_tmpro = option_group_transform.Find("FullscreenText").GetComponent<TextMeshProUGUI>();
+
+		option_back_button_tmpro = option_group_transform.Find("Back").GetChild(0).GetComponent<TextMeshProUGUI>();
+
+		
+		input_option_back_button_tmpro = input_option_group_transform.Find("Back").GetChild(0).GetComponent<TextMeshProUGUI>();
+
 	}
 
 	void Update() {
@@ -175,6 +195,14 @@ public class GameManager : MonoBehaviour {
 			case menu_state_enum.option:
 				if (InputManager.get_button_down("cancel")) {
 					toggle_option(false);
+				}
+				if (InputManager.get_button_down("submit")) {
+					apply_option();
+				}
+				break;
+			case menu_state_enum.input_option:
+				if (InputManager.get_button_down("cancel")) {
+					toggle_input_option(false);
 				}
 				break;
 			case menu_state_enum.gameover:
@@ -204,10 +232,7 @@ public class GameManager : MonoBehaviour {
 		title_tmpro.text = toggle ? "OPTION" : "PAUSE";
 
 		if (!toggle) {
-			screen_res_slider.value = screen_res_index;
-			fullscreen_slider.value = (float) fullscreen_mode;
-			change_screen_res(screen_res_slider.value);
-			change_fullscreen(fullscreen_slider.value);
+			cancel_option();
 		}
 	}
 
@@ -232,25 +257,23 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void change_music_volume(float volume) {
-		music_volume = get_gain(volume);
-		if (volume == 0) {
-			music_volume = -80;
-		}
-		mixer.SetFloat("Music", music_volume);
+		temp_music_volume = volume;
+		mixer.SetFloat("Music", get_gain(volume));
 		music_volume_tmpro.SetText($"Music Volume - {(int) volume}%");
+		change_option_back_button_text(true);
+		
 	}
 	public void change_effect_volume(float volume) {
-		effect_volume = get_gain(volume);
-		if (volume == 0) {
-			effect_volume = -80;
-		}
-		mixer.SetFloat("Effect", effect_volume);
+		temp_effect_volume = volume;
+		mixer.SetFloat("Effect", get_gain(volume));
 		effect_volume_tmpro.SetText($"Effect Volume - {(int) volume}%");
+		change_option_back_button_text(true);
 	}
 
 	public void change_screen_res(float index) {
 		screen_res_tmpro.text = get_screen_res_text((int) index);
 		temp_screen_res_index = (int) index;
+		change_option_back_button_text(true);
 	}
 
 	public void change_fullscreen(float index) {
@@ -262,12 +285,36 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 		fullscreen_tmpro.text = System.Enum.GetName(typeof(FullScreenMode), temp_fullscreen_mode);
+		change_option_back_button_text(true);
 	}
 
-	public void apply_screen_res() {
+	public void apply_option() {
 		screen_res_index = temp_screen_res_index;
 		fullscreen_mode = temp_fullscreen_mode;
+		effect_volume = temp_effect_volume;
+		music_volume = temp_music_volume;
 		Screen.SetResolution(screen_res_list[screen_res_index].width, screen_res_list[screen_res_index].height, fullscreen_mode);
+
+		change_option_back_button_text(false);
+	}
+
+	public void cancel_option() {
+		screen_res_slider.value = screen_res_index;
+		fullscreen_slider.value = (float) fullscreen_mode;
+		change_screen_res(screen_res_slider.value);
+		change_fullscreen(fullscreen_slider.value);
+		
+		effect_volume_slider.value = effect_volume;
+		music_volume_slider.value = music_volume;
+		change_music_volume(music_volume);
+		change_effect_volume(effect_volume);
+
+		change_option_back_button_text(false);
+	}
+
+	void change_option_back_button_text(bool toggle) {
+		if (toggle) option_back_button_tmpro.text = "Cancel";
+		else option_back_button_tmpro.text = "Back";
 	}
 
 	string get_screen_res_text(int index) {
@@ -275,6 +322,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	float get_gain(float volume) {
+		if (volume == 0.0f) return -80.0f;
 		return 20 * (Mathf.Log(volume / 100) / Mathf.Log(10));
 	}
 
