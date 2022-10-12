@@ -18,7 +18,7 @@ public class Caption : MonoBehaviour {
 		caption_tmpro = transform.Find("Text").GetComponent<TextMeshProUGUI>();
 		skip_tmpro = transform.Find("Skip").GetComponent<TextMeshProUGUI>();
 
-		skip_tmpro.text = $"[{InputManager.get_button_key_names("submit")} 또는 {InputManager.get_button_key_names("fire")}] 키를 눌러 넘기기...";
+		reset_caption_info();
 	}
 
 	void Update() {
@@ -71,5 +71,9 @@ public class Caption : MonoBehaviour {
 
 	bool is_pressed_skip_button() {
 		return InputManager.get_button_down("submit") || InputManager.get_button_down("fire");
+	}
+
+	public void reset_caption_info() {
+		skip_tmpro.text = $"[{InputManager.get_button_key_names("submit")} 또는 {InputManager.get_button_key_names("fire")}] 키를 눌러 넘기기...";
 	}
 }

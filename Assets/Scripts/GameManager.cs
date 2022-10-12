@@ -202,6 +202,8 @@ public class GameManager : MonoBehaviour {
 		input_option_back_button_tmpro = input_option_group_transform.Find("Back").GetChild(0).GetComponent<TextMeshProUGUI>();
 		input_panel = input_option_group_transform.Find("InputPanel");
 
+		key_button_texts.Clear();
+
 		foreach (string str in button_names) {
 			Char[] temp_arr = str.ToCharArray();
 			temp_arr[0] = Char.ToUpper(temp_arr[0]);
@@ -425,6 +427,7 @@ public class GameManager : MonoBehaviour {
 		}
 		temp_keys.Clear();
 		change_input_option_back_button_text(false);
+		caption.reset_caption_info();
 	}
 
 	public void cancel_input_option() {
