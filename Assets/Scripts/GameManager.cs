@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,7 @@ using TMPro;
 
 public class GameManager : MonoBehaviour {
 	public static GameManager instance = null;
+	public Transform essentials;
 
 	public Transform canvas_transform;
 	Transform pause_menu_transform;
@@ -34,6 +36,10 @@ public class GameManager : MonoBehaviour {
 
 	Transform crosshair_transform;
 
+	
+	bool caption_toggle = false;
+	Caption caption;
+
 	TextMeshProUGUI option_back_button_tmpro;
 	TextMeshProUGUI input_option_back_button_tmpro;
 
@@ -48,8 +54,8 @@ public class GameManager : MonoBehaviour {
 	float music_volume = 100;
 	float effect_volume = 100;
 
-	float temp_music_volume = 0;
-	float temp_effect_volume = 0;
+	float temp_music_volume = 100;
+	float temp_effect_volume = 100;
 
 
 	public struct ScreenRes {
@@ -76,16 +82,33 @@ public class GameManager : MonoBehaviour {
 	FullScreenMode fullscreen_mode = FullScreenMode.ExclusiveFullScreen;
 	FullScreenMode temp_fullscreen_mode = FullScreenMode.ExclusiveFullScreen;
 
-	bool menu_toggle = false;
-	bool caption_toggle = false;
+	List<string> button_names = new List<string> {
+		"fire",
+		"interact",
+		"jump",
+		"weapon 1",
+		"weapon 2",
+		"up",
+		"down",
+		"left",
+		"right"
+	};
 
-	Caption caption;
+	Dictionary<string, TextMeshProUGUI> key_button_texts = new Dictionary<string, TextMeshProUGUI>();
+
+
+	Dictionary<string, KeyCode> temp_keys = new Dictionary<string, KeyCode>();
+	string current_input_button_name = "";
+	Transform input_panel;
+
+	bool menu_toggle = false;
 
 	public enum menu_state_enum {
 		none,
 		pause,
 		option,
 		input_option,
+		input_key,
 		gameover
 	}
 
@@ -125,6 +148,10 @@ public class GameManager : MonoBehaviour {
 		change_fullscreen(fullscreen_slider.value);
 
 		apply_option();
+
+		foreach (string button_name in button_names) {
+			key_button_texts[button_name].text = $"{InputManager.get_button_primary_key_code(button_name)}";
+		}
 	}
 
 	void OnEnable() {
@@ -175,6 +202,25 @@ public class GameManager : MonoBehaviour {
 
 		
 		input_option_back_button_tmpro = input_option_group_transform.Find("Back").GetChild(0).GetComponent<TextMeshProUGUI>();
+		input_panel = input_option_group_transform.Find("InputPanel");
+
+		foreach (string str in button_names) {
+			Char[] temp_arr = str.ToCharArray();
+			temp_arr[0] = Char.ToUpper(temp_arr[0]);
+			string temp_str = $"{temp_arr.ArrayToString().Replace(" ", "")}Button";
+			
+			Transform temp_button_transform = input_option_group_transform.Find(temp_str);
+			Button temp_button = temp_button_transform.GetComponent<Button>();
+			TextMeshProUGUI temp_tmpro = temp_button_transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+
+			temp_button.onClick.AddListener(
+				delegate {
+					toggle_input_key(str);
+				}
+			);
+
+			key_button_texts.Add(str, temp_tmpro);
+		}
 
 	}
 
@@ -201,6 +247,12 @@ public class GameManager : MonoBehaviour {
 			case menu_state_enum.input_option:
 				if (InputManager.get_button_down("cancel")) {
 					toggle_input_option(false);
+				}
+				break;
+			case menu_state_enum.input_key:
+				KeyCode keycode = InputManager.get_anykey_down();
+				if (keycode != KeyCode.None) {
+					get_input_key(current_input_button_name, keycode);
 				}
 				break;
 			case menu_state_enum.gameover:
@@ -235,7 +287,14 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void toggle_input_option(bool toggle) {
-		
+		option_group_transform.gameObject.SetActive(!toggle);
+		input_option_group_transform.gameObject.SetActive(toggle);
+		menu_state = toggle ? menu_state_enum.input_option : menu_state_enum.option;
+		title_tmpro.text = toggle ? "INPUT OPTION" : "OPTION";
+
+		if (!toggle) {
+			cancel_input_option();
+		}
 	}
 	
 	public void toggle_gameover(bool toggle) {
@@ -315,6 +374,11 @@ public class GameManager : MonoBehaviour {
 		else option_back_button_tmpro.text = "Back";
 	}
 
+	void change_input_option_back_button_text(bool toggle) {
+		if (toggle) input_option_back_button_tmpro.text = "Cancel";
+		else input_option_back_button_tmpro.text = "Back";
+	}
+
 	string get_screen_res_text(int index) {
 		return $"{screen_res_list[index].width}×{screen_res_list[index].height}";
 	}
@@ -322,6 +386,54 @@ public class GameManager : MonoBehaviour {
 	float get_gain(float volume) {
 		if (volume == 0.0f) return -80.0f;
 		return 20 * (Mathf.Log(volume / 100) / Mathf.Log(10));
+	}
+
+	public void toggle_input_key(string button_name) {
+		current_input_button_name = button_name;
+		key_button_texts[button_name].text = "";
+		menu_state = menu_state_enum.input_key;
+		input_panel.gameObject.SetActive(true);
+	}
+
+	public void get_input_key(string button_name, KeyCode keycode) {
+		foreach (string temp_button_name in button_names) {
+			if (key_button_texts[temp_button_name].text.Equals($"{keycode}")) {
+				key_button_texts[temp_button_name].text = "";
+				set_temp_key(temp_button_name, KeyCode.None);
+			}
+		}
+
+		key_button_texts[button_name].text = $"{keycode}";
+		set_temp_key(button_name, keycode);
+		change_input_option_back_button_text(true);
+		menu_state = menu_state_enum.input_option;
+		input_panel.gameObject.SetActive(false);
+	}
+
+	public void set_temp_key(string button_name, KeyCode keycode) {
+		KeyCode temp_keycode;
+		if (temp_keys.TryGetValue(button_name, out temp_keycode)) {
+			temp_keys[button_name] = keycode;
+		}
+		else temp_keys.Add(button_name, keycode);
+	}
+
+	public void apply_input_option() {
+		foreach (KeyValuePair<string, KeyCode> pair in temp_keys) {
+			string button_name = pair.Key;
+			InputManager.KeyPair kp = InputManager.key_mapping[button_name];
+			kp.primary_key_code = pair.Value;
+			InputManager.key_mapping[button_name] = kp;
+		}
+		temp_keys.Clear();
+		change_input_option_back_button_text(false);
+	}
+
+	public void cancel_input_option() {
+		foreach (string button_name in button_names) {
+			key_button_texts[button_name].text = $"{InputManager.get_button_primary_key_code(button_name)}";
+		}
+		change_input_option_back_button_text(false);
 	}
 
 	public void restart_level() {

@@ -92,6 +92,17 @@ public class InputManager : MonoBehaviour {
 		return primary || secondary;
 	}
 
+	public static KeyCode get_anykey_down() {
+		if (Input.anyKeyDown) {
+			foreach (KeyCode keycode in System.Enum.GetValues(typeof(KeyCode))) {
+				if (Input.GetKey(keycode)) {
+					return keycode;
+				}
+			}
+		}
+		return KeyCode.None;
+	}
+
 	public static KeyCode get_button_primary_key_code(string button_name) {
 		return key_mapping[button_name].primary_key_code;
 	}
