@@ -74,6 +74,7 @@ public class Caption : MonoBehaviour {
 	}
 
 	public void reset_caption_info() {
+		if (skip_tmpro != null)
 		skip_tmpro.text = $"[{InputManager.get_button_key_names("submit")} 또는 {InputManager.get_button_key_names("fire")}] 키를 눌러 넘기기...";
 	}
 }

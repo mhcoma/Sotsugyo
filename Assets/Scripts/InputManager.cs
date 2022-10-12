@@ -1,3 +1,4 @@
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,6 +40,8 @@ public class InputManager : MonoBehaviour {
 	public static Dictionary<string, KeyPair> key_mapping = new Dictionary<string, KeyPair>();
 	public static Dictionary<string, AxisPair> axis_mapping = new Dictionary<string, AxisPair>();
 
+	public const string button_mapping_file_path = "button.json";
+
 	void Awake() {
 		if (instance == null) {
 			instance = this;
@@ -48,7 +51,16 @@ public class InputManager : MonoBehaviour {
 	}
 
 	void Start() {
-		load_deafult_button_mapping();
+		FileInfo button_mapping_file_info = new FileInfo(button_mapping_file_path);
+		
+		if (button_mapping_file_info.Exists) {
+			load_button_mapping(false);
+		}
+		else {
+			load_button_mapping(true);
+			save_button_mapping();
+		}
+
 		load_default_axis_mapping();
 	}
 
@@ -133,15 +145,21 @@ public class InputManager : MonoBehaviour {
 			temp.secondary_key_code = key;
 	}
 
-	public static void load_deafult_button_mapping() {
-		TextAsset button_mapping_file = Resources.Load<TextAsset>("Settings/button");
-		Buttons button_mapping_list = JsonUtility.FromJson<Buttons>(button_mapping_file.text);
+	public static void load_button_mapping(bool load_default) {
+		string button_mapping_file;
+		if (load_default) {
+			TextAsset button_mapping_file_asset = Resources.Load<TextAsset>("Settings/button");
+			button_mapping_file = button_mapping_file_asset.text;
+		}
+		else button_mapping_file = File.ReadAllText(button_mapping_file_path);
+		
+		Buttons button_mapping_list = JsonUtility.FromJson<Buttons>(button_mapping_file);
 
-		foreach (Button k in button_mapping_list.buttons) {
+		foreach (Button b in button_mapping_list.buttons) {
 			KeyPair kp = new KeyPair();
-			kp.primary_key_code = (KeyCode) System.Enum.Parse(typeof(KeyCode), k.primary_key);
-			kp.secondary_key_code = (KeyCode) System.Enum.Parse(typeof(KeyCode), k.secondary_key);
-			key_mapping[k.button_name] = kp;
+			kp.primary_key_code = (KeyCode) System.Enum.Parse(typeof(KeyCode), b.primary_key);
+			kp.secondary_key_code = (KeyCode) System.Enum.Parse(typeof(KeyCode), b.secondary_key);
+			key_mapping[b.button_name] = kp;
 		}
 	}
 
@@ -155,5 +173,24 @@ public class InputManager : MonoBehaviour {
 			ap.negative_button_name = a.negative_button;
 			axis_mapping[a.axis_name] = ap;
 		}
+	}
+
+	public static void save_button_mapping() {
+		Buttons button_mapping_list = new Buttons();
+		button_mapping_list.buttons = new Button[key_mapping.Count];
+
+		int index = 0;
+		foreach (KeyValuePair<string, KeyPair> pair in key_mapping) {
+			Button b = new Button();
+			KeyPair kp = pair.Value;
+			b.primary_key = $"{kp.primary_key_code}";
+			b.secondary_key = $"{kp.secondary_key_code}";
+			b.button_name = pair.Key;
+			button_mapping_list.buttons[index] = b;
+			index++;
+		}
+
+		string button_mapping_file = JsonUtility.ToJson(button_mapping_list);
+		File.WriteAllText(button_mapping_file_path, button_mapping_file);
 	}
 }

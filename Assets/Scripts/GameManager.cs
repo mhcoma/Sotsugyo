@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -57,6 +58,14 @@ public class GameManager : MonoBehaviour {
 	float temp_music_volume = 100;
 	float temp_effect_volume = 100;
 
+	[System.Serializable]
+	public class SoundVolume {
+		public int effect_volume;
+		public int music_volume;
+	}
+
+	public const string sound_volume_file_path = "music.json";
+
 
 	public struct ScreenRes {
 		public int width;
@@ -100,6 +109,7 @@ public class GameManager : MonoBehaviour {
 	Dictionary<string, KeyCode> temp_keys = new Dictionary<string, KeyCode>();
 	string current_input_button_name = "";
 	Transform input_panel;
+	bool is_reset_buttons = false;
 
 	bool menu_toggle = false;
 
@@ -146,6 +156,12 @@ public class GameManager : MonoBehaviour {
 		fullscreen_slider.value = (float) Screen.fullScreenMode;
 		if (fullscreen_slider.value >= (float) FullScreenMode.MaximizedWindow) fullscreen_slider.value += 1.0f;
 		change_fullscreen(fullscreen_slider.value);
+
+		FileInfo music_volume_file_info = new FileInfo(sound_volume_file_path);
+
+		if (music_volume_file_info.Exists) {
+			load_sound_volume();
+		}
 
 		apply_option();
 
@@ -327,6 +343,23 @@ public class GameManager : MonoBehaviour {
 		change_option_back_button_text(true);
 	}
 
+	public void load_sound_volume() {
+		string sound_volume_file = File.ReadAllText(sound_volume_file_path);
+		SoundVolume sound_volume = JsonUtility.FromJson<SoundVolume>(sound_volume_file);
+
+		temp_music_volume = sound_volume.music_volume;
+		temp_effect_volume = sound_volume.effect_volume;
+	}
+	
+	public void save_sound_volume() {
+		SoundVolume sound_volume = new SoundVolume();
+		sound_volume.music_volume = (int) music_volume;
+		sound_volume.effect_volume = (int) effect_volume;
+
+		string sound_volume_file = JsonUtility.ToJson(sound_volume);
+		File.WriteAllText(sound_volume_file_path, sound_volume_file);
+	}
+
 	public void change_screen_res(float index) {
 		screen_res_tmpro.text = get_screen_res_text((int) index);
 		temp_screen_res_index = (int) index;
@@ -348,9 +381,16 @@ public class GameManager : MonoBehaviour {
 	public void apply_option() {
 		screen_res_index = temp_screen_res_index;
 		fullscreen_mode = temp_fullscreen_mode;
+
 		effect_volume = temp_effect_volume;
 		music_volume = temp_music_volume;
+		effect_volume_slider.value = effect_volume;
+		music_volume_slider.value = music_volume;
+
 		Screen.SetResolution(screen_res_list[screen_res_index].width, screen_res_list[screen_res_index].height, fullscreen_mode);
+
+		save_sound_volume();
+		
 
 		change_option_back_button_text(false);
 	}
@@ -428,22 +468,31 @@ public class GameManager : MonoBehaviour {
 		temp_keys.Clear();
 		change_input_option_back_button_text(false);
 		caption.reset_caption_info();
+		InputManager.save_button_mapping();
 	}
 
 	public void cancel_input_option() {
+		if (is_reset_buttons) {
+			InputManager.load_button_mapping(false);
+			is_reset_buttons = false;
+		}
 		initialize_input_button_texts();
 		change_input_option_back_button_text(false);
 	}
 
 	public void reset_input_option() {
-		InputManager.load_deafult_button_mapping();
+		InputManager.load_button_mapping(true);
 		initialize_input_button_texts();
-		change_input_option_back_button_text(false);
+		change_input_option_back_button_text(true);
+		is_reset_buttons = true;
 	}
 
 	public void initialize_input_button_texts() {
 		foreach (string button_name in button_names) {
-			key_button_texts[button_name].text = $"{InputManager.get_button_primary_key_code(button_name)}";
+			if (InputManager.get_button_primary_key_code(button_name) == KeyCode.None)
+				key_button_texts[button_name].text = "";
+			else
+				key_button_texts[button_name].text = $"{InputManager.get_button_primary_key_code(button_name)}";
 		}
 	}
 
