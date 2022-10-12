@@ -435,6 +435,7 @@ public class GameManager : MonoBehaviour {
 	public void reset_input_option() {
 		InputManager.load_deafult_button_mapping();
 		initialize_input_button_texts();
+		change_input_option_back_button_text(false);
 	}
 
 	public void initialize_input_button_texts() {
