@@ -54,7 +54,9 @@ public class Player : MonoBehaviour {
 
 	Transform canvas_transform;
 	WeaponHUDSprite weapon_hud_sprite_manager;
-	Transform HUD_transform;
+
+	[System.NonSerialized]
+	public Transform hud_transform;
 	TextMeshProUGUI hp_tmpro;
 	TextMeshProUGUI weapon_tmpro;
 	
@@ -184,9 +186,9 @@ public class Player : MonoBehaviour {
 		canvas_transform = GameManager.instance.canvas_transform;
 
 		weapon_hud_sprite_manager = canvas_transform.Find("WeaponImage").GetComponent<WeaponHUDSprite>();
-		HUD_transform = canvas_transform.Find("HUD");
-		hp_tmpro = HUD_transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-		weapon_tmpro = HUD_transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+		hud_transform = canvas_transform.Find("HUD");
+		hp_tmpro = hud_transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+		weapon_tmpro = hud_transform.GetChild(1).GetComponent<TextMeshProUGUI>();
 
 		AudioSource[] asrcs = GetComponents<AudioSource>();
 		
@@ -503,11 +505,6 @@ public class Player : MonoBehaviour {
 		controllable = toggle;
 		if (is_shooting_laser) {
 			toggle_laser(toggle);
-		}
-		if (toggle) {
-		}
-		else {
-			
 		}
 	}
 

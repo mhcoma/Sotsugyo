@@ -337,9 +337,28 @@ public class GameManager : MonoBehaviour {
 		player.set_controllable(!temp_tot);
 
 		pause_menu_transform.gameObject.SetActive(!toggle);
+		player.hud_transform.gameObject.SetActive(toggle);
 
 		if (toggle) {
 			menu_state = menu_state_enum.playing;
+		}
+	}
+
+	public void toggle_main_menu(bool toggle) {
+		if (toggle) {
+			move_level("Scenes/TutorialScene");
+			menu_state = menu_state_enum.main_menu;
+			title_tmpro.text = "";
+			is_main_menu = true;
+		}
+		main_menu_group_transform.gameObject.SetActive(toggle);
+	}
+
+	public void toggle_pause(bool toggle) {
+		pause_group_transform.gameObject.SetActive(toggle);
+		if (toggle) {
+			menu_state = menu_state_enum.pause;
+			title_tmpro.text = "PAUSE";
 		}
 	}
 
@@ -349,6 +368,14 @@ public class GameManager : MonoBehaviour {
 			title_tmpro.text = "PLAY";
 		}
 		play_group_transform.gameObject.SetActive(toggle);
+	}
+	
+	public void toggle_gameover(bool toggle) {
+		gameover_screen_transform.gameObject.SetActive(toggle);
+		if (toggle) {
+			menu_state = menu_state_enum.gameover;
+			title_tmpro.text = "GAME OVER";
+		}
 	}
 
 	public void toggle_option(bool toggle) {
@@ -380,22 +407,6 @@ public class GameManager : MonoBehaviour {
 			cancel_input_option();
 		}
 	}
-	
-	public void toggle_gameover(bool toggle) {
-		gameover_screen_transform.gameObject.SetActive(toggle);
-		if (toggle) {
-			menu_state = menu_state_enum.gameover;
-			title_tmpro.text = "GAME OVER";
-		}
-	}
-
-	public void toggle_pause(bool toggle) {
-		pause_group_transform.gameObject.SetActive(toggle);
-		if (toggle) {
-			menu_state = menu_state_enum.pause;
-			title_tmpro.text = "PAUSE";
-		}
-	}
 
 	public void resume() {
 		menu_state = menu_state_enum.playing;
@@ -412,16 +423,6 @@ public class GameManager : MonoBehaviour {
 	public void gameover() {
 		toggle_playing(false);
 		toggle_gameover(true);
-	}
-
-	public void toggle_main_menu(bool toggle) {
-		if (toggle) {
-			move_level("Scenes/TutorialScene");
-			menu_state = menu_state_enum.main_menu;
-			title_tmpro.text = "";
-			is_main_menu = true;
-		}
-		main_menu_group_transform.gameObject.SetActive(toggle);
 	}
 
 	public void swap_play_menu_main_menu(bool swap) {
@@ -616,8 +617,6 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	
-
 	public void quit() {
 		#if UNITY_EDITOR
 			UnityEditor.EditorApplication.isPlaying = false;
@@ -638,9 +637,5 @@ public class GameManager : MonoBehaviour {
 		toggle_caption(true);
 
 		caption.add_text(string.Join("\n", strs));
-	}
-
-	public bool controlable() {
-		return player.controllable;
 	}
 }
