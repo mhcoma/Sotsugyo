@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using TMPro;
 
 public class Caption : MonoBehaviour {
@@ -13,6 +14,8 @@ public class Caption : MonoBehaviour {
 
 	TextMeshProUGUI caption_tmpro;
 	TextMeshProUGUI skip_tmpro;
+
+	public UnityEvent on_end;
 
 	void Start() {
 		caption_tmpro = transform.Find("Text").GetComponent<TextMeshProUGUI>();
@@ -59,6 +62,8 @@ public class Caption : MonoBehaviour {
 			caption_tmpro.text = "";
 		if (!text_queue.TryDequeue(out buffer_text)) {
 			GameManager.instance.toggle_caption(false);
+			on_end.Invoke();
+			on_end.RemoveAllListeners();
 		}
 		type_index = 0;
 		type_time = 0.0f;

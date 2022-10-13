@@ -71,5 +71,10 @@ public class TutorialScene : MonoBehaviour {
 			"튜토리얼을 완료했습니다.",
 			"축하합니다."
 		);
+		GameManager.instance.caption_addevent(
+			delegate {
+				GameManager.instance.level_clear();
+			}
+		);
 	}
 }

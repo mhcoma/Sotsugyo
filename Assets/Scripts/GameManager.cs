@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
@@ -124,8 +125,10 @@ public class GameManager : MonoBehaviour {
 	Transform pause_group_transform;
 	Transform option_group_transform;
 	Transform input_option_group_transform;
-	Transform gameover_screen_transform;
+	Transform gameover_group_transform;
+	Transform next_level_button_transform;
 	bool is_main_menu = true;
+	string gameover_text = "GAME OVER";
 
 	public menu_state_enum menu_state = menu_state_enum.none;
 
@@ -138,8 +141,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Start() {
-		toggle_playing(false);
 		menu_state = menu_state_enum.main_menu;
+		toggle_playing(false);
+		swap_clear_gameover(false);
 
 		ScreenRes screen_res = new ScreenRes(Screen.width, Screen.height);
 		int temp_index = 0;
@@ -201,10 +205,9 @@ public class GameManager : MonoBehaviour {
 		pause_group_transform = pause_menu_transform.Find("PauseGroup");
 		option_group_transform = pause_menu_transform.Find("OptionGroup");
 		input_option_group_transform = pause_menu_transform.Find("InputOptionGroup");
-		gameover_screen_transform = pause_menu_transform.Find("GameOverGroup");
+		gameover_group_transform = pause_menu_transform.Find("GameOverGroup");
 
 		title_tmpro = pause_menu_transform.Find("Title").GetComponent<TextMeshProUGUI>();
-
 
 		music_volume_slider = option_group_transform.Find("MusicVolumeSlider").GetComponent<Slider>();
 		music_volume_tmpro = option_group_transform.Find("MusicVolumeText").GetComponent<TextMeshProUGUI>();
@@ -220,9 +223,10 @@ public class GameManager : MonoBehaviour {
 
 		option_back_button_tmpro = option_group_transform.Find("Back").GetChild(0).GetComponent<TextMeshProUGUI>();
 
-		
 		input_option_back_button_tmpro = input_option_group_transform.Find("Back").GetChild(0).GetComponent<TextMeshProUGUI>();
 		input_panel = input_option_group_transform.Find("InputPanel");
+
+		next_level_button_transform = gameover_group_transform.Find("NextLevelButton");
 
 		key_button_texts.Clear();
 
@@ -320,6 +324,11 @@ public class GameManager : MonoBehaviour {
 		move_level(SceneManager.GetActiveScene().name);
 	}
 
+	public void start_next_level() {
+		toggle_playing(true);
+		move_level(SceneManager.GetActiveScene().name);
+	}
+
 	public void move_level(string level_name) {
 		player.rebirth();
 		caption.clear();
@@ -338,6 +347,10 @@ public class GameManager : MonoBehaviour {
 
 		pause_menu_transform.gameObject.SetActive(!toggle);
 		player.hud_transform.gameObject.SetActive(toggle);
+
+		if (caption_toggle) {
+			caption_transform.gameObject.SetActive(toggle);
+		}
 
 		if (toggle) {
 			menu_state = menu_state_enum.playing;
@@ -371,11 +384,19 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	public void toggle_gameover(bool toggle) {
-		gameover_screen_transform.gameObject.SetActive(toggle);
+		gameover_group_transform.gameObject.SetActive(toggle);
 		if (toggle) {
 			menu_state = menu_state_enum.gameover;
-			title_tmpro.text = "GAME OVER";
+			title_tmpro.text = gameover_text;
 		}
+		else {
+			swap_clear_gameover(false);
+		}
+	}
+
+	public void swap_clear_gameover(bool toggle) {
+		next_level_button_transform.gameObject.SetActive(toggle);
+		gameover_text = toggle ? "CLEAR" : "GAME OVER";
 	}
 
 	public void toggle_option(bool toggle) {
@@ -420,9 +441,18 @@ public class GameManager : MonoBehaviour {
 		toggle_playing(false);
 	}
 
+	public void playing_to_main_menu() {
+		menu_state = menu_state_enum.main_menu;
+	}
+
 	public void gameover() {
 		toggle_playing(false);
 		toggle_gameover(true);
+	}
+
+	public void level_clear() {
+		swap_clear_gameover(true);
+		gameover();
 	}
 
 	public void swap_play_menu_main_menu(bool swap) {
@@ -438,6 +468,11 @@ public class GameManager : MonoBehaviour {
 	public void pause_to_main_menu() {
 		toggle_pause(false);
 		toggle_main_menu(true);
+	}
+
+	public void gameover_to_next_level() {
+		toggle_gameover(false);
+		start_next_level();
 	}
 
 	public void gameover_to_restart() {
@@ -637,5 +672,9 @@ public class GameManager : MonoBehaviour {
 		toggle_caption(true);
 
 		caption.add_text(string.Join("\n", strs));
+	}
+
+	public void caption_addevent(UnityAction call) {
+		caption.on_end.AddListener(call);
 	}
 }

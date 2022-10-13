@@ -44,6 +44,7 @@ public class EnemyAITest : MonoBehaviour {
 		attack,
 		dead
 	}
+	[System.NonSerialized]
 	public Act_state state = Act_state.wait;
 
 	public enum Attack_type {
@@ -51,10 +52,13 @@ public class EnemyAITest : MonoBehaviour {
 		rocket,
 		laser,
 	}
+	
 	public Attack_type type;
 	bool attackable = false;
 	public float attack_rate;
 	float attack_time = 0.0f;
+	public float primary_attack_damage = 10.0f;
+	public float secondary_attack_damage = 10.0f;
 
 	ParticleSystem attack_effect;
 	public GameObject rocket_prefab;
@@ -217,7 +221,7 @@ public class EnemyAITest : MonoBehaviour {
 			case Attack_type.melee:
 				attack_effect.Play();
 				asrc.PlayOneShot(attack_clip);
-				player.get_damage(10.0f);
+				player.get_damage(primary_attack_damage);
 				break;
 			case Attack_type.rocket:
 				GameObject rocket_obj = Instantiate(rocket_prefab);
@@ -227,7 +231,7 @@ public class EnemyAITest : MonoBehaviour {
 					launcher_pos,
 					player.next_position(launcher_pos, Rocket.speed),
 					transform,
-					10, 10
+					primary_attack_damage, secondary_attack_damage
 				);
 				break;
 			case Attack_type.laser:
