@@ -23,15 +23,6 @@ public class GameManager : MonoBehaviour {
 	public Transform camera_transform;
 
 	public Transform player_spawn_point_transform;
-	public Vector3 get_player_spawn_point {
-		get { return player_spawn_point_transform.position; }
-	}
-
-
-	Transform pause_group_transform;
-	Transform option_group_transform;
-	Transform input_option_group_transform;
-	Transform gameover_screen_transform;
 
 	Transform caption_transform;
 
@@ -115,12 +106,26 @@ public class GameManager : MonoBehaviour {
 
 	public enum menu_state_enum {
 		none,
+		main_menu,
+		main_play,
+		main_option,
+		main_input_option,
+		main_input_key,
+		mission_info,
+		playing,
 		pause,
 		option,
 		input_option,
 		input_key,
 		gameover
 	}
+	Transform main_menu_group_transform;
+	Transform play_group_transform;
+	Transform pause_group_transform;
+	Transform option_group_transform;
+	Transform input_option_group_transform;
+	Transform gameover_screen_transform;
+	bool is_main_menu = true;
 
 	public menu_state_enum menu_state = menu_state_enum.none;
 
@@ -133,6 +138,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Start() {
+		toggle_playing(false);
+		menu_state = menu_state_enum.main_menu;
+
 		ScreenRes screen_res = new ScreenRes(Screen.width, Screen.height);
 		int temp_index = 0;
 
@@ -174,16 +182,12 @@ public class GameManager : MonoBehaviour {
 
 	void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
 		Init();
-		Debug.Log("init");
 	}
 
 	void Init() {
 		player = player_transform.GetComponent<Player>();
 
 		camera_transform = camera_holder_transform.Find("PlayerCamera");
-
-		Cursor.lockState = CursorLockMode.Locked;
-		Cursor.visible = false;
 
 		caption_transform = canvas_transform.Find("Caption");
 		caption = caption_transform.GetComponent<Caption>();
@@ -192,6 +196,8 @@ public class GameManager : MonoBehaviour {
 
 		pause_menu_transform = canvas_transform.Find("PauseMenu");
 
+		main_menu_group_transform = pause_menu_transform.Find("MainMenuGroup");
+		play_group_transform = pause_menu_transform.Find("PlayGroup");
 		pause_group_transform = pause_menu_transform.Find("PauseGroup");
 		option_group_transform = pause_menu_transform.Find("OptionGroup");
 		input_option_group_transform = pause_menu_transform.Find("InputOptionGroup");
@@ -240,18 +246,33 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+	int count = 0;
+
 	void Update() {
+		Debug.Log($"{count} - {menu_state}");
+		count++;
 		switch (menu_state) {
-			case menu_state_enum.none:
+			case menu_state_enum.main_menu:
 				if (InputManager.get_button_down("cancel")) {
-					toggle_pause(true);
+					quit();
+				}
+				break;
+			case menu_state_enum.main_play:
+				if (InputManager.get_button_down("cancel")) {
+					swap_play_menu_main_menu(false);
+				}
+				break;
+			case menu_state_enum.playing:
+				if (InputManager.get_button_down("cancel")) {
+					pause();
 				}
 				break;
 			case menu_state_enum.pause:
 				if (InputManager.get_button_down("cancel")) {
-					toggle_pause(false);
+					resume();
 				}
 				break;
+			case menu_state_enum.main_option:
 			case menu_state_enum.option:
 				if (InputManager.get_button_down("cancel")) {
 					toggle_option(false);
@@ -260,11 +281,16 @@ public class GameManager : MonoBehaviour {
 					apply_option();
 				}
 				break;
+			case menu_state_enum.main_input_option:
 			case menu_state_enum.input_option:
 				if (InputManager.get_button_down("cancel")) {
 					toggle_input_option(false);
 				}
+				if (InputManager.get_button_down("submit")) {
+					apply_input_option();
+				}
 				break;
+			case menu_state_enum.main_input_key:
 			case menu_state_enum.input_key:
 				KeyCode keycode = InputManager.get_anykey_down();
 				if (keycode != KeyCode.None) {
@@ -273,31 +299,68 @@ public class GameManager : MonoBehaviour {
 				break;
 			case menu_state_enum.gameover:
 				if (InputManager.get_button_down("cancel")) {
-					
+					gameover_to_main_menu();
+				}
+				if (InputManager.get_button_down("submit")) {
+					gameover_to_restart();
 				}
 				break;
 		}
 	}
 
-	public void toggle_pause(bool toggle) {
-		bool temp_tot = toggle || caption_toggle;
-		menu_toggle = toggle;
-		pause_menu_transform.gameObject.SetActive(toggle);
-		Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
-		Cursor.visible = toggle;
+	public void start_level(string level_name) {
+		toggle_play_menu(false);
+		toggle_playing(true);
+		move_level(level_name);
+		is_main_menu = false;
+	}
+
+	public void restart_level() {
+		toggle_playing(true);
+		move_level(SceneManager.GetActiveScene().name);
+	}
+
+	public void move_level(string level_name) {
+		player.rebirth();
+		caption.clear();
+		SceneManager.LoadScene(level_name, LoadSceneMode.Single);
+	}
+
+	public void toggle_playing(bool toggle) {
+		bool temp_tot = !toggle || caption_toggle;
+
+		menu_toggle = !toggle;
+		
+		Cursor.lockState = !toggle ? CursorLockMode.None : CursorLockMode.Locked;
+		Cursor.visible = !toggle;
 		Time.timeScale = temp_tot ? 0 : 1;
 		player.set_controllable(!temp_tot);
-		menu_state = toggle ? menu_state_enum.pause : menu_state_enum.none;
-		title_tmpro.text = toggle ? "PAUSE" : "";
+
+		pause_menu_transform.gameObject.SetActive(!toggle);
+
+		if (toggle) {
+			menu_state = menu_state_enum.playing;
+		}
+	}
+
+	public void toggle_play_menu(bool toggle) {
+		if (toggle) {
+			menu_state = menu_state_enum.main_play;
+			title_tmpro.text = "PLAY";
+		}
+		play_group_transform.gameObject.SetActive(toggle);
 	}
 
 	public void toggle_option(bool toggle) {
-		pause_group_transform.gameObject.SetActive(!toggle);
 		option_group_transform.gameObject.SetActive(toggle);
-		menu_state = toggle ? menu_state_enum.option : menu_state_enum.pause;
-		title_tmpro.text = toggle ? "OPTION" : "PAUSE";
+		if (is_main_menu) toggle_main_menu(!toggle);
+		else toggle_pause(!toggle);
 
-		if (!toggle) {
+		if (toggle) {
+			menu_state = is_main_menu ? menu_state_enum.main_option : menu_state_enum.option;
+			title_tmpro.text = "OPTION";
+		}
+		else {
 			cancel_option();
 		}
 	}
@@ -305,7 +368,12 @@ public class GameManager : MonoBehaviour {
 	public void toggle_input_option(bool toggle) {
 		option_group_transform.gameObject.SetActive(!toggle);
 		input_option_group_transform.gameObject.SetActive(toggle);
-		menu_state = toggle ? menu_state_enum.input_option : menu_state_enum.option;
+		if (is_main_menu) {
+			menu_state = toggle ? menu_state_enum.main_input_option : menu_state_enum.main_option;
+		}
+		else {
+			menu_state = toggle ? menu_state_enum.input_option : menu_state_enum.option;
+		}
 		title_tmpro.text = toggle ? "INPUT OPTION" : "OPTION";
 
 		if (!toggle) {
@@ -314,19 +382,71 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	public void toggle_gameover(bool toggle) {
-		bool temp_tot = toggle || caption_toggle;
-		menu_toggle = toggle;
-		pause_menu_transform.gameObject.SetActive(toggle);
-		Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
-		Cursor.visible = toggle;
-		Time.timeScale = temp_tot ? 0 : 1;
-		player.set_controllable(!temp_tot);
-
 		gameover_screen_transform.gameObject.SetActive(toggle);
-		pause_group_transform.gameObject.SetActive(!toggle);
-		option_group_transform.gameObject.SetActive(false);
-		menu_state = toggle ? menu_state_enum.gameover : menu_state_enum.none;
-		title_tmpro.text = toggle ? "GAME OVER" : "";
+		if (toggle) {
+			menu_state = menu_state_enum.gameover;
+			title_tmpro.text = "GAME OVER";
+		}
+	}
+
+	public void toggle_pause(bool toggle) {
+		pause_group_transform.gameObject.SetActive(toggle);
+		if (toggle) {
+			menu_state = menu_state_enum.pause;
+			title_tmpro.text = "PAUSE";
+		}
+	}
+
+	public void resume() {
+		menu_state = menu_state_enum.playing;
+		toggle_pause(false);
+		toggle_playing(true);
+	}
+
+	public void pause() {
+		menu_state = menu_state_enum.pause;
+		toggle_pause(true);
+		toggle_playing(false);
+	}
+
+	public void gameover() {
+		toggle_playing(false);
+		toggle_gameover(true);
+	}
+
+	public void toggle_main_menu(bool toggle) {
+		if (toggle) {
+			move_level("Scenes/TutorialScene");
+			menu_state = menu_state_enum.main_menu;
+			title_tmpro.text = "";
+			is_main_menu = true;
+		}
+		main_menu_group_transform.gameObject.SetActive(toggle);
+	}
+
+	public void swap_play_menu_main_menu(bool swap) {
+		toggle_play_menu(swap);
+		toggle_main_menu(!swap);
+	}
+
+	public void pause_to_restart() {
+		toggle_pause(false);
+		restart_level();
+	}
+
+	public void pause_to_main_menu() {
+		toggle_pause(false);
+		toggle_main_menu(true);
+	}
+
+	public void gameover_to_restart() {
+		toggle_gameover(false);
+		restart_level();
+	}
+
+	public void gameover_to_main_menu() {
+		toggle_gameover(false);
+		toggle_main_menu(true);
 	}
 
 	public void change_music_volume(float volume) {
@@ -431,7 +551,7 @@ public class GameManager : MonoBehaviour {
 	public void toggle_input_key(string button_name) {
 		current_input_button_name = button_name;
 		key_button_texts[button_name].text = "";
-		menu_state = menu_state_enum.input_key;
+		menu_state = is_main_menu ? menu_state_enum.main_input_key : menu_state_enum.input_key;
 		input_panel.gameObject.SetActive(true);
 	}
 
@@ -446,7 +566,7 @@ public class GameManager : MonoBehaviour {
 		key_button_texts[button_name].text = $"{keycode}";
 		set_temp_key(button_name, keycode);
 		change_input_option_back_button_text(true);
-		menu_state = menu_state_enum.input_option;
+		menu_state = is_main_menu ? menu_state_enum.main_input_option : menu_state_enum.input_option;
 		input_panel.gameObject.SetActive(false);
 	}
 
@@ -496,16 +616,7 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	public void restart_level() {
-		move_level(SceneManager.GetActiveScene().name);
-	}
-
-	public void move_level(string level_name) {
-		player.rebirth();
-		toggle_gameover(false);
-		caption.clear();
-		SceneManager.LoadScene(level_name, LoadSceneMode.Single);
-	}
+	
 
 	public void quit() {
 		#if UNITY_EDITOR

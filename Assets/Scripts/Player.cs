@@ -512,7 +512,7 @@ public class Player : MonoBehaviour {
 	}
 
 	public void kill_player() {
-		GameManager.instance.toggle_gameover(true);
+		GameManager.instance.gameover();
 	}
 
 	public void rebirth() {
@@ -526,7 +526,15 @@ public class Player : MonoBehaviour {
 		weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[weapon_index]);
 		refresh_display_ammo();
 
-		transform.position = GameManager.instance.get_player_spawn_point;
+		Input.ResetInputAxes();
+
+		transform.position = GameManager.instance.player_spawn_point_transform.position;
+		transform.localEulerAngles = GameManager.instance.player_spawn_point_transform.localEulerAngles;
+		camera_holder_transform.localEulerAngles = new Vector3(0, 0, 0);
+		cam_transform.localEulerAngles = new Vector3(0, 0, 0);
+		mouse_x = 0;
+		mouse_y = 0;
+		
 		rigid.velocity = Vector3.zero;
 		jump_button = false;
 		jumped = false;

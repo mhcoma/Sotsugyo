@@ -22,7 +22,7 @@ public class Caption : MonoBehaviour {
 	}
 
 	void Update() {
-		if (GameManager.instance.menu_state == GameManager.menu_state_enum.none) {
+		if (GameManager.instance.menu_state == GameManager.menu_state_enum.playing) {
 			if (!string.IsNullOrEmpty(buffer_text)) {
 				if (type_index < buffer_text.Length) {
 					if (is_pressed_skip_button()) {
