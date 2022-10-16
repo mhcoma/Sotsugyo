@@ -19,6 +19,8 @@ public class SpriteObject : MonoBehaviour {
 	public int anim = 0;
 
 	public float health = 100;
+
+	[System.NonSerialized]
 	public bool is_alive = true;
 	float dead_anim = 0;
 	float dead_anim_speed = 1f;
@@ -27,6 +29,7 @@ public class SpriteObject : MonoBehaviour {
 
 	public bool is_gas_explosion = false;
 
+	[System.NonSerialized]
 	public bool is_ai_object;
 
 	EnemyAITest ai;
@@ -107,11 +110,19 @@ public class SpriteObject : MonoBehaviour {
 	public void get_damage(float damage) {
 		health -= damage;
 		if (health <= 0) {
-			is_alive = false;
-			if (is_ai_object) ai.die();
-			rigid.isKinematic = true;
-			colid.enabled = false;
-			shadow_mesh_transform.gameObject.SetActive(false);
+			kill(true);
+		}
+	}
+
+	public void kill(bool effect) {
+		is_alive = false;
+		if (is_ai_object) ai.die();
+		rigid.isKinematic = true;
+		colid.enabled = false;
+		shadow_mesh_transform.gameObject.SetActive(false);
+
+		if (!effect) {
+			dead_anim = 1;
 		}
 	}
 }

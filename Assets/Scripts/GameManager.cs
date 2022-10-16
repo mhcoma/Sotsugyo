@@ -112,7 +112,6 @@ public class GameManager : MonoBehaviour {
 		main_option,
 		main_input_option,
 		main_input_key,
-		mission_info,
 		playing,
 		pause,
 		option,
@@ -131,6 +130,13 @@ public class GameManager : MonoBehaviour {
 	string gameover_text = "GAME OVER";
 
 	public menu_state_enum menu_state = menu_state_enum.none;
+
+
+	int map_index_x = 0;
+	int map_index_y = 0;
+	string next_level_name = "";
+	bool is_cleared_stage = false;
+
 
 	void Awake() {
 		if (instance == null) {
@@ -248,12 +254,25 @@ public class GameManager : MonoBehaviour {
 			key_button_texts.Add(str, temp_tmpro);
 		}
 
+		if (is_cleared_stage) {
+			Debug.Log("!!");
+			GameObject[] actors = GameObject.FindGameObjectsWithTag("Actor");
+			foreach (GameObject obj in actors) {
+				obj.SetActive(false);
+			}
+
+			GameObject[] items = GameObject.FindGameObjectsWithTag("Item");
+			foreach (GameObject obj in items) {
+				obj.SetActive(false);
+			}
+
+			is_cleared_stage = false;
+		}
 	}
 
 	int count = 0;
 
 	void Update() {
-		Debug.Log($"{count} - {menu_state}");
 		count++;
 		switch (menu_state) {
 			case menu_state_enum.main_menu:
@@ -310,6 +329,34 @@ public class GameManager : MonoBehaviour {
 				}
 				break;
 		}
+	}
+
+	public void start_tutorial() {
+		is_cleared_stage = true;
+		start_level("Scenes/TutorialScene");
+		map_index_x = -1;
+		map_index_y = -1;
+		next_level_name = "";
+	}
+
+	public void start_maze() {
+		MazeGenerator.generate_grid();
+		map_index_x = MazeGenerator.grid_width - 1;
+		map_index_y = MazeGenerator.grid_height - 1;
+		Debug.Log(maze_direction(0, 0));
+	}
+
+	public string maze_direction(int x, int y) {
+		string result = "";
+		int c = MazeGenerator.grid[y][x];
+
+		foreach(MazeGenerator.direction_enum dir in Enum.GetValues(typeof(MazeGenerator.direction_enum))) {
+			if ((c & (int) dir) != 0) {
+				result += $"{dir.ToString()[0]}";
+			}
+		}
+
+		return result;
 	}
 
 	public void start_level(string level_name) {
@@ -395,7 +442,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void swap_clear_gameover(bool toggle) {
-		next_level_button_transform.gameObject.SetActive(toggle);
+		bool is_exist_next_level = !next_level_name.Equals("");
+		next_level_button_transform.gameObject.SetActive(toggle && is_exist_next_level);
 		gameover_text = toggle ? "CLEAR" : "GAME OVER";
 	}
 

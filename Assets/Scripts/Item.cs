@@ -41,14 +41,20 @@ public class Item : MonoBehaviour {
 			bool result = item_effect(other.transform);
 			if (result) {
 				on_get.Invoke();
-				asrc.PlayOneShot(get_clip);
-				alive = false;
-				spr.enabled = false;
+				kill(true);
 			}
 		}
 	}
 
-	bool item_effect(Transform tr) {
+	public void kill(bool effect) {
+		alive = false;
+		spr.enabled = false;
+		if (effect) {
+			asrc.PlayOneShot(get_clip);
+		}
+	}
+
+	public bool item_effect(Transform tr) {
 		bool result = true;
 		Player player = tr.GetComponent<Player>();
 		switch (type) {

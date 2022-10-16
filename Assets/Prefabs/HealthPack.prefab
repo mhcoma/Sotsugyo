@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -8826601857826248773}
   m_Layer: 9
   m_Name: HealthPack
-  m_TagString: Untagged
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -128,6 +128,9 @@ MonoBehaviour:
   type: 1
   value: -50
   get_clip: {fileID: 8300000, guid: b197352fee3cb444d969b5070521ec85, type: 3}
+  on_get:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!82 &-8826601857826248773
 AudioSource:
   m_ObjectHideFlags: 0
