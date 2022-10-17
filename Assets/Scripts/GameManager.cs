@@ -11,7 +11,6 @@ using TMPro;
 
 public class GameManager : MonoBehaviour {
 	public static GameManager instance = null;
-	public Transform essentials;
 
 	public Transform canvas_transform;
 	Transform pause_menu_transform;
@@ -23,6 +22,7 @@ public class GameManager : MonoBehaviour {
 	[System.NonSerialized]
 	public Transform camera_transform;
 
+	[System.NonSerialized]
 	public Transform player_spawn_point_transform;
 
 	Transform caption_transform;
@@ -265,9 +265,10 @@ public class GameManager : MonoBehaviour {
 			foreach (GameObject obj in items) {
 				obj.SetActive(false);
 			}
-
-			is_cleared_stage = false;
 		}
+
+		player_spawn_point_transform = GameObject.Find("PlayerSpawnPoint").transform;
+		player.reset_player_position();
 	}
 
 	int count = 0;
@@ -344,11 +345,14 @@ public class GameManager : MonoBehaviour {
 		map_index_x = MazeGenerator.grid_width - 1;
 		map_index_y = MazeGenerator.grid_height - 1;
 		Debug.Log(maze_direction(0, 0));
+
+		start_level("Scenes/NA");
+		next_level_name = "";
 	}
 
 	public string maze_direction(int x, int y) {
 		string result = "";
-		int c = MazeGenerator.grid[y][x];
+		int c = MazeGenerator.grid[y][x].dir;
 
 		foreach(MazeGenerator.direction_enum dir in Enum.GetValues(typeof(MazeGenerator.direction_enum))) {
 			if ((c & (int) dir) != 0) {
@@ -377,9 +381,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void move_level(string level_name) {
-		player.rebirth();
 		caption.clear();
 		SceneManager.LoadScene(level_name, LoadSceneMode.Single);
+		player.rebirth();
 	}
 
 	public void toggle_playing(bool toggle) {
@@ -406,7 +410,7 @@ public class GameManager : MonoBehaviour {
 
 	public void toggle_main_menu(bool toggle) {
 		if (toggle) {
-			move_level("Scenes/TutorialScene");
+			move_level("Scenes/MainScene");
 			menu_state = menu_state_enum.main_menu;
 			title_tmpro.text = "";
 			is_main_menu = true;

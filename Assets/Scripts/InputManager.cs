@@ -42,14 +42,6 @@ public class InputManager : MonoBehaviour {
 
 	public const string button_mapping_file_path = "button.json";
 
-	// void Awake() {
-	// 	if (instance == null) {
-	// 		instance = this;
-	// 		DontDestroyOnLoad(this.gameObject);
-	// 	}
-	// 	else Destroy(this.gameObject);
-	// }
-
 	void Start() {
 		FileInfo button_mapping_file_info = new FileInfo(button_mapping_file_path);
 		

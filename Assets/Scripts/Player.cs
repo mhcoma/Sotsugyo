@@ -523,18 +523,7 @@ public class Player : MonoBehaviour {
 		weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[weapon_index]);
 		refresh_display_ammo();
 
-		Input.ResetInputAxes();
-
-		transform.position = GameManager.instance.player_spawn_point_transform.position;
-		transform.localEulerAngles = GameManager.instance.player_spawn_point_transform.localEulerAngles;
-		camera_holder_transform.localEulerAngles = new Vector3(0, 0, 0);
-		cam_transform.localEulerAngles = new Vector3(0, 0, 0);
-		mouse_x = 0;
-		mouse_y = 0;
-		
-		rigid.velocity = Vector3.zero;
-		jump_button = false;
-		jumped = false;
+		reset_player_position();
 	}
 
 	public bool is_alive() {
@@ -566,5 +555,23 @@ public class Player : MonoBehaviour {
 
 	public void refresh_display_ammo() {
 		weapon_tmpro.SetText($"<size=64>{weapon_names[weapon_index]}</size>\n{weapon_ammo[weapon_index]}");
+	}
+
+	public void reset_player_position() {
+		Input.ResetInputAxes();
+
+		transform.position = GameManager.instance.player_spawn_point_transform.position;
+		transform.localEulerAngles = GameManager.instance.player_spawn_point_transform.localEulerAngles;
+		if (camera_holder_transform != null) {
+			camera_holder_transform.localEulerAngles = new Vector3(0, 0, 0);
+			cam_transform.localEulerAngles = new Vector3(0, 0, 0);
+		}
+		mouse_x = 0;
+		mouse_y = 0;
+		
+		if (rigid != null)
+			rigid.velocity = Vector3.zero;
+		jump_button = false;
+		jumped = false;
 	}
 }

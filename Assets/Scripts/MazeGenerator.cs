@@ -34,8 +34,30 @@ public class MazeGenerator : MonoBehaviour {
 
 	public static int grid_width;
 	public static int grid_height;
+	
+	public class GridNode {
+		public int dir;
+		public bool is_cleared;
 
-	public static List<List<int>> grid = new List<List<int>>();
+		public GridNode(int d = 0, bool c = false) {
+			dir = d;
+			is_cleared = c;	
+		}
+
+		public void set_dir(int d) {
+			dir = d;
+		}
+
+		public void add_dir(int d) {
+			dir |= d;
+		}
+
+		public void set_cleared(bool c) {
+			is_cleared = c;
+		}
+	};
+
+	public static List<List<GridNode>> grid = new List<List<GridNode>>();
 
 	void Start() {
 		
@@ -50,9 +72,10 @@ public class MazeGenerator : MonoBehaviour {
 		grid_height = height;
 		grid.Clear();
 		for (int y = 0; y < height; y++) {
-			List<int> temp_list = new List<int>();
+			List<GridNode> temp_list = new List<GridNode>();
 			for (int x = 0; x < width; x++) {
-				temp_list.Add(0);
+				GridNode temp_node = new GridNode();
+				temp_list.Add(temp_node);
 			}
 			grid.Add(temp_list);
 		}
@@ -84,10 +107,11 @@ public class MazeGenerator : MonoBehaviour {
 			if (
 				(ny >= 0 && ny < grid_height) &&
 				(nx >= 0 && nx < grid_width) &&
-				(grid[ny][nx] == 0)
+				(grid[ny][nx].dir == 0)
 			) {
-				grid[cy][cx] |= (int) dir;
-				grid[ny][nx] |= opposite[dir];
+				grid[cy][cx].add_dir((int) dir);
+				if (grid[cy][cx].dir == 0) GameManager.instance.quit();
+				grid[ny][nx].add_dir(opposite[dir]);
 				carve(nx, ny);
 			}
 		}
