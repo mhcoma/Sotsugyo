@@ -145,6 +145,12 @@ public class Player : MonoBehaviour {
 	float goo_damage_time = 0.0f;
 	float goo_damage = 2.5f;
 
+	float main_demo_rotate_degree_phi = 0;
+	float main_demo_rotate_degree_theta = 0;
+	const float main_demo_rotate_scale_theta = 20.0f;
+	const float main_demo_rotate_speed_phi = 10.0f;
+	const float main_demo_rotate_speed_theta = 2.0f;
+
 	public bool controllable = true;
 
 	void Awake() {
@@ -202,62 +208,76 @@ public class Player : MonoBehaviour {
 	}
 
 	void Update() {
-		if (InputManager.get_button_down("jump")) jump_button = true;
-		if (InputManager.get_button_up("jump")) jump_button = false;
+		switch (GameManager.instance.menu_state) {
+			case GameManager.menu_state_enum.main_menu:
+			case GameManager.menu_state_enum.main_play:
+			case GameManager.menu_state_enum.main_option:
+			case GameManager.menu_state_enum.main_input_option:
+			case GameManager.menu_state_enum.main_input_key:
+				camera_holder_transform.eulerAngles = new Vector3(0, main_demo_rotate_degree_phi, 0);
+				main_demo_rotate_degree_phi += Time.unscaledDeltaTime * main_demo_rotate_speed_phi;
+				float temp = Mathf.Cos(main_demo_rotate_degree_theta) * main_demo_rotate_scale_theta;
+				cam_transform.localEulerAngles = new Vector3(temp, 0, 0);
+				main_demo_rotate_degree_theta += Time.unscaledDeltaTime * main_demo_rotate_speed_theta;
+				break;
+			case GameManager.menu_state_enum.playing:
+				if (InputManager.get_button_down("jump")) jump_button = true;
+				if (InputManager.get_button_up("jump")) jump_button = false;
+				if (controllable) {
+					bool temp_grounded = is_grounded;
+					bool temp_liquided = is_liquided;
 
-		if (controllable) {
-			bool temp_grounded = is_grounded;
-			bool temp_liquided = is_liquided;
+					is_grounded = Physics.CheckSphere(ground_check_transform.position, ground_distance, ground_mask);
+					is_liquided = Physics.CheckSphere(ground_check_transform.position, ground_distance, liquid_mask);
 
-			is_grounded = Physics.CheckSphere(ground_check_transform.position, ground_distance, ground_mask);
-			is_liquided = Physics.CheckSphere(ground_check_transform.position, ground_distance, liquid_mask);
+					temp_grounded = temp_grounded != is_grounded;
+					temp_liquided = temp_liquided != is_liquided;
 
-			temp_grounded = temp_grounded != is_grounded;
-			temp_liquided = temp_liquided != is_liquided;
+					rigid.drag = is_grounded ? ground_drag : air_drag;
+					rigid.drag += is_liquided ? liquid_drag : 0.0f;
 
-			rigid.drag = is_grounded ? ground_drag : air_drag;
-			rigid.drag += is_liquided ? liquid_drag : 0.0f;
+					if (water_splashes_time >= 0.0f) {
+						water_splashes_time -= Time.deltaTime;
+					}
 
-			if (water_splashes_time >= 0.0f) {
-				water_splashes_time -= Time.deltaTime;
-			}
+					if (is_liquided) {
+						if (goo_damage_time >= 0.0f)
+							goo_damage_time -= Time.deltaTime;
+						if (goo_damage_time <= 0.0f) {
+							get_damage(goo_damage);
+							goo_damage_time += goo_damage_interval;
+						}
+					}
 
-			if (is_liquided) {
-				if (goo_damage_time >= 0.0f)
-					goo_damage_time -= Time.deltaTime;
-				if (goo_damage_time <= 0.0f) {
-					get_damage(goo_damage);
-					goo_damage_time += goo_damage_interval;
+					if (temp_liquided && water_splashes_time <= 0.0f) {
+						asrc.PlayOneShot(water_splashes_aclip, 0.25f);
+						water_splashes_time += water_splashes_interval;
+					}
+
+					key_direc = new Vector3 (InputManager.get_axis("horizontal"), 0, InputManager.get_axis("vertical")).normalized;
+					mouse_x += Input.GetAxis("Mouse X") * 10;
+					camera_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
+					move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
+
+					if (InputManager.get_button_down("interact")) {
+						interact();
+					}
+
+					slope_move_amount = Vector3.ProjectOnPlane(move_amount, slope_hit.normal);
+
+					mouse_y += Input.GetAxis("Mouse Y") * 10;
+					mouse_y = Mathf.Clamp(mouse_y, -90.0f, 90.0f);
+					cam_transform.localEulerAngles = new Vector3(-mouse_y, 0, 0);
+
+					weapon_control();
+
+					if (damage_scale > 0.0f) {
+						damage_scale -= Time.deltaTime;
+						if (damage_scale < 0.0f) damage_scale = 0.0f;
+						vignette.intensity.value = damage_scale;
+					}
 				}
-			}
-
-			if (temp_liquided && water_splashes_time <= 0.0f) {
-				asrc.PlayOneShot(water_splashes_aclip, 0.25f);
-				water_splashes_time += water_splashes_interval;
-			}
-
-			key_direc = new Vector3 (InputManager.get_axis("horizontal"), 0, InputManager.get_axis("vertical")).normalized;
-			mouse_x += Input.GetAxis("Mouse X") * 10;
-			camera_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
-			move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
-
-			if (InputManager.get_button_down("interact")) {
-				interact();
-			}
-
-			slope_move_amount = Vector3.ProjectOnPlane(move_amount, slope_hit.normal);
-
-			mouse_y += Input.GetAxis("Mouse Y") * 10;
-			mouse_y = Mathf.Clamp(mouse_y, -90.0f, 90.0f);
-			cam_transform.localEulerAngles = new Vector3(-mouse_y, 0, 0);
-
-			weapon_control();
-
-			if (damage_scale > 0.0f) {
-				damage_scale -= Time.deltaTime;
-				if (damage_scale < 0.0f) damage_scale = 0.0f;
-				vignette.intensity.value = damage_scale;
-			}
+				break;
 		}
 	}
 

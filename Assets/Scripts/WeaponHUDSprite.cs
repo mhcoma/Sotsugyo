@@ -22,14 +22,14 @@ public class WeaponHUDSprite : MonoBehaviour {
 
 		switch (anim_y_direction) {
 			case 1:
-				anim_pos_y += anim_speed * Time.deltaTime;
+				anim_pos_y += anim_speed * Time.unscaledDeltaTime;
 				if (anim_pos_y >= 0) {
 					anim_y_direction = 0;
 					anim_pos_y = 0;
 				}
 				break;
 			case -1:
-				anim_pos_y -= anim_speed * Time.deltaTime;
+				anim_pos_y -= anim_speed * Time.unscaledDeltaTime;
 				if (anim_pos_y <= -(Screen.height / 2.0f)) {
 					anim_y_direction = 1;
 					GetComponent<CanvasRenderer>().SetTexture(next_sprite.texture);

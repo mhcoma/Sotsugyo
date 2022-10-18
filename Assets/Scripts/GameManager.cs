@@ -333,7 +333,6 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void start_tutorial() {
-		is_cleared_stage = true;
 		start_level("Scenes/TutorialScene");
 		map_index_x = -1;
 		map_index_y = -1;
