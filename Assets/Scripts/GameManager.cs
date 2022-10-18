@@ -136,6 +136,7 @@ public class GameManager : MonoBehaviour {
 	int map_index_y = 0;
 	string next_level_name = "";
 	bool is_cleared_stage = false;
+	bool is_maze_stage = false;
 
 
 	void Awake() {
@@ -269,6 +270,10 @@ public class GameManager : MonoBehaviour {
 
 		player_spawn_point_transform = GameObject.Find("PlayerSpawnPoint").transform;
 		player.reset_player_position();
+
+		if (is_maze_stage) {
+			
+		}
 	}
 
 	int count = 0;
@@ -345,8 +350,9 @@ public class GameManager : MonoBehaviour {
 		map_index_y = MazeGenerator.grid_height - 1;
 		Debug.Log(maze_direction(0, 0));
 
-		start_level("Scenes/NA");
+		start_level("Scenes/BaseScene");
 		next_level_name = "";
+		is_maze_stage = true;
 	}
 
 	public string maze_direction(int x, int y) {
