@@ -256,7 +256,6 @@ public class GameManager : MonoBehaviour {
 		}
 
 		if (is_cleared_stage) {
-			Debug.Log("!!");
 			GameObject[] actors = GameObject.FindGameObjectsWithTag("Actor");
 			foreach (GameObject obj in actors) {
 				obj.SetActive(false);
@@ -348,7 +347,6 @@ public class GameManager : MonoBehaviour {
 		MazeGenerator.generate_grid();
 		map_index_x = MazeGenerator.grid_width - 1;
 		map_index_y = MazeGenerator.grid_height - 1;
-		Debug.Log(maze_direction(0, 0));
 
 		start_level("Scenes/BaseScene");
 		next_level_name = "";
