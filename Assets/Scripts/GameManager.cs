@@ -132,8 +132,8 @@ public class GameManager : MonoBehaviour {
 	public menu_state_enum menu_state = menu_state_enum.none;
 
 
-	int map_index_x = 0;
-	int map_index_y = 0;
+	public int map_index_x = 0;
+	public int map_index_y = 0;
 	string next_level_name = "";
 	bool is_cleared_stage = false;
 	bool is_maze_stage = false;
@@ -733,5 +733,9 @@ public class GameManager : MonoBehaviour {
 
 	public void caption_addevent(UnityAction call) {
 		caption.on_end.AddListener(call);
+	}
+
+	public MazeGenerator.GridNode get_current_node() {
+		return MazeGenerator.grid[map_index_y][map_index_x];
 	}
 }

@@ -11,6 +11,18 @@ public class MazeGenerator : MonoBehaviour {
 		west = 8
 	};
 
+	public enum floor_enum {
+		sw = 1,
+		s = 2,
+		se = 4,
+		w = 8,
+		c = 16,
+		e = 32,
+		nw = 64,
+		n = 128,
+		ne = 256
+	};
+
 	static Dictionary<direction_enum, int> dx = new Dictionary<direction_enum, int> {
 		{direction_enum.east, 1},
 		{direction_enum.west, -1},
@@ -39,6 +51,10 @@ public class MazeGenerator : MonoBehaviour {
 		public int dir;
 		public bool is_cleared;
 
+		public int first_floor;
+		public int second_floor;
+		public int roof;
+
 		public GridNode(int d = 0, bool c = false) {
 			dir = d;
 			is_cleared = c;	
@@ -55,9 +71,24 @@ public class MazeGenerator : MonoBehaviour {
 		public void set_cleared(bool c) {
 			is_cleared = c;
 		}
+
+		public void add_floor(int i, int f) {
+			if (i == 0)
+				first_floor |= f;
+			else if (i == 1)
+				second_floor |= f;
+			else
+				roof |= f;
+		}
 	};
 
 	public static List<List<GridNode>> grid = new List<List<GridNode>>();
+
+
+	const float first_floor_ratio = 0.625f;
+	const float second_floor_ratio = 0.75f;
+	const float roof_ratio = 0.375f;
+
 
 	void Start() {
 		
@@ -84,6 +115,12 @@ public class MazeGenerator : MonoBehaviour {
 		int ry = UnityEngine.Random.Range(0, height);
 
 		carve(rx, ry);
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				randomize_node(x, y);
+			}
+		}
 	}
 
 	static public List<T> shuffle<T>(List<T> list) {
@@ -115,5 +152,57 @@ public class MazeGenerator : MonoBehaviour {
 				carve(nx, ny);
 			}
 		}
+	}
+
+	static public void randomize_node(int x, int y) {
+		GridNode node = grid[y][x];
+
+		if ((node.dir & (int) direction_enum.north) != 0) node.add_floor(1, (int) floor_enum.n);
+		if ((node.dir & (int) direction_enum.south) != 0) node.add_floor(1, (int) floor_enum.s);
+		if ((node.dir & (int) direction_enum.west) != 0) node.add_floor(1, (int) floor_enum.w);
+		if ((node.dir & (int) direction_enum.east) != 0) node.add_floor(1, (int) floor_enum.e);
+
+		bool is_able_generate_center_of_second = false;
+		float r;
+		foreach (floor_enum f in Enum.GetValues(typeof(floor_enum))) {
+			r = UnityEngine.Random.Range(0.0f, 1.0f);
+			if (r <= first_floor_ratio) {
+				node.add_floor(0, (int) f);
+				r = UnityEngine.Random.Range(0.0f, 1.0f);
+
+				int rotated = rotate_first_to_second(f);
+
+				if (r <= second_floor_ratio && rotated >= 0) {
+					node.add_floor(1, rotated);
+					is_able_generate_center_of_second = true;
+				}
+			}
+			
+
+			r = UnityEngine.Random.Range(0.0f, 1.0f);
+			if (r <= roof_ratio) node.add_floor(2, (int) f);
+		}
+
+		if (is_able_generate_center_of_second) {
+			r = UnityEngine.Random.Range(0.0f, 1.0f);
+			if (r <= second_floor_ratio) {
+				node.add_floor(1, (int) floor_enum.c);
+			}
+		}
+
+		grid[y][x] = node;
+	}
+
+	static int rotate_first_to_second(floor_enum f) {
+		floor_enum result;
+		switch (f) {
+			case floor_enum.n: result = floor_enum.w; break;
+			case floor_enum.s: result = floor_enum.e; break;
+			case floor_enum.w: result = floor_enum.s; break;
+			case floor_enum.e: result = floor_enum.n; break;
+			default: return -1;
+		}
+
+		return (int) result;
 	}
 }

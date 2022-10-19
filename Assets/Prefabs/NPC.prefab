@@ -119,10 +119,8 @@ MonoBehaviour:
   sprite_side_count: 8
   anim: 0
   health: 100
-  is_alive: 1
   explosion: {fileID: 1249377751591763654, guid: 8ac77b580d9565b4f99f7fe0783f7dea, type: 3}
   is_gas_explosion: 0
-  is_ai_object: 0
   dead_clip: {fileID: 8300000, guid: 838b60c2ce6facb40b5e014cb8abcbcf, type: 3}
   on_dead:
     m_PersistentCalls:

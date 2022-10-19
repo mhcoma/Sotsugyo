@@ -91,10 +91,8 @@ MonoBehaviour:
   sprite_side_count: 8
   anim: 0
   health: 100
-  is_alive: 1
   explosion: {fileID: 1249377751591763654, guid: 8ac77b580d9565b4f99f7fe0783f7dea, type: 3}
   is_gas_explosion: 0
-  is_ai_object: 0
   dead_clip: {fileID: 8300000, guid: 838b60c2ce6facb40b5e014cb8abcbcf, type: 3}
   on_dead:
     m_PersistentCalls:
@@ -123,9 +121,10 @@ MonoBehaviour:
   speed: 0
   anim_rate: 0.0625
   anim_frames: 00000000010000000000000002000000
-  state: 0
   type: 0
   attack_rate: 0.5
+  primary_attack_damage: 10
+  secondary_attack_damage: 10
   rocket_prefab: {fileID: 0}
   attack_clip: {fileID: 8300000, guid: 8bf01ea74b6af52429d1bd6f666fb0cf, type: 3}
   water_splashes_aclip: {fileID: 8300000, guid: 9b58bdbac2d8e1447b9dd4ae2a3e0e20, type: 3}
