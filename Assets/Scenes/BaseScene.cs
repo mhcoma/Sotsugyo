@@ -37,14 +37,16 @@ public class BaseScene : MonoBehaviour {
 				}
 			}
 			if (!MazeGenerator.is_exist_part(node.roof, (int) MazeGenerator.floor_enums[i])) {
-				roofs_transform.GetChild(i).gameObject.SetActive(false);
+				roofs_transform.GetChild(i).GetComponent<MeshRenderer>().enabled = false;
 			}
 		}
 
 		MazeGenerator.direction_enum[] direction_enums = (MazeGenerator.direction_enum[]) Enum.GetValues(typeof(MazeGenerator.direction_enum));
 
+		
 		for (int i = 0; i < 4; i++) {
-			if ((node.dir & (int) direction_enums[i]) == 0) {
+			bool temp = (node.dir & (int) direction_enums[i]) != 0;
+			if (temp) {
 				walls_transform.GetChild(i).gameObject.SetActive(false);
 			}
 		}

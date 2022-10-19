@@ -167,10 +167,10 @@ public class MazeGenerator : MonoBehaviour {
 	static public void randomize_node(int x, int y) {
 		GridNode node = grid[y][x];
 
-		if ((node.dir & (int) direction_enum.north) != 0) node.add_floor(0, (int) floor_enum.n);
-		if ((node.dir & (int) direction_enum.south) != 0) node.add_floor(0, (int) floor_enum.s);
-		if ((node.dir & (int) direction_enum.west) != 0) node.add_floor(0, (int) floor_enum.w);
-		if ((node.dir & (int) direction_enum.east) != 0) node.add_floor(0, (int) floor_enum.e);
+		if (is_exist_part(node.dir, (int) direction_enum.north)) node.add_floor(0, (int) floor_enum.n);
+		if (is_exist_part(node.dir, (int) direction_enum.south)) node.add_floor(0, (int) floor_enum.s);
+		if (is_exist_part(node.dir, (int) direction_enum.west)) node.add_floor(0, (int) floor_enum.w);
+		if (is_exist_part(node.dir, (int) direction_enum.east)) node.add_floor(0, (int) floor_enum.e);
 
 		bool is_able_generate_center_of_second = false;
 		float r;
@@ -184,9 +184,6 @@ public class MazeGenerator : MonoBehaviour {
 				r = UnityEngine.Random.Range(0.0f, 1.0f);
 				int rotated = rotate_first_to_second(f);
 				if (r <= second_floor_ratio && rotated >= 0) {
-					Debug.Log(
-						$"({x}, {y}) - {f} => {(floor_enum) rotated}"
-					);
 					node.add_floor(1, rotated);
 					is_able_generate_center_of_second = true;
 				}
