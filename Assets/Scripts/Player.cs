@@ -12,7 +12,6 @@ public class Player : MonoBehaviour {
 	Vector3 key_direc = new Vector3(0, 0, 0);
 	float mouse_x = 0;
 	float mouse_y = 0;
-	bool jumped = false;
 
 	float ground_drag = 10.0f;
 	float liquid_drag = 4.0f;
@@ -24,7 +23,12 @@ public class Player : MonoBehaviour {
 	float liquid_jump_multiplier = 0.075f;
 	float liquid_move_multiplier = 0.6f;
 	bool jump_button = false;
+	int jumped = 0;
+	float jumped_time = 0.0f;
+	float jumped_interval = 0.25f;
 	Vector3 move_amount = Vector3.zero;
+	public AudioClip jump_aclip;
+	public AudioClip landing_aclip;
 
 	float player_height = 2.0f;
 	float ground_distance = 0.3f;
@@ -239,6 +243,10 @@ public class Player : MonoBehaviour {
 					if (water_splashes_time >= 0.0f) {
 						water_splashes_time -= Time.deltaTime;
 					}
+					
+					if (is_grounded && temp_grounded) {
+						asrc.PlayOneShot(landing_aclip);
+					}
 
 					if (is_liquided) {
 						if (goo_damage_time >= 0.0f)
@@ -284,38 +292,49 @@ public class Player : MonoBehaviour {
 	void FixedUpdate() {
 		float temp_multiplier;
 		if (Time.timeScale > 0) {
+			Debug.Log($"{jumped}");
 			if (jump_button) {
 				if (is_liquided) {
 					rigid.AddForce(transform.up * jump_force * liquid_jump_multiplier, ForceMode.Impulse);
 				}
-				if (is_grounded) {
+				if (is_grounded && jumped == 0) {
 					rigid.velocity = new Vector3(rigid.velocity.x, 0, rigid.velocity.z);
 					rigid.AddForce(transform.up * jump_force, ForceMode.Impulse);
 					is_grounded = false;
-					jumped = true;
+					asrc.PlayOneShot(jump_aclip);
+					
+					jumped++;
 				}
 			}
 
 			if (is_grounded) {
+				if (jumped > 2) {
+					jumped = 0;
+					jumped_time = 0.0f;
+				}
+				else if (jumped > 0) {
+					jumped_time += Time.fixedDeltaTime;
+					if (jumped_time >= jumped_interval) jumped++;
+				}
 				if (on_slope()) {
-					if (jumped) {
+					if (jumped != 0) {
 						rigid.AddForce(move_amount * speed * movement_multiplier, ForceMode.Acceleration);
-						jumped = false;
 					}
 					else rigid.AddForce(slope_move_amount * speed * movement_multiplier, ForceMode.Acceleration);
 					rigid.useGravity = false;
 				}
 				else {
 					rigid.AddForce(move_amount * speed * movement_multiplier, ForceMode.Acceleration);
-					jumped = false;
 					rigid.useGravity = true;
 				}
 			}
 			else {
+				if (jumped == 1 || jumped == 2) jumped++; 
 				temp_multiplier = is_liquided ? liquid_move_multiplier : air_multiplier;
 				rigid.AddForce(move_amount * speed * movement_multiplier * temp_multiplier, ForceMode.Acceleration);
 				rigid.useGravity = true;
 			}
+			
 			if (is_shooting_laser) {
 				if (weapon_ammo[weapon_index] > 0) {
 					weapon_ammo[WeaponIndex.lasergun] -= 1;
@@ -592,6 +611,6 @@ public class Player : MonoBehaviour {
 		if (rigid != null)
 			rigid.velocity = Vector3.zero;
 		jump_button = false;
-		jumped = false;
+		jumped = 0;
 	}
 }

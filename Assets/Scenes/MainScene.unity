@@ -11517,6 +11517,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8614057ca5c52494ea946d85d77151c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  jump_aclip: {fileID: 8300000, guid: 01730bc3d777f6f4a9c3b53a6fbf9c0c, type: 3}
+  landing_aclip: {fileID: 8300000, guid: 027e11d00a8458a489cffb32a79479fd, type: 3}
   ground_mask:
     serializedVersion: 2
     m_Bits: 256
@@ -12904,6 +12906,8 @@ MonoBehaviour:
   camera_holder_transform: {fileID: 1872402042}
   mixer: {fileID: 24100000, guid: 437c6d19cfb868a41915f64c5dcd2c6e, type: 2}
   menu_state: 1
+  map_index_x: 0
+  map_index_y: 0
 --- !u!4 &1932148091
 Transform:
   m_ObjectHideFlags: 0
