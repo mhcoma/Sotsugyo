@@ -138,6 +138,9 @@ public class GameManager : MonoBehaviour {
 	bool is_cleared_stage = false;
 	bool is_maze_stage = false;
 
+	[NonSerialized]
+	public MazeGenerator.direction_enum start_dir;
+
 
 	void Awake() {
 		if (instance == null) {
@@ -351,6 +354,7 @@ public class GameManager : MonoBehaviour {
 		start_level("Scenes/BaseScene");
 		next_level_name = "";
 		is_maze_stage = true;
+		start_dir = MazeGenerator.direction_enum.south;
 	}
 
 	public string maze_direction(int x, int y) {

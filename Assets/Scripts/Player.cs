@@ -600,13 +600,13 @@ public class Player : MonoBehaviour {
 		Input.ResetInputAxes();
 
 		transform.position = GameManager.instance.player_spawn_point_transform.position;
-		transform.localEulerAngles = GameManager.instance.player_spawn_point_transform.localEulerAngles;
+		Vector3 temp_angle = GameManager.instance.player_spawn_point_transform.localEulerAngles;
+		mouse_y = temp_angle.x;
+		mouse_x = temp_angle.y;
 		if (camera_holder_transform != null) {
 			camera_holder_transform.localEulerAngles = new Vector3(0, 0, 0);
 			cam_transform.localEulerAngles = new Vector3(0, 0, 0);
 		}
-		mouse_x = 0;
-		mouse_y = 0;
 		
 		if (rigid != null)
 			rigid.velocity = Vector3.zero;

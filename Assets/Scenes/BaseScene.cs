@@ -11,6 +11,7 @@ public class BaseScene : MonoBehaviour {
 	public Transform roofs_transform;
 	public Transform stairs_transform;
 	public Transform walls_transform;
+	public Transform doors_transform;
 
 	void Start() {
 		MazeGenerator.GridNode node = GameManager.instance.get_current_node();
@@ -54,6 +55,28 @@ public class BaseScene : MonoBehaviour {
 		NavMeshSurface surface = GetComponent<NavMeshSurface>();
 		surface.RemoveData();
 		surface.BuildNavMesh();
+
+
+		Vector3 temp_door_pos;
+		temp_door_pos = doors_transform.GetChild((int) GameManager.instance.start_dir).GetComponent<Renderer>().bounds.center;
+		GameManager.instance.player_spawn_point_transform.position = Vector3.Lerp(GameManager.instance.player_spawn_point_transform.position, temp_door_pos, 0.5f);
+
+		float temp_angle = 0.0f;;
+		switch (GameManager.instance.start_dir) {
+			case MazeGenerator.direction_enum.east:
+				temp_angle += 90.0f;
+				break;
+			case MazeGenerator.direction_enum.south:
+				temp_angle += 180.0f;
+				break;
+			case MazeGenerator.direction_enum.west:
+				temp_angle += 270.0f;
+				break;
+		}
+
+		GameManager.instance.player_spawn_point_transform.localEulerAngles = new Vector3(0, temp_angle, 0);
+
+		GameManager.instance.player_transform.GetComponent<Player>().reset_player_position();
 	}
 
 	void Update() {

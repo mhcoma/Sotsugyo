@@ -4,12 +4,39 @@ using UnityEngine;
 
 public class TutorialScene : MonoBehaviour {
 
+	bool is_worked_start_event;
+
 	void Start() {
 		
 	}
 
 	void Update() {
 		
+	}
+
+	public void start_event() {
+		if (!is_worked_start_event) {
+			
+			GameManager.instance.caption_addtext(
+				"환영합니다.",
+				"튜토리얼을 시작하겠습니다."
+			);
+			GameManager.instance.caption_addtext(
+				"우선 이동 조작법입니다.",
+				$"[{InputManager.get_axis_positive_key_names("vertical")}] 키를 눌러 앞으로 이동할 수 있습니다.",
+				$"[{InputManager.get_axis_negative_key_names("vertical")}] 키를 눌러 뒤로 이동할 수 있습니다."
+			);
+			GameManager.instance.caption_addtext(
+				$"[{InputManager.get_axis_positive_key_names("horizontal")}] 키를 눌러 오른쪽으로 이동할 수 있습니다.",
+				$"[{InputManager.get_axis_negative_key_names("horizontal")}] 키를 눌러 왼쪽으로 이동할 수 있습니다."
+			);
+			GameManager.instance.caption_addtext(
+				"이동하여 언덕 위로 올라가 초록색의 물체에 다가가세요.",
+				"아이템을 획득할 수 있습니다."
+			);
+
+			is_worked_start_event = true;
+		}
 	}
 
 	public void laser_ammo_get_event() {
