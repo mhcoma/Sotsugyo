@@ -292,7 +292,6 @@ public class Player : MonoBehaviour {
 	void FixedUpdate() {
 		float temp_multiplier;
 		if (Time.timeScale > 0) {
-			Debug.Log($"{jumped}");
 			if (jump_button) {
 				if (is_liquided) {
 					rigid.AddForce(transform.up * jump_force * liquid_jump_multiplier, ForceMode.Impulse);

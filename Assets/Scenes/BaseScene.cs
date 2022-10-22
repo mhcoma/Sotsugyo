@@ -45,12 +45,15 @@ public class BaseScene : MonoBehaviour {
 		MazeGenerator.direction_enum[] direction_enums = (MazeGenerator.direction_enum[]) Enum.GetValues(typeof(MazeGenerator.direction_enum));
 
 		
+		string temp_string = $"Current Pos = ({GameManager.instance.map_index_x}, {GameManager.instance.map_index_y}), Next Doors :";
 		for (int i = 0; i < 4; i++) {
 			bool temp = (node.dir & (int) direction_enums[i]) != 0;
 			if (temp) {
 				walls_transform.GetChild(i).gameObject.SetActive(false);
+				temp_string += $" {direction_enums[i]}";
 			}
 		}
+		Debug.Log(temp_string);
 
 		NavMeshSurface surface = GetComponent<NavMeshSurface>();
 		surface.RemoveData();
@@ -58,21 +61,25 @@ public class BaseScene : MonoBehaviour {
 
 
 		Vector3 temp_door_pos;
-		temp_door_pos = doors_transform.GetChild((int) GameManager.instance.start_dir).GetComponent<Renderer>().bounds.center;
-		GameManager.instance.player_spawn_point_transform.position = Vector3.Lerp(GameManager.instance.player_spawn_point_transform.position, temp_door_pos, 0.5f);
+		int temp_door_index = 0;
 
-		float temp_angle = 0.0f;;
+		float temp_angle = 90.0f;;
 		switch (GameManager.instance.start_dir) {
 			case MazeGenerator.direction_enum.east:
+				temp_door_index = 2;
 				temp_angle += 90.0f;
 				break;
 			case MazeGenerator.direction_enum.south:
+				temp_door_index = 1;
 				temp_angle += 180.0f;
 				break;
 			case MazeGenerator.direction_enum.west:
+				temp_door_index = 3;
 				temp_angle += 270.0f;
 				break;
 		}
+		temp_door_pos = doors_transform.GetChild(temp_door_index).GetComponent<Renderer>().bounds.center;
+		GameManager.instance.player_spawn_point_transform.position = Vector3.Lerp(GameManager.instance.player_spawn_point_transform.position, temp_door_pos, 0.5f);
 
 		GameManager.instance.player_spawn_point_transform.localEulerAngles = new Vector3(0, temp_angle, 0);
 
@@ -81,5 +88,11 @@ public class BaseScene : MonoBehaviour {
 
 	void Update() {
 
+	}
+
+	public void next_stage_event(int temp) {
+		GameManager gm = GameManager.instance;
+		gm.next_dir = (MazeGenerator.direction_enum) temp;
+		gm.level_clear();
 	}
 }

@@ -140,6 +140,7 @@ public class GameManager : MonoBehaviour {
 
 	[NonSerialized]
 	public MazeGenerator.direction_enum start_dir;
+	public MazeGenerator.direction_enum next_dir;
 
 
 	void Awake() {
@@ -352,7 +353,7 @@ public class GameManager : MonoBehaviour {
 		map_index_y = MazeGenerator.grid_height - 1;
 
 		start_level("Scenes/BaseScene");
-		next_level_name = "";
+		next_level_name = "Scenes/BaseScene";
 		is_maze_stage = true;
 		start_dir = MazeGenerator.direction_enum.south;
 	}
@@ -384,7 +385,28 @@ public class GameManager : MonoBehaviour {
 
 	public void start_next_level() {
 		toggle_playing(true);
-		move_level(SceneManager.GetActiveScene().name);
+		if (is_maze_stage) {
+			get_current_node().set_cleared(true);
+			switch (next_dir) {
+				case MazeGenerator.direction_enum.north:
+					map_index_y -= 1;
+					start_dir = MazeGenerator.direction_enum.south;
+					break;
+				case MazeGenerator.direction_enum.south:
+					map_index_y += 1;
+					start_dir = MazeGenerator.direction_enum.north;
+					break;
+				case MazeGenerator.direction_enum.east:
+					map_index_x += 1;
+					start_dir = MazeGenerator.direction_enum.west;
+					break;
+				case MazeGenerator.direction_enum.west:
+					map_index_x -= 1;
+					start_dir = MazeGenerator.direction_enum.east;
+					break;
+			}
+		}
+		move_level(next_level_name);
 	}
 
 	public void move_level(string level_name) {
@@ -738,6 +760,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public MazeGenerator.GridNode get_current_node() {
+		Debug.Log($"{map_index_x}, {map_index_y}");
 		return MazeGenerator.grid[map_index_y][map_index_x];
 	}
 }
