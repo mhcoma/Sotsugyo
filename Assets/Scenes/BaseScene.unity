@@ -15627,6 +15627,14 @@ MonoBehaviour:
   stairs_transform: {fileID: 1276664397}
   walls_transform: {fileID: 1304963679}
   doors_transform: {fileID: 1003415958}
+  rocket_prefab: {fileID: 2602537523663976857, guid: d8d70694d46832c4fab9b96fb2e0a6de, type: 3}
+  laser_prefab: {fileID: 5964381780630259752, guid: 0ad1f0d46df003540ac2e87bbd096e22, type: 3}
+  healthpack_prefab: {fileID: 4770809974314305956, guid: 86ecce8137531554c8c2f5a2aff2dd8c, type: 3}
+  key_prefab: {fileID: 4830361918587077728, guid: 3aa8f58b1878e85419d0f7f51ce20759, type: 3}
+  npc_prefab: {fileID: 4977751207723688404, guid: 0b6e404a6a976984a933e06d188512af, type: 3}
+  gas_prefab: {fileID: 8804730980534130081, guid: df9fb1f6f0fed484bb1763e77bf00a2a, type: 3}
+  melee_prefab: {fileID: 3517350711181375575, guid: ddde691fe6b5fc643ab82ad64c28757e, type: 3}
+  gunner_prefab: {fileID: 3487128960617349465, guid: 7438cd347ffba4f4b98eee708f82668e, type: 3}
 --- !u!114 &1123791668
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -146,7 +146,7 @@ public class MazeGenerator : MonoBehaviour {
 
 	static public void carve(int cx, int cy) {
 		List<direction_enum> dirs = new List<direction_enum>((direction_enum[]) Enum.GetValues(typeof(direction_enum)));
-		dirs = shuffle<direction_enum>(dirs);
+		dirs = shuffle(dirs);
 		
 		foreach (direction_enum dir in dirs) {
 			int nx = cx + dx[dir];
