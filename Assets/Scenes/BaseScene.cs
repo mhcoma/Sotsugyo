@@ -31,16 +31,18 @@ public class BaseScene : MonoBehaviour {
 		for (int i = 0; i < 9; i++) {
 			MazeGenerator.floor_enum f = MazeGenerator.floor_enums[i];
 			int temp_index;
+			int stair_under_floor_index;
 
 			Transform first_floor = first_floors_transform.GetChild(i);
 			Transform second_floor = second_floors_transform.GetChild(i);
+			
 
 			switch (f) {
-				case MazeGenerator.floor_enum.s: temp_index = 0; break;
-				case MazeGenerator.floor_enum.w: temp_index = 1; break;
-				case MazeGenerator.floor_enum.e: temp_index = 2; break;
-				case MazeGenerator.floor_enum.n: temp_index = 3; break;
-				default: temp_index = -1; break;
+				case MazeGenerator.floor_enum.s: temp_index = 0; stair_under_floor_index = 0; break;
+				case MazeGenerator.floor_enum.w: temp_index = 1; stair_under_floor_index = 6; break;
+				case MazeGenerator.floor_enum.e: temp_index = 2; stair_under_floor_index = 2; break;
+				case MazeGenerator.floor_enum.n: temp_index = 3; stair_under_floor_index = 8; break;
+				default: temp_index = -1; stair_under_floor_index = -1; break;
 			}
 
 			if (!MazeGenerator.is_exist_part(node.first_floor, (int) MazeGenerator.floor_enums[i]))
@@ -53,9 +55,15 @@ public class BaseScene : MonoBehaviour {
 			
 			if (temp_index >= 0) {
 				Transform stair;
+				Transform stair_under_floor;
 				stair = stairs_transform.GetChild(temp_index);
-				if (!MazeGenerator.is_exist_part(node.stair, (int) MazeGenerator.floor_enums[i])) {
+
+				stair_under_floor = first_floors_transform.GetChild(stair_under_floor_index); 
+				if (!MazeGenerator.is_exist_part(node.stair, (int) MazeGenerator.floor_enums[i]))
 					stair.gameObject.SetActive(false);
+				else {
+					var a = floor_lists.Find(x => x.name.Equals(stair_under_floor.name));
+					Debug.Log(a);
 				}
 			}
 
@@ -75,7 +83,7 @@ public class BaseScene : MonoBehaviour {
 				temp_string += $" {direction_enums[i]}";
 			}
 		}
-		Debug.Log(temp_string);
+		// Debug.Log(temp_string);
 
 		// 동적 네비게이션 메시 생성
 		NavMeshSurface surface = GetComponent<NavMeshSurface>();
@@ -112,12 +120,29 @@ public class BaseScene : MonoBehaviour {
 		if (!node.is_cleared) {
 			floor_lists = MazeGenerator.shuffle(floor_lists);
 
+
 			
+			int count = 0;
+
+			bool is_enemy_already_spawned = false;
 
 			foreach (Transform floor in floor_lists) {
-				Vector3 pos = get_random_pos_on_floor(floor, true);
-
-				GameObject.Instantiate(gas_prefab, pos, Quaternion.identity);
+				if (true) {
+					GameObject.Instantiate(
+						(count % 2 == UnityEngine.Random.Range(0, 2)) ? laser_prefab : rocket_prefab,
+						get_random_pos_on_floor(floor, false),
+						Quaternion.identity
+					);
+				}
+				// if ((UnityEngine.Random.Range(0.0f, 1.0f) >= 0.5f) || !is_enemy_already_spawned) {
+				// 	GameObject.Instantiate(
+				// 		(count % 2 == 1) ? melee_prefab : gunner_prefab,
+				// 		get_random_pos_on_floor(floor, true),
+				// 		Quaternion.identity
+				// 	);
+				// 	is_enemy_already_spawned = true;
+				// }
+				count++;
 			}
 		}
 	}
@@ -143,7 +168,6 @@ public class BaseScene : MonoBehaviour {
 
 		float lerp_z = UnityEngine.Random.Range(0.0f, 1.0f);
 		float lerp_x = UnityEngine.Random.Range(0.0f, 1.0f);
-		Debug.Log($"{lerp_z}, {lerp_x}");
 		
 		Vector3 result = Vector3.Lerp(
 			Vector3.Lerp(
