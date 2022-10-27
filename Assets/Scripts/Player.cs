@@ -91,8 +91,8 @@ public class Player : MonoBehaviour {
 
 	Dictionary<WeaponIndex, int> weapon_ammo_last = new Dictionary<WeaponIndex, int> {
 		{WeaponIndex.none, 0},
-		{WeaponIndex.lasergun, 0},
-		{WeaponIndex.rocketlauncher, 0}
+		{WeaponIndex.lasergun, 500},
+		{WeaponIndex.rocketlauncher, 25}
 	};
 	
 	Dictionary<WeaponIndex, int> weapon_ammo_full = new Dictionary<WeaponIndex, int> {
