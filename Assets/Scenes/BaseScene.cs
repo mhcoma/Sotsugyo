@@ -223,7 +223,7 @@ public class BaseScene : MonoBehaviour {
 			Transform random_floor_transform = floor_transform_lists[UnityEngine.Random.Range(0, floor_transform_lists.Count)];
 			GameObject key_obj = GameObject.Instantiate(
 				key_prefab,
-				get_random_pos_on_floor(random_floor_transform, false, true),
+				get_random_pos_on_floor(random_floor_transform, false, false),
 				Quaternion.identity
 			);
 
