@@ -130,6 +130,7 @@ public class Player : MonoBehaviour {
 
 	float health;
 	public float max_health;
+	public bool is_invincible;
 
 	PostProcessVolume post_volume;
 	Vignette vignette;
@@ -137,6 +138,8 @@ public class Player : MonoBehaviour {
 	float damage_scale = 0.0f;
 
 	float interact_range = 3.0f;
+	public AudioClip interact_fail_aclip;
+	public AudioClip interact_aclip;
 
 
 	AudioSource laser_asrc;
@@ -486,6 +489,7 @@ public class Player : MonoBehaviour {
 	}
 
 	void interact() {
+		bool result = false;
 		RaycastHit hit;
 		Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 		if (Physics.Raycast(ray, out hit, interact_range, raycast_mask)) {
@@ -495,24 +499,29 @@ public class Player : MonoBehaviour {
 				interobj = hit.transform.GetComponent<InteractableObject>();
 				if (interobj != null) {
 					interobj.on_interact.Invoke();
+					result = true;
 				}
 			}
 		}
+
+		if (result) asrc.PlayOneShot(interact_aclip);
+		else asrc.PlayOneShot(interact_fail_aclip);
 	}
 
 	public bool get_damage(float damage) {
 		if (damage <= 0 && health == max_health) {
 			return false;
 		}
+		if (is_invincible && damage > 0.0f) damage = 0.0f;
 		health -= damage;
 		if (health > max_health) health = max_health;
 		hp_tmpro.SetText($"<size=64>HP</size>\n{(int)health}");
 
-		if (damage > 0) {
+		if (damage > 0.0f) {
 			damage_scale = Mathf.Max(Mathf.Min(Mathf.Max(damage / 20.0f, 0.5f), 1.0f), damage_scale);
 			asrc.PlayOneShot(damaged_aclip, damage_scale);
 		}
-		if (health <= 0) {
+		if (health <= 0.0f) {
 			kill_player();
 		}
 

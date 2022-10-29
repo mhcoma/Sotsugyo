@@ -13,6 +13,8 @@ public class BaseScene : MonoBehaviour {
 	public Transform walls_transform;
 	public Transform doors_transform;
 
+	public Transform second_to_first_navmeshlinks_transform;
+
 	public GameObject rocket_prefab;
 	public GameObject laser_prefab;
 	public GameObject healthpack_prefab;
@@ -22,20 +24,45 @@ public class BaseScene : MonoBehaviour {
 	public GameObject melee_prefab;
 	public GameObject gunner_prefab;
 
-	List<Transform> floor_lists = new List<Transform>();
+	List<Transform> floor_transform_lists = new List<Transform>();
+
+	int enemy_count = 0;
+	SpriteObject npc_sprite_obj;
+
+	List<List<(int, int)>> navmeshlinks_lists = new List<List<(int, int)>> {
+		new List<(int, int)> { (6, 3), (5, 2), (4, 1) },
+		new List<(int, int)> { (9, 6), (8, 5), (7, 4) },
+		new List<(int, int)> { (2, 1), (5, 4), (8, 7) },
+		new List<(int, int)> { (3, 2), (6, 5), (9, 8) }
+	};
 
 	void Start() {
 		MazeGenerator.GridNode node = GameManager.instance.get_current_node();
 
-		// 미로 데이터에 따라 층, 계단, 지붕 생성
+		// 미로 데이터에 따라 층, 지붕 생성
+		for (int i = 0; i < 9; i++) {
+			Transform first_floor = first_floors_transform.GetChild(i);
+			Transform second_floor = second_floors_transform.GetChild(i);
+
+			if (!MazeGenerator.is_exist_part(node.first_floor, (int) MazeGenerator.floor_enums[i]))
+				first_floor.gameObject.SetActive(false);
+			else floor_transform_lists.Add(first_floor);
+
+			if (!MazeGenerator.is_exist_part(node.second_floor, (int) MazeGenerator.floor_enums[i]))
+			// if (false)
+				second_floor.gameObject.SetActive(false);
+			else floor_transform_lists.Add(second_floor);
+
+			if (!MazeGenerator.is_exist_part(node.roof, (int) MazeGenerator.floor_enums[i])) {
+				roofs_transform.GetChild(i).GetComponent<MeshRenderer>().enabled = false;
+			}
+		}
+
+		// 미로 데이터에 따라 계단 생성, 계단이 위치한 층은 엔티티 생성하지 않음
 		for (int i = 0; i < 9; i++) {
 			MazeGenerator.floor_enum f = MazeGenerator.floor_enums[i];
 			int temp_index;
 			int stair_under_floor_index;
-
-			Transform first_floor = first_floors_transform.GetChild(i);
-			Transform second_floor = second_floors_transform.GetChild(i);
-			
 
 			switch (f) {
 				case MazeGenerator.floor_enum.s: temp_index = 0; stair_under_floor_index = 0; break;
@@ -44,14 +71,6 @@ public class BaseScene : MonoBehaviour {
 				case MazeGenerator.floor_enum.n: temp_index = 3; stair_under_floor_index = 8; break;
 				default: temp_index = -1; stair_under_floor_index = -1; break;
 			}
-
-			if (!MazeGenerator.is_exist_part(node.first_floor, (int) MazeGenerator.floor_enums[i]))
-				first_floor.gameObject.SetActive(false);
-			else floor_lists.Add(first_floor);
-
-			if (!MazeGenerator.is_exist_part(node.second_floor, (int) MazeGenerator.floor_enums[i]))
-				second_floor.gameObject.SetActive(false);
-			else floor_lists.Add(second_floor);
 			
 			if (temp_index >= 0) {
 				Transform stair;
@@ -62,13 +81,9 @@ public class BaseScene : MonoBehaviour {
 				if (!MazeGenerator.is_exist_part(node.stair, (int) MazeGenerator.floor_enums[i]))
 					stair.gameObject.SetActive(false);
 				else {
-					var a = floor_lists.Find(x => x.name.Equals(stair_under_floor.name));
-					Debug.Log(a);
+					var a = floor_transform_lists.Find(x => x.name.Equals(stair_under_floor.name));
+					floor_transform_lists.Remove(a);
 				}
-			}
-
-			if (!MazeGenerator.is_exist_part(node.roof, (int) MazeGenerator.floor_enums[i])) {
-				roofs_transform.GetChild(i).GetComponent<MeshRenderer>().enabled = false;
 			}
 		}
 
@@ -83,7 +98,36 @@ public class BaseScene : MonoBehaviour {
 				temp_string += $" {direction_enums[i]}";
 			}
 		}
-		// Debug.Log(temp_string);
+
+		// 층 생성에 따라 네비게이션 메시 링크 생성
+		for (int i = 0; i < navmeshlinks_lists.Count; i++) {
+			List<(int, int)> navmeshlinks_list = navmeshlinks_lists[i];
+
+			Transform navmeshlinks_transform = second_to_first_navmeshlinks_transform.GetChild(i);
+
+			NavMeshLink[] navmeshlinks = navmeshlinks_transform.GetComponents<NavMeshLink>();
+			for (int j = 0; j < navmeshlinks_list.Count; j++) {
+				NavMeshLink navmeshlink = navmeshlinks[j];
+				(int, int) second_to_first = navmeshlinks_list[j];
+				bool second_floor_active = second_floors_transform.GetChild(second_to_first.Item1 - 1).gameObject.activeSelf;
+				bool first_floor_active = first_floors_transform.GetChild(second_to_first.Item2 - 1).gameObject.activeSelf;
+				bool second_floor_on_first_floor_active = second_floors_transform.GetChild(second_to_first.Item2 - 1).gameObject.activeSelf;
+				bool result = (second_floor_active && first_floor_active) && (!second_floor_on_first_floor_active);
+
+				if (!result) navmeshlink.enabled = false;
+			}
+
+			for (int j = 0; j < (navmeshlinks_list.Count); j++) {
+				NavMeshLink navmeshlink = navmeshlinks[j + 3];
+				(int, int) first_from_second = navmeshlinks_list[j];
+				bool second_floor_active = second_floors_transform.GetChild(first_from_second.Item2 - 1).gameObject.activeSelf;
+				bool first_floor_active = first_floors_transform.GetChild(first_from_second.Item1 - 1).gameObject.activeSelf;
+				bool second_floor_on_first_floor_active = second_floors_transform.GetChild(first_from_second.Item1 - 1).gameObject.activeSelf;
+				bool result = (second_floor_active && first_floor_active) && (!second_floor_on_first_floor_active);
+
+				if (!result) navmeshlink.enabled = false;
+			}
+		}
 
 		// 동적 네비게이션 메시 생성
 		NavMeshSurface surface = GetComponent<NavMeshSurface>();
@@ -116,32 +160,59 @@ public class BaseScene : MonoBehaviour {
 
 		GameManager.instance.player_transform.GetComponent<Player>().reset_player_position();
 
-		// 등장 요소 무작위 생성
-		if (!node.is_cleared) {
-			floor_lists = MazeGenerator.shuffle(floor_lists);
+		// 등장 엔티티 무작위 생성
+		if (node.is_cleared) {
+			for (int i = 0; i < 4; i++) {
+				doors_transform.GetChild(i).gameObject.SetActive(false);
+			}
+		}
+		else {
+			int count;
 
-
-			
-			int count = 0;
-
-			bool is_enemy_already_spawned = false;
-
-			foreach (Transform floor in floor_lists) {
-				if (true) {
-					GameObject.Instantiate(
+			// 무기 탄약 생성
+			floor_transform_lists = MazeGenerator.shuffle(floor_transform_lists);
+			count = 0;
+			foreach (Transform floor_transform in floor_transform_lists) {
+				if (count <= 3) {
+					GameObject obj = GameObject.Instantiate(
 						(count % 2 == UnityEngine.Random.Range(0, 2)) ? laser_prefab : rocket_prefab,
-						get_random_pos_on_floor(floor, false),
+						get_random_pos_on_floor(floor_transform, false, true),
 						Quaternion.identity
 					);
 				}
-				// if ((UnityEngine.Random.Range(0.0f, 1.0f) >= 0.5f) || !is_enemy_already_spawned) {
-				// 	GameObject.Instantiate(
-				// 		(count % 2 == 1) ? melee_prefab : gunner_prefab,
-				// 		get_random_pos_on_floor(floor, true),
-				// 		Quaternion.identity
-				// 	);
-				// 	is_enemy_already_spawned = true;
-				// }
+				count++;
+			}
+
+			// 적 생성
+			floor_transform_lists = MazeGenerator.shuffle(floor_transform_lists);
+			count = 0;
+			foreach (Transform floor_transform in floor_transform_lists) {
+				if (count <= UnityEngine.Random.Range(1, 4)) {
+					GameObject obj = GameObject.Instantiate(
+						(UnityEngine.Random.Range(0.0f, 0.2f) <= 0.5f) ? melee_prefab : gunner_prefab,
+						get_random_pos_on_floor(floor_transform, true, true),
+						Quaternion.identity
+					);
+					SpriteObject spriteobj = obj.GetComponent<SpriteObject>();
+					spriteobj.on_dead.AddListener(
+						enemy_kill_event
+					);
+					enemy_count++;
+				}
+				count++;
+			}
+
+			// 체력 팩 생성
+			floor_transform_lists = MazeGenerator.shuffle(floor_transform_lists);
+			count = 0;
+			foreach (Transform floor_transform in floor_transform_lists) {
+				if (count <= UnityEngine.Random.Range(1, 4)) {
+					GameObject obj = GameObject.Instantiate(
+						healthpack_prefab,
+						get_random_pos_on_floor(floor_transform, false, true),
+						Quaternion.identity
+					);
+				}
 				count++;
 			}
 		}
@@ -157,7 +228,32 @@ public class BaseScene : MonoBehaviour {
 		gm.level_clear();
 	}
 
-	Vector3 get_random_pos_on_floor(Transform floor, bool type) {
+	public void npc_interact_event() {
+		for (int i = 0; i < 4; i++) {
+			doors_transform.GetChild(i).GetComponent<Door>().open();
+		}
+		npc_sprite_obj.kill(true);
+	}
+
+	// 적 사살 이벤트
+	public void enemy_kill_event() {
+		enemy_count--;
+		Debug.Log($"kill! {enemy_count}");
+
+		if (enemy_count == 0) {
+			Transform floor_transform = floor_transform_lists[UnityEngine.Random.Range(0, floor_transform_lists.Count)];
+			GameObject obj = GameObject.Instantiate(
+				npc_prefab,
+				get_random_pos_on_floor(floor_transform, true, false),
+				Quaternion.identity
+			);
+			npc_sprite_obj = obj.GetComponent<SpriteObject>();
+			InteractableObject inter_obj = obj.GetComponent<InteractableObject>();
+			inter_obj.on_interact.AddListener(npc_interact_event);
+		}
+	}
+
+	Vector3 get_random_pos_on_floor(Transform floor, bool type, bool randomize) {
 		Bounds bounds = floor.GetComponent<Renderer>().bounds;
 		Vector3 center = bounds.center;
 		Vector3 size = bounds.size;
@@ -166,8 +262,8 @@ public class BaseScene : MonoBehaviour {
 		float half_z = size.z / 2;
 		float height = type ? 4.0f : 1.5f;
 
-		float lerp_z = UnityEngine.Random.Range(0.0f, 1.0f);
-		float lerp_x = UnityEngine.Random.Range(0.0f, 1.0f);
+		float lerp_z = randomize ? UnityEngine.Random.Range(0.0f, 1.0f) : 0.5f;
+		float lerp_x = randomize ? UnityEngine.Random.Range(0.0f, 1.0f) : 0.5f;
 		
 		Vector3 result = Vector3.Lerp(
 			Vector3.Lerp(

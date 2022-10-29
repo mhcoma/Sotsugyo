@@ -31,6 +31,7 @@ public class SpriteObject : MonoBehaviour {
 
 	[System.NonSerialized]
 	public bool is_ai_object;
+	public bool is_invincible;
 
 	EnemyAITest ai;
 	NonAIObject nonai;
@@ -108,8 +109,9 @@ public class SpriteObject : MonoBehaviour {
 	}
 
 	public void get_damage(float damage) {
+		if (is_invincible && damage > 0.0f) damage = 0.0f;
 		health -= damage;
-		if (health <= 0) {
+		if (health <= 0.0f) {
 			kill(true);
 		}
 	}
