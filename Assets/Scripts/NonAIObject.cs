@@ -8,6 +8,12 @@ public class NonAIObject : MonoBehaviour {
 	float liquid_drag = 4.0f;
 	float air_drag = 2.0f;
 	float ground_distance = 0.3f;
+
+	SpriteObject sobj;
+	float goo_damage_interval = 0.5f;
+	float goo_damage_time = 0.0f;
+	float goo_damage = 25.0f;
+
 	public Transform ground_check_transform;
 	public LayerMask ground_mask;
 	public LayerMask liquid_mask;
@@ -19,6 +25,7 @@ public class NonAIObject : MonoBehaviour {
 	void Start() {
 		rigid = GetComponent<Rigidbody>();
 		asrc = GetComponent<AudioSource>();
+		sobj = GetComponent<SpriteObject>();
 	}
 
 	void Update() {
@@ -36,6 +43,15 @@ public class NonAIObject : MonoBehaviour {
 		
 		if (temp_liquided) {
 			asrc.PlayOneShot(water_splashes_aclip);
+		}
+
+		if (is_liquided) {
+			if (goo_damage_time >= 0.0f)
+				goo_damage_time -= Time.deltaTime;
+			if (goo_damage_time <= 0.0f) {
+				sobj.get_damage(goo_damage);
+				goo_damage_time += goo_damage_interval;
+			}
 		}
 	}
 }

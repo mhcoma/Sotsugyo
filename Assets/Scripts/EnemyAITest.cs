@@ -60,6 +60,10 @@ public class EnemyAITest : MonoBehaviour {
 	public float primary_attack_damage = 10.0f;
 	public float secondary_attack_damage = 10.0f;
 
+	float goo_damage_interval = 0.5f;
+	float goo_damage_time = 0.0f;
+	float goo_damage = 25.0f;
+
 	ParticleSystem attack_effect;
 	public GameObject rocket_prefab;
 
@@ -100,6 +104,15 @@ public class EnemyAITest : MonoBehaviour {
 				
 				if (temp_liquided) {
 					asrc.PlayOneShot(water_splashes_aclip);
+				}
+
+				if (is_liquided) {
+					if (goo_damage_time >= 0.0f)
+						goo_damage_time -= Time.deltaTime;
+					if (goo_damage_time <= 0.0f) {
+						sobj.get_damage(goo_damage);
+						goo_damage_time += goo_damage_interval;
+					}
 				}
 
 				if ((temp_grounded || !agent.enabled || agent.isStopped) && is_stopped() && !agent.isOnOffMeshLink) {
