@@ -12,7 +12,7 @@ public class NonAIObject : MonoBehaviour {
 	SpriteObject sobj;
 	float goo_damage_interval = 0.5f;
 	float goo_damage_time = 0.0f;
-	float goo_damage = 25.0f;
+	float goo_damage = 50.0f;
 
 	public Transform ground_check_transform;
 	public LayerMask ground_mask;

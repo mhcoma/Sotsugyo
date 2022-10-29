@@ -62,7 +62,7 @@ public class EnemyAITest : MonoBehaviour {
 
 	float goo_damage_interval = 0.5f;
 	float goo_damage_time = 0.0f;
-	float goo_damage = 25.0f;
+	float goo_damage = 50.0f;
 
 	ParticleSystem attack_effect;
 	public GameObject rocket_prefab;
