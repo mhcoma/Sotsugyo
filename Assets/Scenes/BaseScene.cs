@@ -134,7 +134,7 @@ public class BaseScene : MonoBehaviour {
 		surface.RemoveData();
 		surface.BuildNavMesh();
 
-		// 플레이어 시작 위치 및 방향 설정
+		// 플레이어 시작 위치 및 방향 설정, 초기 탄약 제공
 		Vector3 temp_door_pos;
 		int temp_door_index = 0;
 
@@ -153,12 +153,16 @@ public class BaseScene : MonoBehaviour {
 				temp_angle += 270.0f;
 				break;
 		}
+
+		Player player = GameManager.instance.player_transform.GetComponent<Player>();
 		temp_door_pos = doors_transform.GetChild(temp_door_index).GetComponent<Renderer>().bounds.center;
 		GameManager.instance.player_spawn_point_transform.position = Vector3.Lerp(GameManager.instance.player_spawn_point_transform.position, temp_door_pos, 0.5f);
 
 		GameManager.instance.player_spawn_point_transform.localEulerAngles = new Vector3(0, temp_angle, 0);
 
-		GameManager.instance.player_transform.GetComponent<Player>().reset_player_position();
+		player.reset_player_position();
+		player.get_ammo(Player.WeaponIndex.lasergun, 500);
+		player.get_ammo(Player.WeaponIndex.rocketlauncher, 25);
 
 		// 등장 엔티티 무작위 생성
 		if (node.is_cleared) {
@@ -189,7 +193,7 @@ public class BaseScene : MonoBehaviour {
 			foreach (Transform floor_transform in floor_transform_lists) {
 				if (count <= UnityEngine.Random.Range(1, 4)) {
 					GameObject obj = GameObject.Instantiate(
-						(UnityEngine.Random.Range(0.0f, 0.2f) <= 0.5f) ? melee_prefab : gunner_prefab,
+						(UnityEngine.Random.Range(0.0f, 1.0f) <= 0.5f) ? melee_prefab : gunner_prefab,
 						get_random_pos_on_floor(floor_transform, true, true),
 						Quaternion.identity
 					);
@@ -215,6 +219,14 @@ public class BaseScene : MonoBehaviour {
 				}
 				count++;
 			}
+
+			Transform random_floor_transform = floor_transform_lists[UnityEngine.Random.Range(0, floor_transform_lists.Count)];
+			GameObject key_obj = GameObject.Instantiate(
+				key_prefab,
+				get_random_pos_on_floor(random_floor_transform, false, true),
+				Quaternion.identity
+			);
+
 		}
 	}
 
