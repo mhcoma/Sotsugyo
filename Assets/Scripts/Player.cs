@@ -107,10 +107,13 @@ public class Player : MonoBehaviour {
 	};
 	Dictionary<WeaponIndex, float> weapon_damage = new Dictionary<WeaponIndex, float> {
 		{WeaponIndex.none, 0},
-		{WeaponIndex.lasergun, 20},
+		{WeaponIndex.lasergun, 50},
 		{WeaponIndex.rocketlauncher, 20}
 	};
-	WeaponIndex weapon_index = WeaponIndex.none;
+	[System.NonSerialized]
+	public WeaponIndex weapon_index = WeaponIndex.none;
+	[System.NonSerialized]
+	public WeaponIndex last_weapon_index = WeaponIndex.none;
 	float shoot_time = 0;
 
 	public enum ItemIndex {
@@ -566,7 +569,7 @@ public class Player : MonoBehaviour {
 		foreach (WeaponIndex index in System.Enum.GetValues(typeof(WeaponIndex))) {
 			weapon_ammo[index] = weapon_ammo_last[index];
 		}
-		weapon_index = WeaponIndex.none;
+		weapon_index = last_weapon_index;
 		weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[weapon_index]);
 		refresh_display_ammo();
 

@@ -58,7 +58,7 @@ public class TutorialScene : MonoBehaviour {
 	public void rocket_ammo_get_event(GameObject gas) {
 		GameManager.instance.caption_addtext(
 			"이것은 로켓 런처의 탄환입니다.",
-			$"[{InputManager.get_button_key_names("weapon 2")}] 키를 눌러 레이저를 선택할 수 있습니다."
+			$"[{InputManager.get_button_key_names("weapon 2")}] 키를 눌러 로켓 런처를 선택할 수 있습니다."
 		);
 		GameManager.instance.caption_addtext(
 			"가스통에 피해를 입히면 폭발하여 주변을 밀쳐내고 피해를 입힙니다.",
