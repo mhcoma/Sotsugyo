@@ -12,6 +12,8 @@ public class Player : MonoBehaviour {
 	Vector3 key_direc = new Vector3(0, 0, 0);
 	float mouse_x = 0;
 	float mouse_y = 0;
+	[System.NonSerialized]
+	public float mouse_sensitivity = 10.0f;
 
 	float ground_drag = 10.0f;
 	float liquid_drag = 4.0f;
@@ -269,7 +271,7 @@ public class Player : MonoBehaviour {
 					}
 
 					key_direc = new Vector3 (InputManager.get_axis("horizontal"), 0, InputManager.get_axis("vertical")).normalized;
-					mouse_x += Input.GetAxis("Mouse X") * 10;
+					mouse_x += Input.GetAxis("Mouse X") * mouse_sensitivity;
 					camera_holder_transform.eulerAngles = new Vector3(0, mouse_x, 0);
 					move_amount = Quaternion.Euler(0, mouse_x, 0) * key_direc;
 
@@ -279,7 +281,7 @@ public class Player : MonoBehaviour {
 
 					slope_move_amount = Vector3.ProjectOnPlane(move_amount, slope_hit.normal);
 
-					mouse_y += Input.GetAxis("Mouse Y") * 10;
+					mouse_y += Input.GetAxis("Mouse Y") * mouse_sensitivity;
 					mouse_y = Mathf.Clamp(mouse_y, -90.0f, 90.0f);
 					cam_transform.localEulerAngles = new Vector3(-mouse_y, 0, 0);
 

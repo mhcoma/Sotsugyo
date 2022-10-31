@@ -40,6 +40,7 @@ public class InputManager : MonoBehaviour {
 	public static Dictionary<string, KeyPair> key_mapping = new Dictionary<string, KeyPair>();
 	public static Dictionary<string, AxisPair> axis_mapping = new Dictionary<string, AxisPair>();
 
+
 	public const string button_mapping_file_path = "button.json";
 
 	void Start() {

@@ -83,6 +83,17 @@ public class GameManager : MonoBehaviour {
 	FullScreenMode fullscreen_mode = FullScreenMode.ExclusiveFullScreen;
 	FullScreenMode temp_fullscreen_mode = FullScreenMode.ExclusiveFullScreen;
 
+	
+	Slider mouse_sensitivity_slider;
+	TextMeshProUGUI mouse_sensitivity_tmpro;
+	float temp_mouse_sensitivity = 0;
+	float mouse_sensitivity_scale = 2.0f;
+	public const string input_settings_file_path = "input.json";
+
+	public class InputSettings {
+		public float mouse_sensitivity;
+	}
+
 	List<string> button_names = new List<string> {
 		"fire",
 		"interact",
@@ -186,7 +197,13 @@ public class GameManager : MonoBehaviour {
 			load_sound_volume();
 		}
 
+		FileInfo input_settings_file_info = new FileInfo(input_settings_file_path);
+		if (input_settings_file_info.Exists) {
+			load_input_settings();
+		}
+
 		apply_option();
+		apply_mouse_sensitivity();
 
 		initialize_input_button_texts();
 	}
@@ -236,6 +253,9 @@ public class GameManager : MonoBehaviour {
 
 		input_option_back_button_tmpro = input_option_group_transform.Find("Back").GetChild(0).GetComponent<TextMeshProUGUI>();
 		input_panel = input_option_group_transform.Find("InputPanel");
+
+		mouse_sensitivity_slider = input_option_group_transform.Find("MouseSensivitySlider").GetComponent<Slider>();
+		mouse_sensitivity_tmpro = input_option_group_transform.Find("MouseSensivityText").GetComponent<TextMeshProUGUI>();
 
 		next_level_button_transform = gameover_group_transform.Find("NextLevelButton");
 
@@ -366,8 +386,11 @@ public class GameManager : MonoBehaviour {
 		);
 		caption_addtext(
 			"미로는 무작위로 생성되고 각 방의 형태도 무작위로 생성됩니다.",
-			"미로에 있는 모든 적을 파괴하고 열쇠를 획득하세요.",
-			"모든 적을 파괴하면 NPC가 생성되고, 상호작용을 통해 문을 열 수 있습니다.",
+			"미로에 있는 모든 적을 파괴하고 열쇠를 획득하세요."
+		);
+		caption_addtext(
+			"모든 적을 파괴하면 NPC가 생성되고,",
+			"상호작용을 통해 문을 열 수 있습니다.",
 			"문을 통해 다음 방으로 넘어가면 체력과 탄알이 초기화됩니다."
 		);
 	}
@@ -642,7 +665,6 @@ public class GameManager : MonoBehaviour {
 		Screen.SetResolution(screen_res_list[screen_res_index].width, screen_res_list[screen_res_index].height, fullscreen_mode);
 
 		save_sound_volume();
-		
 
 		change_option_back_button_text(false);
 	}
@@ -710,6 +732,32 @@ public class GameManager : MonoBehaviour {
 		else temp_keys.Add(button_name, keycode);
 	}
 
+	public void load_input_settings() {
+		string input_settings_file = File.ReadAllText(input_settings_file_path);
+		InputSettings input_settings = JsonUtility.FromJson<InputSettings>(input_settings_file);
+		temp_mouse_sensitivity = input_settings.mouse_sensitivity;
+	}
+
+	public void save_input_settings() {
+		InputSettings input_settings = new InputSettings();
+		input_settings.mouse_sensitivity = player.mouse_sensitivity;
+
+		string input_settings_file = JsonUtility.ToJson(input_settings);
+		File.WriteAllText(input_settings_file_path, input_settings_file);
+	}
+
+	public void change_mouse_sensitivity(float scale) {
+		temp_mouse_sensitivity = scale / mouse_sensitivity_scale;
+		mouse_sensitivity_tmpro.SetText($"Mouse Sensivity - {temp_mouse_sensitivity:0.0}");
+		change_input_option_back_button_text(true);
+	}
+
+	public void apply_mouse_sensitivity() {
+		player.mouse_sensitivity = temp_mouse_sensitivity;
+		mouse_sensitivity_slider.value = temp_mouse_sensitivity * mouse_sensitivity_scale;
+		save_input_settings();
+	}
+
 	public void apply_input_option() {
 		foreach (KeyValuePair<string, KeyCode> pair in temp_keys) {
 			string button_name = pair.Key;
@@ -718,9 +766,13 @@ public class GameManager : MonoBehaviour {
 			InputManager.key_mapping[button_name] = kp;
 		}
 		temp_keys.Clear();
-		change_input_option_back_button_text(false);
 		caption.reset_caption_info();
+
 		InputManager.save_button_mapping();
+		
+		apply_mouse_sensitivity();
+
+		change_input_option_back_button_text(false);
 	}
 
 	public void cancel_input_option() {
@@ -729,6 +781,10 @@ public class GameManager : MonoBehaviour {
 			is_reset_buttons = false;
 		}
 		initialize_input_button_texts();
+
+		mouse_sensitivity_slider.value = player.mouse_sensitivity * mouse_sensitivity_scale;
+		change_mouse_sensitivity(mouse_sensitivity_slider.value);
+
 		change_input_option_back_button_text(false);
 	}
 
