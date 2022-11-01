@@ -36,6 +36,8 @@ public class BaseScene : MonoBehaviour {
 		new List<(int, int)> { (3, 2), (6, 5), (9, 8) }
 	};
 
+	Player player;
+
 	void Start() {
 		MazeGenerator.GridNode node = GameManager.instance.get_current_node();
 
@@ -154,7 +156,7 @@ public class BaseScene : MonoBehaviour {
 				break;
 		}
 
-		Player player = GameManager.instance.player_transform.GetComponent<Player>();
+		player = GameManager.instance.player_transform.GetComponent<Player>();
 		temp_door_pos = doors_transform.GetChild(temp_door_index).GetComponent<Renderer>().bounds.center;
 		GameManager.instance.player_spawn_point_transform.position = Vector3.Lerp(GameManager.instance.player_spawn_point_transform.position, temp_door_pos, 0.5f);
 
@@ -172,6 +174,9 @@ public class BaseScene : MonoBehaviour {
 		}
 		else {
 			int count;
+
+			float difficulty = calculate_difficulty();
+			Debug.Log(difficulty);
 
 			// 무기 탄약 생성
 			floor_transform_lists = MazeGenerator.shuffle(floor_transform_lists);
@@ -191,16 +196,24 @@ public class BaseScene : MonoBehaviour {
 			floor_transform_lists = MazeGenerator.shuffle(floor_transform_lists);
 			count = 0;
 			foreach (Transform floor_transform in floor_transform_lists) {
-				if (count <= UnityEngine.Random.Range(1, 4)) {
+				if (count <= UnityEngine.Random.Range(
+					Mathf.Lerp(1, 2, difficulty),
+					Mathf.Lerp(1, 4, difficulty)
+				)) {
 					GameObject obj = GameObject.Instantiate(
 						(UnityEngine.Random.Range(0.0f, 1.0f) <= 0.5f) ? melee_prefab : gunner_prefab,
 						get_random_pos_on_floor(floor_transform, true, true),
 						Quaternion.identity
 					);
 					SpriteObject spriteobj = obj.GetComponent<SpriteObject>();
+					spriteobj.health *= Mathf.Lerp(0.25f, 1.0f, difficulty);
 					spriteobj.on_dead.AddListener(
 						enemy_kill_event
 					);
+					EnemyAITest ai = obj.GetComponent<EnemyAITest>();
+					ai.primary_attack_damage *= Mathf.Lerp(0.25f, 1.0f, difficulty);
+					ai.secondary_attack_damage *= Mathf.Lerp(0.75f, 1.0f, difficulty);
+
 					enemy_count++;
 				}
 				count++;
@@ -210,12 +223,31 @@ public class BaseScene : MonoBehaviour {
 			floor_transform_lists = MazeGenerator.shuffle(floor_transform_lists);
 			count = 0;
 			foreach (Transform floor_transform in floor_transform_lists) {
-				if (count <= UnityEngine.Random.Range(1, 4)) {
+				if (count <= UnityEngine.Random.Range(
+					Mathf.Lerp(5, 1, difficulty),
+					Mathf.Lerp(10, 4, difficulty)
+				)) {
 					GameObject obj = GameObject.Instantiate(
 						healthpack_prefab,
 						get_random_pos_on_floor(floor_transform, false, true),
 						Quaternion.identity
 					);
+				}
+				count++;
+			}
+
+			// 가스통 생성
+			floor_transform_lists = MazeGenerator.shuffle(floor_transform_lists);
+			count = 0;
+			foreach (Transform floor_transform in floor_transform_lists) {
+				if (count <= 3) {
+					for (int i = 0; i < UnityEngine.Random.Range(1, 4); i++) {
+						GameObject obj = GameObject.Instantiate(
+							gas_prefab,
+							get_random_pos_on_floor(floor_transform, true, true),
+							Quaternion.identity
+						);
+					}
 				}
 				count++;
 			}
@@ -241,16 +273,18 @@ public class BaseScene : MonoBehaviour {
 	}
 
 	public void npc_interact_event() {
-		for (int i = 0; i < 4; i++) {
-			doors_transform.GetChild(i).GetComponent<Door>().open();
+		if (player.has_key()) {
+			for (int i = 0; i < 4; i++) {
+				doors_transform.GetChild(i).GetComponent<Door>().open();
+			}
+			npc_sprite_obj.kill(true);
+			player.get_item(Player.ItemIndex.key, -1);
 		}
-		npc_sprite_obj.kill(true);
 	}
 
 	// 적 사살 이벤트
 	public void enemy_kill_event() {
 		enemy_count--;
-		Debug.Log($"kill! {enemy_count}");
 
 		if (enemy_count == 0) {
 			Transform floor_transform = floor_transform_lists[UnityEngine.Random.Range(0, floor_transform_lists.Count)];
@@ -291,6 +325,12 @@ public class BaseScene : MonoBehaviour {
 			lerp_x
 		);
 
+		return result;
+	}
+
+	public float calculate_difficulty() {
+		GameManager game_manager = GameManager.instance;
+		float result = (game_manager.cleared_stage_count + 1) / (game_manager.map_size_x * game_manager.map_size_y);
 		return result;
 	}
 }

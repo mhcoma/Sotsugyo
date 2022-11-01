@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour {
 
 	Transform caption_transform;
 
+
+	Transform hud_transform;
 	Transform crosshair_transform;
 
 	
@@ -142,12 +144,14 @@ public class GameManager : MonoBehaviour {
 
 	public menu_state_enum menu_state = menu_state_enum.none;
 
-
+	public int map_size_x = 2;
+	public int map_size_y = 1;
 	public int map_index_x = 0;
 	public int map_index_y = 0;
 	string next_level_name = "";
 	bool is_cleared_stage = false;
 	bool is_maze_stage = false;
+	public int cleared_stage_count = 0;
 
 	[NonSerialized]
 	public MazeGenerator.direction_enum start_dir;
@@ -224,7 +228,8 @@ public class GameManager : MonoBehaviour {
 		caption_transform = canvas_transform.Find("Caption");
 		caption = caption_transform.GetComponent<Caption>();
 
-		crosshair_transform = canvas_transform.Find("Crosshair");
+		hud_transform = canvas_transform.Find("HUD");
+		crosshair_transform = hud_transform.Find("Crosshair");
 
 		pause_menu_transform = canvas_transform.Find("PauseMenu");
 
@@ -318,6 +323,15 @@ public class GameManager : MonoBehaviour {
 				if (InputManager.get_button_down("cancel")) {
 					pause();
 				}
+				if (InputManager.get_button_down("debug_hud")) {
+					toggle_hud();
+				}
+				if (InputManager.get_button_down("debug_invincivle")) {
+					player.toggle_invincivle();
+				}
+				if (InputManager.get_button_down("debug_kill")) {
+					kill_enemies();
+				}
 				break;
 			case menu_state_enum.pause:
 				if (InputManager.get_button_down("cancel")) {
@@ -369,7 +383,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void start_maze() {
-		MazeGenerator.generate_grid();
+		MazeGenerator.generate_grid(map_size_x, map_size_y);
 		map_index_x = MazeGenerator.grid_width - 1;
 		map_index_y = MazeGenerator.grid_height - 1;
 
@@ -378,6 +392,8 @@ public class GameManager : MonoBehaviour {
 		is_maze_stage = true;
 		start_dir = MazeGenerator.direction_enum.south;
 		player.last_weapon_index = Player.WeaponIndex.none;
+
+		cleared_stage_count = 0;
 
 		caption_addtext(
 			"게임의 맵은 여러 개의 방으로 구성된 미로 형식입니다.",
@@ -424,7 +440,10 @@ public class GameManager : MonoBehaviour {
 		toggle_playing(true);
 		player.last_weapon_index = player.weapon_index;
 		if (is_maze_stage) {
-			get_current_node().set_cleared(true);
+			if (!get_current_node().is_cleared) {
+				get_current_node().set_cleared(true);
+				cleared_stage_count++;
+			}
 			switch (next_dir) {
 				case MazeGenerator.direction_enum.north:
 					map_index_y -= 1;
@@ -831,7 +850,26 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public MazeGenerator.GridNode get_current_node() {
-		Debug.Log($"{map_index_x}, {map_index_y}");
 		return MazeGenerator.grid[map_index_y][map_index_x];
+	}
+
+	public void toggle_hud() {
+		bool result = true;
+		if (hud_transform.gameObject.activeSelf) {
+			result = false;
+		}
+		hud_transform.gameObject.SetActive(result);
+	}
+
+	public void kill_enemies() {
+		GameObject[] actors = GameObject.FindGameObjectsWithTag("Actor");
+
+		foreach (GameObject actor_gameobj in actors) {
+			EnemyAITest ai;
+
+			if (actor_gameobj.TryGetComponent<EnemyAITest>(out ai)) {
+				actor_gameobj.GetComponent<SpriteObject>().get_damage(float.MaxValue);
+			}
+		}
 	}
 }

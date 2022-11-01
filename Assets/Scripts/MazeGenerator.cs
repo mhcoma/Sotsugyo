@@ -108,7 +108,7 @@ public class MazeGenerator : MonoBehaviour {
 		
 	}
 
-	static public void generate_grid(int width = 3, int height = 3) {
+	static public void generate_grid(int width, int height) {
 		grid_width = width;
 		grid_height = height;
 		grid.Clear();

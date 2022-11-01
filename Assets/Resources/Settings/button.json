@@ -59,6 +59,21 @@
 			"button_name" : "left",
 			"primary_key" : "A",
 			"secondary_key" : "LeftArrow"
+		},
+		{
+			"button_name" : "debug_hud",
+			"primary_key" : "H",
+			"secondary_key" : "None"
+		},
+		{
+			"button_name" : "debug_invincivle",
+			"primary_key" : "J",
+			"secondary_key" : "None"
+		},
+		{
+			"button_name" : "debug_kill",
+			"primary_key" : "K",
+			"secondary_key" : "None"
 		}
 	]
 }

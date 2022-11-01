@@ -120,13 +120,11 @@ public class Player : MonoBehaviour {
 
 	public enum ItemIndex {
 		none,
-		key,
-		gold
+		key
 	}
 	Dictionary<ItemIndex, int> item_inventory = new Dictionary<ItemIndex, int> {
 		{ItemIndex.none, 0},
-		{ItemIndex.key, 0},
-		{ItemIndex.gold, 0}
+		{ItemIndex.key, 0}
 	};
 
 	public GameObject rocket_prefab;
@@ -571,6 +569,11 @@ public class Player : MonoBehaviour {
 		foreach (WeaponIndex index in System.Enum.GetValues(typeof(WeaponIndex))) {
 			weapon_ammo[index] = weapon_ammo_last[index];
 		}
+
+		foreach (ItemIndex index in System.Enum.GetValues(typeof(ItemIndex))) {
+			item_inventory[index] = 0;
+		}
+
 		weapon_index = last_weapon_index;
 		weapon_hud_sprite_manager.chnage_weapon_sprite(weapon_hud_sprites[weapon_index]);
 		refresh_display_ammo();
@@ -625,5 +628,13 @@ public class Player : MonoBehaviour {
 			rigid.velocity = Vector3.zero;
 		jump_button = false;
 		jumped = 0;
+	}
+
+	public void toggle_invincivle() {
+		is_invincible = !is_invincible;
+	}
+
+	public bool has_key() {
+		return (item_inventory[ItemIndex.key] > 0);
 	}
 }
