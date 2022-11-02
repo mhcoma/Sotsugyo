@@ -66,8 +66,7 @@ v2f vert(appdata_full v){
 }
 
 fixed4 frag(v2f i) : SV_Target {
-
-	fixed time = int(_Time.x * 128) / 16.0f;
+	fixed time = floor(_Time.x * 128) / 16.0f;
 
 	i.normal = (
 		create_normal(
@@ -82,8 +81,7 @@ fixed4 frag(v2f i) : SV_Target {
 		)
 	) / 2.0f;
 
-
-	fixed noise = int(tex2D(_NoiseMap,
+	fixed noise = floor(tex2D(_NoiseMap,
 		float2(i.uv.x + time, i.uv.y - time)
 	).r * 16) / 16.0f;
 

@@ -86,9 +86,7 @@ Shader "Unlit/UnderwaterShader" {
 							i.uvgrab.y + noise_y
 						)
 					);
-
 					half4 color_result = lerp(result, _Color, _Color.a);
-
 					return color_result;
 				}
 				ENDCG
