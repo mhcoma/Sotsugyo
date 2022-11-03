@@ -294,7 +294,7 @@ public class BaseScene : MonoBehaviour {
 					doors_transform.GetChild(i).GetComponent<Door>().open();
 				}
 				npc_sprite_obj.kill(true);
-				player.get_item(Player.ItemIndex.key, -1);
+				player.clear_item(Player.ItemIndex.key);
 			}
 		}
 	}
