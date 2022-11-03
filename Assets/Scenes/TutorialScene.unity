@@ -1694,7 +1694,7 @@ GameObject:
   - component: {fileID: 170429473}
   m_Layer: 12
   m_Name: StartTriggerLocation
-  m_TagString: Untagged
+  m_TagString: Location
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9749,7 +9749,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh30900
+  m_Name: pb_Mesh85428
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2

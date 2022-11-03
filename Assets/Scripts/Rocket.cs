@@ -53,12 +53,15 @@ public class Rocket : MonoBehaviour {
 				return;
 			}
 		}
-		
-		if (other.transform.CompareTag("Actor")) {
-			other.transform.gameObject.GetComponent<SpriteObject>().get_damage(damage);
+
+		if (other.transform.CompareTag("Location")) {
+			return;
+		}
+		else if (other.transform.CompareTag("Actor")) {
+			other.transform.GetComponent<SpriteObject>().get_damage(damage);
 		}
 		else if (other.transform.CompareTag("Player")) {
-			other.transform.gameObject.GetComponent<Player>().get_damage(damage);
+			other.transform.GetComponent<Player>().get_damage(damage);
 		}
 
 		transform.position -= direction * 0.5f;

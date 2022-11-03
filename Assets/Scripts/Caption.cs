@@ -38,15 +38,15 @@ public class Caption : MonoBehaviour {
 							char c;
 							c = buffer_text[type_index];
 							caption_tmpro.text += c;
+							type_index++;
 							if (c == '<') {
 								do {
-									type_index++;
 									c = buffer_text[type_index];
 									caption_tmpro.text += c;
+									type_index++;
 								} while (c != '>');
 							}
 							type_time += type_interval;
-							type_index++;
 						}
 					}
 				}

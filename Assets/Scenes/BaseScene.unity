@@ -21075,7 +21075,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-59434
+  m_Name: pb_Mesh82976
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -22760,7 +22760,7 @@ GameObject:
   - component: {fileID: 1726106163}
   m_Layer: 12
   m_Name: StartTriggerLocation
-  m_TagString: Untagged
+  m_TagString: Location
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.19634691, g: 0.09731356, b: 0.119633995, a: 1}
+  m_IndirectSpecularColor: {r: 0.19543347, g: 0.09683668, b: 0.11907894, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -13484,8 +13484,11 @@ MonoBehaviour:
   camera_holder_transform: {fileID: 1872402042}
   mixer: {fileID: 24100000, guid: 437c6d19cfb868a41915f64c5dcd2c6e, type: 2}
   menu_state: 1
+  map_size_x: 2
+  map_size_y: 1
   map_index_x: 0
   map_index_y: 0
+  cleared_stage_count: 0
   next_dir: 0
 --- !u!4 &1932148091
 Transform:

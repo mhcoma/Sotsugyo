@@ -46,6 +46,8 @@ public class BaseScene : MonoBehaviour {
 		new List<(int, int)> { (2, 1), (5, 4), (8, 7) },
 		new List<(int, int)> { (3, 2), (6, 5), (9, 8) }
 	};
+	
+	bool is_already_worked_start_event;
 
 	Player player;
 
@@ -280,7 +282,7 @@ public class BaseScene : MonoBehaviour {
 	}
 
 	public void start_event() {
-		if (gm.cleared_stage_count == 0) {
+		if (gm.cleared_stage_count == 0 && !is_already_worked_start_event) {
 			string door_directions = "";
 
 			for (int i = 0; i < 4; i++) {
@@ -295,13 +297,14 @@ public class BaseScene : MonoBehaviour {
 			);
 			gm.caption_addtext(
 				"미로는 무작위로 생성되고 각 방의 형태도 무작위로 생성됩니다.",
-				"미로에 있는 모든 <color=red>적</color>을 파괴하고 열쇠를 획득하세요."
+				"미로에 있는 모든 <color=#ff6f6f>적</color>을 파괴하고 <color=#ffff00>열쇠</color>를 획득하세요."
 			);
 			gm.caption_addtext(
-				"모든 적을 파괴하면 <color=green>NPC</color>가 생성되고,",
-				"상호작용을 통해 문을 열 수 있습니다.",
+				"모든 적을 파괴하면 <color=#7fff3f>NPC</color>가 생성되고,",
+				"<color=#ffff00>열쇠</color>가 있으면 상호작용을 통해 문을 열 수 있습니다.",
 				"문을 통해 다음 방으로 넘어가면 체력과 탄알이 초기화됩니다."
 			);
+			is_already_worked_start_event = true;
 		}
 	}
 
@@ -316,7 +319,7 @@ public class BaseScene : MonoBehaviour {
 		if (player.has_key()) {
 			if (gm.is_last_stage()) {
 				gm.caption_addtext(
-					"<color=green>[Admin]</color>",
+					"<color=#7fff3f>[Admin]</color>",
 					"미로를 클리어했습니다!"
 				);
 				gm.caption_addevent(
@@ -328,7 +331,7 @@ public class BaseScene : MonoBehaviour {
 			}
 			else {
 				gm.caption_addtext(
-					"<color=green>[Admin]</color>",
+					"<color=#7fff3f>[Admin]</color>",
 					"다음 스테이지로 넘어가세요.",
 					$"{next_doors} 방향으로 건너갈 수 있습니다."
 				);
@@ -341,8 +344,8 @@ public class BaseScene : MonoBehaviour {
 		}
 		else {
 			gm.caption_addtext(
-				"<color=green>[Admin]</color>",
-				"<color=yellow>열쇠</color>가 없으니 열어줄 수 없습니다."
+				"<color=#7fff3f>[Admin]</color>",
+				"<color=#ffff00>열쇠</color>가 없으니 열어줄 수 없습니다."
 			);
 		}
 	}
