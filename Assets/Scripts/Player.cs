@@ -546,9 +546,12 @@ public class Player : MonoBehaviour {
 		return false;
 	}
 
-	public bool get_item(ItemIndex index, int value) {
+	public void get_item(ItemIndex index, int value) {
 		item_inventory[index] += value;
-		return true;
+	}
+
+	public void clear_item(ItemIndex index) {
+		item_inventory[index] = 0;
 	}
 
 	public void set_controllable(bool toggle) {
