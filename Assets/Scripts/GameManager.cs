@@ -394,21 +394,6 @@ public class GameManager : MonoBehaviour {
 		player.last_weapon_index = Player.WeaponIndex.none;
 
 		cleared_stage_count = 0;
-
-		caption_addtext(
-			"게임의 맵은 여러 개의 방으로 구성된 미로 형식입니다.",
-			$"미로는 총 {MazeGenerator.grid_width} × {MazeGenerator.grid_height} 크기이며,",
-			"사방에 North, South, West, East의 방향 별 게이트가 있습니다."
-		);
-		caption_addtext(
-			"미로는 무작위로 생성되고 각 방의 형태도 무작위로 생성됩니다.",
-			"미로에 있는 모든 적을 파괴하고 열쇠를 획득하세요."
-		);
-		caption_addtext(
-			"모든 적을 파괴하면 NPC가 생성되고,",
-			"상호작용을 통해 문을 열 수 있습니다.",
-			"문을 통해 다음 방으로 넘어가면 체력과 탄알이 초기화됩니다."
-		);
 	}
 
 	public string maze_direction(int x, int y) {

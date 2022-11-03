@@ -35,7 +35,16 @@ public class Caption : MonoBehaviour {
 					else {
 						type_time -= Time.unscaledDeltaTime;
 						if (type_time < 0) {
-							caption_tmpro.text += buffer_text[type_index];
+							char c;
+							c = buffer_text[type_index];
+							caption_tmpro.text += c;
+							if (c == '<') {
+								do {
+									type_index++;
+									c = buffer_text[type_index];
+									caption_tmpro.text += c;
+								} while (c != '>');
+							}
 							type_time += type_interval;
 							type_index++;
 						}

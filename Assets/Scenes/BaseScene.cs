@@ -27,6 +27,16 @@ public class BaseScene : MonoBehaviour {
 
 	List<Transform> floor_transform_lists = new List<Transform>();
 
+	MazeGenerator.direction_enum[] direction_enums;
+	string next_doors = "";
+
+	string[] door_colors = new string[] {
+		"ff7f9f",
+		"7f9fff",
+		"ff9f7f",
+		"9f7fff"
+	};
+
 	int enemy_count = 0;
 	SpriteObject npc_sprite_obj;
 
@@ -93,14 +103,14 @@ public class BaseScene : MonoBehaviour {
 		}
 
 		// 미로 방향에 따른 벽 뚫기
-		MazeGenerator.direction_enum[] direction_enums = (MazeGenerator.direction_enum[]) Enum.GetValues(typeof(MazeGenerator.direction_enum));
+		direction_enums = (MazeGenerator.direction_enum[]) Enum.GetValues(typeof(MazeGenerator.direction_enum));
 		
-		string temp_string = $"Current Pos = ({GameManager.instance.map_index_x}, {GameManager.instance.map_index_y}), Next Doors :";
 		for (int i = 0; i < 4; i++) {
 			bool temp = (node.dir & (int) direction_enums[i]) != 0;
 			if (temp) {
 				walls_transform.GetChild(i).gameObject.SetActive(false);
-				temp_string += $" {direction_enums[i]}";
+				next_doors += get_door_name(i);
+				if (i < 3) next_doors += ", ";
 			}
 		}
 
@@ -269,6 +279,32 @@ public class BaseScene : MonoBehaviour {
 
 	}
 
+	public void start_event() {
+		if (gm.cleared_stage_count == 0) {
+			string door_directions = "";
+
+			for (int i = 0; i < 4; i++) {
+				door_directions += get_door_name(i);
+				if (i < 3) door_directions += ", ";
+			}
+
+			gm.caption_addtext(
+				"게임의 맵은 여러 개의 방으로 구성된 미로 형식입니다.",
+				$"미로는 총 {gm.map_size_x} × {gm.map_size_y} 크기이며,",
+				$"사방에 {door_directions}의 방향 별 게이트가 있습니다."
+			);
+			gm.caption_addtext(
+				"미로는 무작위로 생성되고 각 방의 형태도 무작위로 생성됩니다.",
+				"미로에 있는 모든 <color=red>적</color>을 파괴하고 열쇠를 획득하세요."
+			);
+			gm.caption_addtext(
+				"모든 적을 파괴하면 <color=green>NPC</color>가 생성되고,",
+				"상호작용을 통해 문을 열 수 있습니다.",
+				"문을 통해 다음 방으로 넘어가면 체력과 탄알이 초기화됩니다."
+			);
+		}
+	}
+
 	// 다음 스테이지 이동 이벤트
 	public void next_stage_event(int temp) {
 		gm.next_dir = (MazeGenerator.direction_enum) temp;
@@ -280,6 +316,7 @@ public class BaseScene : MonoBehaviour {
 		if (player.has_key()) {
 			if (gm.is_last_stage()) {
 				gm.caption_addtext(
+					"<color=green>[Admin]</color>",
 					"미로를 클리어했습니다!"
 				);
 				gm.caption_addevent(
@@ -290,12 +327,23 @@ public class BaseScene : MonoBehaviour {
 				);
 			}
 			else {
+				gm.caption_addtext(
+					"<color=green>[Admin]</color>",
+					"다음 스테이지로 넘어가세요.",
+					$"{next_doors} 방향으로 건너갈 수 있습니다."
+				);
 				for (int i = 0; i < 4; i++) {
 					doors_transform.GetChild(i).GetComponent<Door>().open();
 				}
 				npc_sprite_obj.kill(true);
 				player.clear_item(Player.ItemIndex.key);
 			}
+		}
+		else {
+			gm.caption_addtext(
+				"<color=green>[Admin]</color>",
+				"<color=yellow>열쇠</color>가 없으니 열어줄 수 없습니다."
+			);
 		}
 	}
 
@@ -351,5 +399,12 @@ public class BaseScene : MonoBehaviour {
 		GameManager game_manager = GameManager.instance;
 		float result = (game_manager.cleared_stage_count + 1) / (game_manager.map_size_x * game_manager.map_size_y);
 		return result;
+	}
+
+	string get_door_name(int i) {
+		char[] door_name_cstr = direction_enums[i].ToString().ToCharArray();
+		door_name_cstr[0] = Char.ToUpper(door_name_cstr[0]);
+		string door_name = new string(door_name_cstr);
+		return $"<color=#{door_colors[i]}>{door_name}</color>";
 	}
 }
