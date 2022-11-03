@@ -872,4 +872,12 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 	}
+
+	public bool is_last_stage() {
+		return cleared_stage_count == ((map_size_x * map_size_y) - 1);
+	}
+
+	public void set_last_stage() {
+		next_level_name = "";
+	}
 }

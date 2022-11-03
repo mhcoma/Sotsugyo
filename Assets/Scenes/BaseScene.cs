@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class BaseScene : MonoBehaviour {
+	GameManager gm;
 
 	public Transform first_floors_transform;
 	public Transform second_floors_transform;
@@ -39,6 +40,8 @@ public class BaseScene : MonoBehaviour {
 	Player player;
 
 	void Start() {
+		gm = GameManager.instance;
+
 		MazeGenerator.GridNode node = GameManager.instance.get_current_node();
 
 		// 미로 데이터에 따라 층, 지붕 생성
@@ -266,19 +269,33 @@ public class BaseScene : MonoBehaviour {
 
 	}
 
+	// 다음 스테이지 이동 이벤트
 	public void next_stage_event(int temp) {
-		GameManager gm = GameManager.instance;
 		gm.next_dir = (MazeGenerator.direction_enum) temp;
 		gm.level_clear();
 	}
 
+	// NPC 상호작용 이벤트
 	public void npc_interact_event() {
 		if (player.has_key()) {
-			for (int i = 0; i < 4; i++) {
-				doors_transform.GetChild(i).GetComponent<Door>().open();
+			if (gm.is_last_stage()) {
+				gm.caption_addtext(
+					"미로를 클리어했습니다!"
+				);
+				gm.caption_addevent(
+					delegate {
+						gm.set_last_stage();
+						gm.level_clear();
+					}
+				);
 			}
-			npc_sprite_obj.kill(true);
-			player.get_item(Player.ItemIndex.key, -1);
+			else {
+				for (int i = 0; i < 4; i++) {
+					doors_transform.GetChild(i).GetComponent<Door>().open();
+				}
+				npc_sprite_obj.kill(true);
+				player.get_item(Player.ItemIndex.key, -1);
+			}
 		}
 	}
 
@@ -299,6 +316,7 @@ public class BaseScene : MonoBehaviour {
 		}
 	}
 
+	// 오브젝트 생성할 무작위 위치 선택
 	Vector3 get_random_pos_on_floor(Transform floor, bool type, bool randomize) {
 		Bounds bounds = floor.GetComponent<Renderer>().bounds;
 		Vector3 center = bounds.center;
@@ -328,6 +346,7 @@ public class BaseScene : MonoBehaviour {
 		return result;
 	}
 
+	// 난이도 결정
 	public float calculate_difficulty() {
 		GameManager game_manager = GameManager.instance;
 		float result = (game_manager.cleared_stage_count + 1) / (game_manager.map_size_x * game_manager.map_size_y);
