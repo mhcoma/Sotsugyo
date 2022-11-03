@@ -5,7 +5,7 @@ using UnityEngine;
 public class TutorialScene : MonoBehaviour {
 	GameManager gm;
 
-	bool is_worked_start_event;
+	bool is_already_worked_start_event;
 
 	void Start() {
 		gm = GameManager.instance;
@@ -16,7 +16,7 @@ public class TutorialScene : MonoBehaviour {
 	}
 
 	public void start_event() {
-		if (!is_worked_start_event) {
+		if (!is_already_worked_start_event) {
 			
 			gm.caption_addtext(
 				"환영합니다.",
@@ -36,7 +36,7 @@ public class TutorialScene : MonoBehaviour {
 				"아이템을 획득할 수 있습니다."
 			);
 
-			is_worked_start_event = true;
+			is_already_worked_start_event = true;
 		}
 	}
 
@@ -101,7 +101,6 @@ public class TutorialScene : MonoBehaviour {
 		);
 		gm.caption_addevent(
 			delegate {
-				gm.set_last_stage();
 				gm.level_clear();
 			}
 		);
