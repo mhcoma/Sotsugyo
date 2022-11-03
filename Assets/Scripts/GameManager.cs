@@ -483,7 +483,7 @@ public class GameManager : MonoBehaviour {
 		player.set_controllable(!temp_tot);
 
 		pause_menu_transform.gameObject.SetActive(!toggle);
-		player.hud_transform.gameObject.SetActive(toggle);
+		hud_transform.gameObject.SetActive(toggle);
 
 		if (caption_toggle) {
 			caption_transform.gameObject.SetActive(toggle);
