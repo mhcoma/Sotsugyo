@@ -589,14 +589,11 @@ public class Player : MonoBehaviour {
 	}
 
 	public Vector3 next_position(Vector3 launcher_pos, float projectile_speed) {
-
 		Vector3 next_pos = transform.position;
 		float distance = Vector3.Distance(next_pos, launcher_pos);
 		float time = 0.0f;
 		float collision_time = distance / projectile_speed;
-
 		int count = 0;
-
 		while ((time < collision_time) && count < 100) {
 			next_pos += rigid.velocity * Time.fixedDeltaTime;
 			distance = Vector3.Distance(next_pos, launcher_pos);
@@ -604,10 +601,8 @@ public class Player : MonoBehaviour {
 			collision_time = distance / projectile_speed;
 			count++;
 		}
-
 		next_pos.y = transform.position.y;
 		next_pos = Vector3.Lerp(next_pos, transform.position, Random.Range(0.0f, 0.5f));
-
 		return next_pos;
 	}
 

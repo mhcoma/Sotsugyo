@@ -46,7 +46,9 @@ public class MazeGenerator : MonoBehaviour {
 		{direction_enum.south, (int) direction_enum.north}
 	};
 
+	[NonSerialized]
 	public static int grid_width;
+	[NonSerialized]
 	public static int grid_height;
 	
 	public class GridNode {

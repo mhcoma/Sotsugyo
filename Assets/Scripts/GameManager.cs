@@ -58,6 +58,8 @@ public class GameManager : MonoBehaviour {
 		public int music_volume;
 	}
 
+	
+	[NonSerialized]
 	public const string sound_volume_file_path = "music.json";
 
 
@@ -90,6 +92,8 @@ public class GameManager : MonoBehaviour {
 	TextMeshProUGUI mouse_sensitivity_tmpro;
 	float temp_mouse_sensitivity = 0;
 	float mouse_sensitivity_scale = 2.0f;
+	
+	[NonSerialized]
 	public const string input_settings_file_path = "input.json";
 
 	public class InputSettings {
@@ -142,19 +146,29 @@ public class GameManager : MonoBehaviour {
 	bool is_main_menu = true;
 	string gameover_text = "GAME OVER";
 
+	
+	[NonSerialized]
 	public menu_state_enum menu_state = menu_state_enum.none;
 
-	public int map_size_x = 2;
-	public int map_size_y = 1;
+	public int map_size_x;
+	public int map_size_y;
+	
+	[NonSerialized]
 	public int map_index_x = 0;
+	
+	[NonSerialized]
 	public int map_index_y = 0;
 	string next_level_name = "";
 	bool is_cleared_stage = false;
 	bool is_maze_stage = false;
+	
+	[NonSerialized]
 	public int cleared_stage_count = 0;
 
 	[NonSerialized]
 	public MazeGenerator.direction_enum start_dir;
+	
+	[NonSerialized]
 	public MazeGenerator.direction_enum next_dir;
 
 
@@ -384,8 +398,9 @@ public class GameManager : MonoBehaviour {
 
 	public void start_maze() {
 		MazeGenerator.generate_grid(map_size_x, map_size_y);
-		map_index_x = MazeGenerator.grid_width - 1;
-		map_index_y = MazeGenerator.grid_height - 1;
+		map_index_x = map_size_x - 1;
+		map_index_y = map_size_y - 1;
+		Debug.Log(map_size_x);
 
 		start_level("Scenes/BaseScene");
 		next_level_name = "Scenes/BaseScene";
@@ -835,7 +850,11 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public MazeGenerator.GridNode get_current_node() {
-		return MazeGenerator.grid[map_index_y][map_index_x];
+		return get_node(map_index_x, map_index_y);
+	}
+
+	public MazeGenerator.GridNode get_node(int x, int y) {
+		return MazeGenerator.grid[y][x];
 	}
 
 	public void toggle_hud() {

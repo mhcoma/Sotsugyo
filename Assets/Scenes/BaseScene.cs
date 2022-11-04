@@ -29,6 +29,7 @@ public class BaseScene : MonoBehaviour {
 
 	MazeGenerator.direction_enum[] direction_enums;
 	string next_doors = "";
+	string next_cleared_doors = "";
 
 	string[] door_colors = new string[] {
 		"ff7f9f",
@@ -107,14 +108,39 @@ public class BaseScene : MonoBehaviour {
 		// 미로 방향에 따른 벽 뚫기
 		direction_enums = (MazeGenerator.direction_enum[]) Enum.GetValues(typeof(MazeGenerator.direction_enum));
 		
+		List<string> temp_doors = new List<string>();
+		List<string> temp_cleared_doors = new List<string>();
 		for (int i = 0; i < 4; i++) {
 			bool temp = (node.dir & (int) direction_enums[i]) != 0;
 			if (temp) {
 				walls_transform.GetChild(i).gameObject.SetActive(false);
-				next_doors += get_door_name(i);
-				if (i < 3) next_doors += ", ";
+
+				int temp_index_x = gm.map_index_x;
+				int temp_index_y = gm.map_index_y;
+
+				switch (direction_enums[i]) {
+					case MazeGenerator.direction_enum.north:
+						temp_index_y -= 1;
+						break;
+					case MazeGenerator.direction_enum.south:
+						temp_index_y += 1;
+						break;
+					case MazeGenerator.direction_enum.east:
+						temp_index_x += 1;
+						break;
+					case MazeGenerator.direction_enum.west:
+						temp_index_x -= 1;
+						break;
+				}
+
+				MazeGenerator.GridNode temp_node = gm.get_node(temp_index_x, temp_index_y);
+				if (temp_node.is_cleared) temp_cleared_doors.Add(get_door_name(i));
+				else temp_doors.Add(get_door_name(i));
 			}
 		}
+
+		next_doors = string.Join(", ", temp_doors);
+		next_cleared_doors = string.Join(", ", temp_cleared_doors);
 
 		// 층 생성에 따라 네비게이션 메시 링크 생성
 		for (int i = 0; i < navmeshlinks_lists.Count; i++) {
@@ -330,10 +356,13 @@ public class BaseScene : MonoBehaviour {
 				);
 			}
 			else {
+				string next_doors_text = next_doors.Equals("") ? "" : $"{next_doors} 방향으로 건너갈 수 있습니다.";
+				string next_cleared_doors_text = next_cleared_doors.Equals("") ? "" : $"{next_cleared_doors} 방향은 클리어했습니다.";
 				gm.caption_addtext(
 					"<color=#7fff3f>[Admin]</color>",
 					"다음 스테이지로 넘어가세요.",
-					$"{next_doors} 방향으로 건너갈 수 있습니다."
+					next_cleared_doors_text,
+					next_doors_text
 				);
 				for (int i = 0; i < 4; i++) {
 					doors_transform.GetChild(i).GetComponent<Door>().open();
@@ -400,7 +429,7 @@ public class BaseScene : MonoBehaviour {
 	// 난이도 결정
 	public float calculate_difficulty() {
 		GameManager game_manager = GameManager.instance;
-		float result = (game_manager.cleared_stage_count + 1) / (game_manager.map_size_x * game_manager.map_size_y);
+		float result = (game_manager.cleared_stage_count + 1.0f) / (game_manager.map_size_x * game_manager.map_size_y);
 		return result;
 	}
 
