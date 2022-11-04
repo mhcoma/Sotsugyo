@@ -13483,8 +13483,8 @@ MonoBehaviour:
   player_transform: {fileID: 1647823185}
   camera_holder_transform: {fileID: 1872402042}
   mixer: {fileID: 24100000, guid: 437c6d19cfb868a41915f64c5dcd2c6e, type: 2}
-  map_size_x: 5
-  map_size_y: 5
+  map_size_x: 3
+  map_size_y: 3
 --- !u!4 &1932148091
 Transform:
   m_ObjectHideFlags: 0
