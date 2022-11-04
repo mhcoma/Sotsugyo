@@ -217,7 +217,6 @@ public class BaseScene : MonoBehaviour {
 			int count;
 
 			float difficulty = calculate_difficulty();
-			Debug.Log(difficulty);
 
 			// 무기 탄약 생성
 			floor_transform_lists = MazeGenerator.shuffle(floor_transform_lists);

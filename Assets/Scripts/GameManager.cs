@@ -400,7 +400,6 @@ public class GameManager : MonoBehaviour {
 		MazeGenerator.generate_grid(map_size_x, map_size_y);
 		map_index_x = map_size_x - 1;
 		map_index_y = map_size_y - 1;
-		Debug.Log(map_size_x);
 
 		start_level("Scenes/BaseScene");
 		next_level_name = "Scenes/BaseScene";
