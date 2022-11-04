@@ -254,6 +254,9 @@ public class BaseScene : MonoBehaviour {
 					ai.primary_attack_damage *= Mathf.Lerp(0.25f, 1.0f, difficulty);
 					ai.secondary_attack_damage *= Mathf.Lerp(0.75f, 1.0f, difficulty);
 
+					NavMeshAgent agent = obj.GetComponent<NavMeshAgent>();
+					agent.speed *= Mathf.Lerp(0.75f, 1.0f, difficulty);
+
 					enemy_count++;
 				}
 				count++;
