@@ -159,7 +159,6 @@ public class MazeGenerator : MonoBehaviour {
 				(grid[ny][nx].dir == 0)
 			) {
 				grid[cy][cx].add_dir((int) dir);
-				if (grid[cy][cx].dir == 0) GameManager.instance.quit();
 				grid[ny][nx].add_dir(opposite[dir]);
 				carve(nx, ny);
 			}
