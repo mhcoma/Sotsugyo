@@ -62,6 +62,9 @@ public class GameManager : MonoBehaviour {
 	[NonSerialized]
 	public const string sound_volume_file_path = "music.json";
 
+	public AudioClip[] play_bgms;
+	public AudioClip tutorial_bgm;
+	public AudioClip main_bgm;
 
 	public struct ScreenRes {
 		public int width;

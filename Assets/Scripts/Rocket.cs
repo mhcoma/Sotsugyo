@@ -47,8 +47,8 @@ public class Rocket : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider other) {
-		
-		if (!ReferenceEquals(other.transform, null)) {
+		bool check_null = !ReferenceEquals(other.transform, null) && !ReferenceEquals(shooter.gameObject, null);
+		if (check_null) {
 			if (other.transform.gameObject == shooter.gameObject) {
 				return;
 			}
