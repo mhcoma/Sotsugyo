@@ -63,8 +63,12 @@ public class GameManager : MonoBehaviour {
 	public const string sound_volume_file_path = "music.json";
 
 	public AudioClip[] play_bgms;
+	int play_bgms_index = 0;
 	public AudioClip tutorial_bgm;
 	public AudioClip main_bgm;
+	public AudioClip gameover_bgm;
+	AudioSource asrc;
+	bool is_gameover_bgm_played = false;
 
 	public struct ScreenRes {
 		public int width;
@@ -148,6 +152,14 @@ public class GameManager : MonoBehaviour {
 	Transform next_level_button_transform;
 	bool is_main_menu = true;
 	string gameover_text = "GAME OVER";
+
+	public enum gameover_state_enum {
+		none,
+		gameover,
+		clear
+	}
+
+	gameover_state_enum gameover_state = gameover_state_enum.none;
 
 	
 	[NonSerialized]
@@ -238,6 +250,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Init() {
+		asrc = GetComponent<AudioSource>();
+
 		player = player_transform.GetComponent<Player>();
 
 		camera_transform = camera_holder_transform.Find("PlayerCamera");
@@ -389,6 +403,47 @@ public class GameManager : MonoBehaviour {
 				}
 				break;
 		}
+
+		switch (menu_state) {
+			case menu_state_enum.main_menu:
+			case menu_state_enum.main_play:
+			case menu_state_enum.main_option:
+			case menu_state_enum.main_input_option:
+			case menu_state_enum.main_input_key:
+				if (!asrc.isPlaying) {
+					asrc.clip = main_bgm;
+					asrc.Play();
+				}
+				break;
+			case menu_state_enum.playing:
+			case menu_state_enum.pause:
+			case menu_state_enum.option:
+			case menu_state_enum.input_option:
+			case menu_state_enum.input_key:
+				if (!asrc.isPlaying) {
+					if (is_maze_stage) {
+						play_bgms_index = (play_bgms_index + 1) % play_bgms.Length;
+						asrc.clip = play_bgms[play_bgms_index];
+					}
+					else {
+						asrc.clip = tutorial_bgm;
+					}
+					asrc.Play();
+				}
+				break;
+			case menu_state_enum.gameover:
+				if (!asrc.isPlaying && !is_gameover_bgm_played && gameover_state != gameover_state_enum.none) {
+					if (gameover_state == gameover_state_enum.gameover)
+						asrc.clip = gameover_bgm;
+					else
+						asrc.clip = main_bgm;
+					asrc.Play();
+					is_gameover_bgm_played = true;
+				}
+				break;
+			default:
+				break;
+		}
 	}
 
 	public void start_tutorial() {
@@ -523,6 +578,7 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	public void toggle_gameover(bool toggle) {
+		if (gameover_state != gameover_state_enum.none) asrc.Stop();
 		gameover_group_transform.gameObject.SetActive(toggle);
 		if (toggle) {
 			menu_state = menu_state_enum.gameover;
@@ -530,6 +586,7 @@ public class GameManager : MonoBehaviour {
 		}
 		else {
 			swap_clear_gameover(false);
+			is_gameover_bgm_played = false;
 		}
 	}
 
@@ -537,6 +594,15 @@ public class GameManager : MonoBehaviour {
 		bool is_exist_next_level = !next_level_name.Equals("");
 		next_level_button_transform.gameObject.SetActive(toggle && is_exist_next_level);
 		gameover_text = toggle ? "CLEAR" : "GAME OVER";
+		if (toggle) {
+			if (is_last_stage())
+				gameover_state = gameover_state_enum.clear;
+			else
+				gameover_state = gameover_state_enum.none;
+		}
+		else {
+			gameover_state = gameover_state_enum.gameover;
+		}
 	}
 
 	public void toggle_option(bool toggle) {
@@ -884,6 +950,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void set_last_stage() {
+		
 		next_level_name = "";
 	}
 }
