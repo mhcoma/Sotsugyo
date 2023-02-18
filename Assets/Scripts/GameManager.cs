@@ -452,6 +452,8 @@ public class GameManager : MonoBehaviour {
 		map_index_y = -1;
 		next_level_name = "";
 		player.last_weapon_index = Player.WeaponIndex.none;
+
+		asrc.Stop();
 	}
 
 	public void start_maze() {
@@ -466,6 +468,8 @@ public class GameManager : MonoBehaviour {
 		player.last_weapon_index = Player.WeaponIndex.none;
 
 		cleared_stage_count = 0;
+		
+		asrc.Stop();
 	}
 
 	public string maze_direction(int x, int y) {
@@ -649,6 +653,7 @@ public class GameManager : MonoBehaviour {
 
 	public void playing_to_main_menu() {
 		menu_state = menu_state_enum.main_menu;
+		asrc.Stop();
 	}
 
 	public void gameover() {
@@ -674,6 +679,7 @@ public class GameManager : MonoBehaviour {
 	public void pause_to_main_menu() {
 		toggle_pause(false);
 		toggle_main_menu(true);
+		asrc.Stop();
 	}
 
 	public void gameover_to_next_level() {
@@ -689,6 +695,7 @@ public class GameManager : MonoBehaviour {
 	public void gameover_to_main_menu() {
 		toggle_gameover(false);
 		toggle_main_menu(true);
+		asrc.Stop();
 	}
 
 	public void change_music_volume(float volume) {
