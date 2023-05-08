@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour {
 	Slider mouse_sensitivity_slider;
 	TextMeshProUGUI mouse_sensitivity_tmpro;
 	float temp_mouse_sensitivity = 0;
-	float mouse_sensitivity_scale = 2.0f;
+	float mouse_sensitivity_scale = 5.0f;
 	
 	[NonSerialized]
 	public const string input_settings_file_path = "input.json";

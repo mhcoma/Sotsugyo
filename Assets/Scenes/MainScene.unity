@@ -13487,10 +13487,10 @@ MonoBehaviour:
   play_bgms:
   - {fileID: 8300000, guid: 7d01f7b61193a0c4e831e4dbe148fa3d, type: 3}
   - {fileID: 8300000, guid: ff47235a96fed63488e0a566206c8735, type: 3}
-  tutorial_bgm: {fileID: 0}
+  tutorial_bgm: {fileID: 8300000, guid: ff47235a96fed63488e0a566206c8735, type: 3}
   main_bgm: {fileID: 0}
   gameover_bgm: {fileID: 8300000, guid: 8986f73f463c13a46b4292dd810950a9, type: 3}
-  map_size_x: 1
+  map_size_x: 2
   map_size_y: 2
 --- !u!4 &1932148091
 Transform:
@@ -13522,7 +13522,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
-  m_Pitch: 1.25
+  m_Pitch: 1
   Loop: 0
   Mute: 0
   Spatialize: 0
